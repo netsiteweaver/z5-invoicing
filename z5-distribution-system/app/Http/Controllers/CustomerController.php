@@ -60,19 +60,28 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'customer_type' => ['required', 'in:individual,business'],
-            'name' => ['required', 'string', 'max:255'],
+            'full_name' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255', 'unique:customers,email'],
             'phone_number' => ['nullable', 'string', 'max:50'],
             'company_name' => ['nullable', 'string', 'max:255'],
             'contact_person' => ['nullable', 'string', 'max:255'],
             'address' => ['nullable', 'string'],
             'city' => ['nullable', 'string', 'max:100'],
-            'state' => ['nullable', 'string', 'max:100'],
             'postal_code' => ['nullable', 'string', 'max:20'],
             'country' => ['nullable', 'string', 'max:100'],
-            'tax_number' => ['nullable', 'string', 'max:100'],
+            'brn' => ['nullable', 'string', 'max:100'],
+            'vat' => ['nullable', 'string', 'max:100'],
             'notes' => ['nullable', 'string'],
         ]);
+
+        // Conditional requirements
+        if ($validated['customer_type'] === 'business') {
+            // For business, company_name is the display name
+            $request->validate(['company_name' => ['required', 'string', 'max:255']]);
+        } else {
+            // For individual, full_name is required
+            $request->validate(['full_name' => ['required', 'string', 'max:255']]);
+        }
 
         $validated['created_by'] = auth()->id();
         $validated['status'] = 1;
@@ -110,19 +119,26 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'customer_type' => ['required', 'in:individual,business'],
-            'name' => ['required', 'string', 'max:255'],
+            'full_name' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255', Rule::unique('customers', 'email')->ignore($customer->id)],
             'phone_number' => ['nullable', 'string', 'max:50'],
             'company_name' => ['nullable', 'string', 'max:255'],
             'contact_person' => ['nullable', 'string', 'max:255'],
             'address' => ['nullable', 'string'],
             'city' => ['nullable', 'string', 'max:100'],
-            'state' => ['nullable', 'string', 'max:100'],
             'postal_code' => ['nullable', 'string', 'max:20'],
             'country' => ['nullable', 'string', 'max:100'],
-            'tax_number' => ['nullable', 'string', 'max:100'],
+            'brn' => ['nullable', 'string', 'max:100'],
+            'vat' => ['nullable', 'string', 'max:100'],
             'notes' => ['nullable', 'string'],
         ]);
+
+        // Conditional requirements
+        if ($validated['customer_type'] === 'business') {
+            $request->validate(['company_name' => ['required', 'string', 'max:255']]);
+        } else {
+            $request->validate(['full_name' => ['required', 'string', 'max:255']]);
+        }
 
         $validated['updated_by'] = auth()->id();
 

@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -83,6 +84,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('user-management/permissions/{permission}/toggle', [UserManagementController::class, 'togglePermissionStatus'])->name('user-management.permissions.toggle');
     Route::patch('user-management/roles/{role}/toggle', [UserManagementController::class, 'toggleRoleStatus'])->name('user-management.roles.toggle');
     
+    // Settings routes
+    Route::resource('settings', SettingsController::class)->except(['show', 'destroy']);
+    Route::get('settings/current', [SettingsController::class, 'getCurrent'])->name('settings.current');
+    Route::post('settings/{setting}/logo', [SettingsController::class, 'updateLogo'])->name('settings.logo');
     
     // Test routes (for development)
     Route::get('/test', function () {

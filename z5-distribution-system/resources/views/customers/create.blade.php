@@ -48,13 +48,13 @@
                 @enderror
             </div>
 
-            <!-- Name -->
+            <!-- Name / Full Name -->
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700">Name *</label>
-                <input type="text" name="name" id="name" value="{{ old('name') }}" 
+                <input type="text" name="full_name" id="full_name" value="{{ old('full_name') }}" 
                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('name') border-red-300 @enderror" 
                        placeholder="Enter customer name">
-                @error('name')
+                @error('full_name')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
@@ -75,7 +75,7 @@
                 <label for="phone_number" class="block text-sm font-medium text-gray-700">Phone Number</label>
                 <input type="text" name="phone_number" id="phone_number" value="{{ old('phone_number') }}" 
                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('phone_number') border-red-300 @enderror" 
-                       placeholder="+1 (555) 123-4567">
+                       placeholder="(230) 123-4567">
                 @error('phone_number')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -114,8 +114,8 @@
                 @enderror
             </div>
 
-            <!-- City, State, Postal Code -->
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <!-- City, Postal Code -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                     <label for="city" class="block text-sm font-medium text-gray-700">City</label>
                     <input type="text" name="city" id="city" value="{{ old('city') }}" 
@@ -127,18 +127,8 @@
                 </div>
                 
                 <div>
-                    <label for="state" class="block text-sm font-medium text-gray-700">State</label>
-                    <input type="text" name="state" id="state" value="{{ old('state') }}" 
-                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('state') border-red-300 @enderror" 
-                           placeholder="State">
-                    @error('state')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                
-                <div>
                     <label for="postal_code" class="block text-sm font-medium text-gray-700">Postal Code</label>
-                    <input type="text" name="postal_code" id="postal_code" value="{{ old('postal_code') }}" 
+                    <input type="text" name="postal_code" id="postal_code" value="{{ old('postal_code','99999') }}" 
                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('postal_code') border-red-300 @enderror" 
                            placeholder="12345">
                     @error('postal_code')
@@ -150,7 +140,7 @@
             <!-- Country -->
             <div>
                 <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
-                <input type="text" name="country" id="country" value="{{ old('country', 'Sri Lanka') }}" 
+                <input type="text" name="country" id="country" value="{{ old('country', 'Mauritius') }}" 
                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('country') border-red-300 @enderror" 
                        placeholder="Country">
                 @error('country')
@@ -158,13 +148,24 @@
                 @enderror
             </div>
 
-            <!-- Tax Number -->
+            <!-- BRN -->
             <div>
-                <label for="tax_number" class="block text-sm font-medium text-gray-700">Tax Number</label>
-                <input type="text" name="tax_number" id="tax_number" value="{{ old('tax_number') }}" 
-                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('tax_number') border-red-300 @enderror" 
-                       placeholder="Enter tax identification number">
-                @error('tax_number')
+                <label for="brn" class="block text-sm font-medium text-gray-700">BRN</label>
+                <input type="text" name="brn" id="brn" value="{{ old('brn') }}" 
+                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('brn') border-red-300 @enderror" 
+                       placeholder="Business Registration Number">
+                @error('brn')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- VAT Number (for business customers) -->
+            <div id="vat-field" style="display: none;">
+                <label for="vat" class="block text-sm font-medium text-gray-700">VAT Number</label>
+                <input type="text" name="vat" id="vat" value="{{ old('vat') }}" 
+                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('vat') border-red-300 @enderror" 
+                       placeholder="VAT Number">
+                @error('vat')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
@@ -198,11 +199,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const customerTypeRadios = document.querySelectorAll('input[name="customer_type"]');
     const companyField = document.getElementById('company-field');
     const contactPersonField = document.getElementById('contact-person-field');
+    const vatField = document.getElementById('vat-field');
     
     function toggleBusinessFields() {
         const isBusiness = document.querySelector('input[name="customer_type"]:checked')?.value === 'business';
         companyField.style.display = isBusiness ? 'block' : 'none';
         contactPersonField.style.display = isBusiness ? 'block' : 'none';
+        vatField.style.display = isBusiness ? 'block' : 'none';
     }
     
     customerTypeRadios.forEach(radio => {

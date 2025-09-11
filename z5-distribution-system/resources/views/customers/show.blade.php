@@ -96,10 +96,17 @@
                             </div>
                         @endif
                         
-                        @if($customer->tax_number)
+                        @if($customer->brn)
                             <div>
-                                <dt class="text-sm font-medium text-gray-500">Tax Number</dt>
-                                <dd class="mt-1 text-sm text-gray-900 font-mono">{{ $customer->tax_number }}</dd>
+                                <dt class="text-sm font-medium text-gray-500">BRN</dt>
+                                <dd class="mt-1 text-sm text-gray-900 font-mono">{{ $customer->brn }}</dd>
+                            </div>
+                        @endif
+
+                        @if($customer->customer_type === 'business' && $customer->vat)
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">VAT Number</dt>
+                                <dd class="mt-1 text-sm text-gray-900 font-mono">{{ $customer->vat }}</dd>
                             </div>
                         @endif
                         
@@ -110,11 +117,11 @@
                             </div>
                         @endif
                         
-                        @if($customer->city || $customer->state || $customer->postal_code)
+                        @if($customer->city || $customer->postal_code)
                             <div class="sm:col-span-2">
                                 <dt class="text-sm font-medium text-gray-500">Location</dt>
                                 <dd class="mt-1 text-sm text-gray-900">
-                                    {{ $customer->city }}{{ $customer->state ? ', ' . $customer->state : '' }}{{ $customer->postal_code ? ' ' . $customer->postal_code : '' }}{{ $customer->country ? ', ' . $customer->country : '' }}
+                                    {{ $customer->city }}{{ $customer->postal_code ? ' ' . $customer->postal_code : '' }}{{ $customer->country ? ', ' . $customer->country : '' }}
                                 </dd>
                             </div>
                         @endif
