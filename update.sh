@@ -54,25 +54,25 @@ if ! command_exists composer; then
 fi
 
 # Check if npm is installed
-if ! command_exists npm; then
-    print_error "npm is not installed. Please install Node.js and npm first."
-    exit 1
-fi
+# if ! command_exists npm; then
+#     print_error "npm is not installed. Please install Node.js and npm first."
+#     exit 1
+# fi
 
 # 1. Install/Update PHP Dependencies
-print_status "Installing/updating PHP dependencies..."
-composer install --no-dev --optimize-autoloader --no-interaction
-print_success "PHP dependencies updated"
+# print_status "Installing/updating PHP dependencies..."
+# composer install --no-dev --optimize-autoloader --no-interaction
+# print_success "PHP dependencies updated"
 
-# 2. Install/Update Node.js Dependencies
-print_status "Installing/updating Node.js dependencies..."
-npm install --production
-print_success "Node.js dependencies updated"
+# # 2. Install/Update Node.js Dependencies
+# print_status "Installing/updating Node.js dependencies..."
+# npm install --production
+# print_success "Node.js dependencies updated"
 
-# 3. Build Frontend Assets
-print_status "Building frontend assets..."
-npm run build
-print_success "Frontend assets built"
+# # 3. Build Frontend Assets
+# print_status "Building frontend assets..."
+# npm run build
+# print_success "Frontend assets built"
 
 # 4. Check if .env file exists
 if [ ! -f ".env" ]; then
