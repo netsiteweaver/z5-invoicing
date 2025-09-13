@@ -112,6 +112,9 @@ class User extends Authenticatable
         if (is_string($role)) {
             return $this->roles()->where('name', $role)->exists();
         }
+        if (is_numeric($role)) {
+            return $this->roles()->where('role_id', (int) $role)->exists();
+        }
         
         return $this->roles()->where('role_id', $role->id)->exists();
     }
@@ -165,9 +168,11 @@ class User extends Authenticatable
     {
         if (is_string($role)) {
             $role = Role::where('name', $role)->first();
+        } elseif (is_numeric($role)) {
+            $role = Role::find((int) $role);
         }
 
-        if ($role && !$this->hasRole($role)) {
+        if ($role && !$this->hasRole($role->id)) {
             $this->roles()->attach($role->id);
         }
 
@@ -178,6 +183,8 @@ class User extends Authenticatable
     {
         if (is_string($role)) {
             $role = Role::where('name', $role)->first();
+        } elseif (is_numeric($role)) {
+            $role = Role::find((int) $role);
         }
 
         if ($role) {
@@ -189,12 +196,23 @@ class User extends Authenticatable
 
     public function syncRoles($roles)
     {
-        $roleIds = collect($roles)->map(function ($role) {
-            if (is_string($role)) {
-                $role = Role::where('name', $role)->first();
-            }
-            return $role ? $role->id : null;
-        })->filter()->toArray();
+        $roleIds = collect($roles)
+            ->map(function ($role) {
+                if (is_numeric($role)) {
+                    return (int) $role;
+                }
+                if (is_string($role)) {
+                    $model = Role::where('name', $role)->orWhere('id', $role)->first();
+                    return $model ? $model->id : null;
+                }
+                if ($role instanceof Role) {
+                    return $role->id;
+                }
+                return null;
+            })
+            ->filter()
+            ->unique()
+            ->toArray();
 
         $this->roles()->sync($roleIds);
         return $this;
