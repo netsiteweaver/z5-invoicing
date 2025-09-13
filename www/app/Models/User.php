@@ -41,16 +41,13 @@ class User extends Authenticatable
         'token',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'last_login' => 'datetime',
-            'token_valid_until' => 'datetime',
-            'status' => 'integer',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'last_login' => 'datetime',
+        'token_valid_until' => 'datetime',
+        'status' => 'integer',
+    ];
 
     protected static function boot()
     {
