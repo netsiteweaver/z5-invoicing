@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice {{ invoice.number }}</title>
+    <style>
+        :root { --text: #111827; --muted:#6b7280; --border:#e5e7eb; --bg:#ffffff; --accent:#111827; }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 24px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; color: var(--text); background: var(--bg); }
+        .invoice { max-width: 900px; margin: 0 auto; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #fff; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 28px 32px; border-bottom: 1px solid var(--border); }
+        .brand { display: flex; align-items: center; gap: 14px; }
+        .brand-mark { width: 44px; height: 44px; border-radius: 8px; background: #111827; color: #fff; display: grid; place-items: center; font-weight: 700; letter-spacing: 0.5px; }
+        .brand-name { font-size: 20px; font-weight: 700; }
+        .doc-title { text-align: right; }
+        .doc-title h1 { margin: 0; font-size: 28px; letter-spacing: 0.6px; }
+        .doc-title .muted { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+        .addresses { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px 32px; }
+        .section-title { font-weight: 600; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .address-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+        .address-card h3 { margin: 0 0 6px 0; font-size: 15px; }
+        .address-card p { margin: 2px 0; font-size: 13px; color: var(--text); }
+
+        .meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 0 32px 24px; }
+        .meta .item { border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+        .meta .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .meta .value { font-size: 14px; margin-top: 4px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        .items { padding: 0 32px 0; }
+        .items table thead th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 600; padding: 12px 10px; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px; }
+        .items table tbody td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+        .items table tbody tr:last-child td { border-bottom: none; }
+        .right { text-align: right; }
+        .muted { color: var(--muted); }
+
+        .totals { display: grid; grid-template-columns: 1fr 320px; gap: 24px; padding: 16px 32px 28px; align-items: start; }
+        .notes { font-size: 13px; color: var(--muted); }
+        .summary { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .summary-row { display: grid; grid-template-columns: 1fr auto; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+        .summary-row:last-child { border-bottom: none; background: #111827; color: #fff; font-weight: 700; }
+        .summary-label { font-size: 13px; }
+        .summary-value { font-size: 14px; }
+
+        .footer { padding: 20px 32px 28px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+        @media (max-width: 768px) {
+            .addresses { grid-template-columns: 1fr; }
+            .meta { grid-template-columns: 1fr; }
+            .totals { grid-template-columns: 1fr; }
+            .doc-title { text-align: left; }
+        }
+
+        @media print {
+            body { padding: 0; }
+            .invoice { border: none; border-radius: 0; }
+            .summary-row:last-child { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .footer { page-break-inside: avoid; }
+        }
+    </style>
+    {% if webfonts %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; } </style>
+    {% endif %}
+</head>
+<body>
+    <div class="invoice">
+        <div class="header">
+            <div class="brand">
+                <div class="brand-mark">{{ company.initials or 'CO' }}</div>
+                <div>
+                    <div class="brand-name">{{ company.name }}</div>
+                    <div class="muted">{{ company.tagline or company.email }}</div>
+                </div>
+            </div>
+            <div class="doc-title">
+                <h1>Invoice</h1>
+                <div class="muted">No. {{ invoice.number }} · {{ invoice.date }}</div>
+            </div>
+        </div>
+
+        <div class="addresses">
+            <div>
+                <div class="section-title">Billed To</div>
+                <div class="address-card">
+                    <h3>{{ client.name }}</h3>
+                    {% if client.attention %}<p>Attn: {{ client.attention }}</p>{% endif %}
+                    <p>{{ client.address.line1 }}</p>
+                    {% if client.address.line2 %}<p>{{ client.address.line2 }}</p>{% endif %}
+                    <p>{{ client.address.city }}, {{ client.address.state }} {{ client.address.postal }}</p>
+                    <p>{{ client.address.country }}</p>
+                    {% if client.email %}<p>{{ client.email }}</p>{% endif %}
+                </div>
+            </div>
+            <div>
+                <div class="section-title">From</div>
+                <div class="address-card">
+                    <h3>{{ company.name }}</h3>
+                    <p>{{ company.address.line1 }}</p>
+                    {% if company.address.line2 %}<p>{{ company.address.line2 }}</p>{% endif %}
+                    <p>{{ company.address.city }}, {{ company.address.state }} {{ company.address.postal }}</p>
+                    <p>{{ company.address.country }}</p>
+                    <p>{{ company.email }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="meta">
+            <div class="item">
+                <div class="label">Invoice Number</div>
+                <div class="value">{{ invoice.number }}</div>
+            </div>
+            <div class="item">
+                <div class="label">Issue Date</div>
+                <div class="value">{{ invoice.date }}</div>
+            </div>
+            <div class="item">
+                <div class="label">Due Date</div>
+                <div class="value">{{ invoice.due_date }}</div>
+            </div>
+        </div>
+
+        <div class="items">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 44%">Description</th>
+                        <th class="right" style="width: 12%">Qty</th>
+                        <th class="right" style="width: 22%">Unit Price</th>
+                        <th class="right" style="width: 22%">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>
+                            <div>{{ item.description }}</div>
+                            {% if item.note %}<div class="muted" style="font-size:12px; margin-top:4px;">{{ item.note }}</div>{% endif %}
+                        </td>
+                        <td class="right">{{ item.quantity }}</td>
+                        <td class="right">{{ currency.symbol }}{{ '%.2f' | format(item.unit_price) }}</td>
+                        <td class="right">{{ currency.symbol }}{{ '%.2f' | format(item.quantity * item.unit_price) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="totals">
+            <div class="notes">
+                {% if notes %}
+                <div class="section-title" style="margin-bottom:6px;">Notes</div>
+                <div>{{ notes }}</div>
+                {% endif %}
+
+                {% if terms %}
+                <div class="section-title" style="margin:16px 0 6px;">Terms</div>
+                <div>{{ terms }}</div>
+                {% endif %}
+            </div>
+            <div class="summary">
+                <div class="summary-row">
+                    <div class="summary-label">Subtotal</div>
+                    <div class="summary-value">{{ currency.symbol }}{{ '%.2f' | format(totals.subtotal) }}</div>
+                </div>
+                {% if totals.discount and totals.discount > 0 %}
+                <div class="summary-row">
+                    <div class="summary-label">Discount</div>
+                    <div class="summary-value">-{{ currency.symbol }}{{ '%.2f' | format(totals.discount) }}</div>
+                </div>
+                {% endif %}
+                {% if totals.tax and totals.tax > 0 %}
+                <div class="summary-row">
+                    <div class="summary-label">Tax</div>
+                    <div class="summary-value">{{ currency.symbol }}{{ '%.2f' | format(totals.tax) }}</div>
+                </div>
+                {% endif %}
+                {% if totals.shipping and totals.shipping > 0 %}
+                <div class="summary-row">
+                    <div class="summary-label">Shipping</div>
+                    <div class="summary-value">{{ currency.symbol }}{{ '%.2f' | format(totals.shipping) }}</div>
+                </div>
+                {% endif %}
+                <div class="summary-row">
+                    <div class="summary-label">Total</div>
+                    <div class="summary-value">{{ currency.symbol }}{{ '%.2f' | format(totals.total) }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>
+                {{ company.name }} · {{ company.email }} · {{ company.website or '' }}
+            </div>
+            {% if payment and payment.bank %}
+            <div>
+                <span class="muted">Bank:</span> {{ payment.bank.name }} · <span class="muted">IBAN:</span> {{ payment.bank.iban }} · <span class="muted">SWIFT:</span> {{ payment.bank.swift }}
+            </div>
+            {% elif payment and payment.notes %}
+            <div>{{ payment.notes }}</div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+

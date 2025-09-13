@@ -1,0 +1,74 @@
+{
+  "company": {
+    "initials": "AC",
+    "name": "Acme Incorporated",
+    "tagline": "Premium Widgets & Services",
+    "email": "billing@acme.example",
+    "website": "https://acme.example",
+    "address": {
+      "line1": "123 Market Street",
+      "line2": "Suite 500",
+      "city": "Metropolis",
+      "state": "CA",
+      "postal": "94107",
+      "country": "USA"
+    }
+  },
+  "client": {
+    "name": "Wayne Enterprises",
+    "attention": "Accounts Payable",
+    "email": "ap@wayneenterprises.example",
+    "address": {
+      "line1": "1007 Mountain Drive",
+      "line2": null,
+      "city": "Gotham",
+      "state": "NJ",
+      "postal": "07001",
+      "country": "USA"
+    }
+  },
+  "invoice": {
+    "number": "INV-2025-001",
+    "date": "2025-09-13",
+    "due_date": "2025-09-30"
+  },
+  "currency": {
+    "code": "USD",
+    "symbol": "$"
+  },
+  "items": [
+    {
+      "description": "Pro Subscription (Annual)",
+      "note": "Includes premium support and SLA",
+      "quantity": 1,
+      "unit_price": 199.0
+    },
+    {
+      "description": "Onsite Setup & Training",
+      "note": "8 hours total across two sessions",
+      "quantity": 8,
+      "unit_price": 125.0
+    },
+    {
+      "description": "Widget Model X (Box of 10)",
+      "note": null,
+      "quantity": 3,
+      "unit_price": 349.99
+    }
+  ],
+  "totals": {
+    "discount_percent": 0.05,
+    "shipping": 25.0,
+    "tax_rate": 0.0825
+  },
+  "notes": "Thank you for your business! If you have any questions about this invoice, please contact billing.",
+  "terms": "Payment due within 14 days. Late payments may be subject to a 1.5% monthly finance charge.",
+  "payment": {
+    "bank": {
+      "name": "Bank of Example",
+      "iban": "GB12BOFA12345678901234",
+      "swift": "BOFAUS3N"
+    }
+  },
+  "webfonts": true
+}
