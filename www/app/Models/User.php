@@ -121,6 +121,10 @@ class User extends Authenticatable
 
     public function hasPermission($permission)
     {
+        // Admins/Root users bypass granular permission checks
+        if ($this->is_admin || $this->is_root) {
+            return true;
+        }
         if (is_string($permission)) {
             $permission = Permission::where('name', $permission)->first();
         }
@@ -136,6 +140,9 @@ class User extends Authenticatable
 
     public function hasAnyPermission($permissions)
     {
+        if ($this->is_admin || $this->is_root) {
+            return true;
+        }
         foreach ($permissions as $permission) {
             if ($this->hasPermission($permission)) {
                 return true;
@@ -146,6 +153,9 @@ class User extends Authenticatable
 
     public function hasAllPermissions($permissions)
     {
+        if ($this->is_admin || $this->is_root) {
+            return true;
+        }
         foreach ($permissions as $permission) {
             if (!$this->hasPermission($permission)) {
                 return false;

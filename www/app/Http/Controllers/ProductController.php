@@ -12,6 +12,14 @@ use App\Http\Controllers\Concerns\HasBreadcrumbs;
 class ProductController extends Controller
 {
     use HasBreadcrumbs;
+    public function __construct()
+    {
+        $this->middleware(['auth', 'verified']);
+        $this->middleware('permission:products.view')->only(['index', 'show']);
+        $this->middleware('permission:products.create')->only(['create', 'store']);
+        $this->middleware('permission:products.edit')->only(['edit', 'update']);
+        $this->middleware('permission:products.delete')->only(['destroy']);
+    }
     /**
      * Display a listing of products.
      */

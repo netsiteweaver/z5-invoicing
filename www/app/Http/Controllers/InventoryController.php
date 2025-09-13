@@ -12,6 +12,17 @@ use App\Http\Controllers\Concerns\HasBreadcrumbs;
 
 class InventoryController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'verified']);
+        $this->middleware('permission:inventory.view')->only(['index', 'show', 'stockReport']);
+        $this->middleware('permission:inventory.create')->only(['create', 'store']);
+        $this->middleware('permission:inventory.edit')->only(['edit', 'update']);
+        $this->middleware('permission:inventory.delete')->only(['destroy']);
+        $this->middleware('permission:inventory.stock_movement')->only(['stockMovement']);
+        $this->middleware('permission:inventory.low_stock')->only(['lowStock']);
+        $this->middleware('permission:inventory.stock_report')->only(['stockReport']);
+    }
     use HasBreadcrumbs;
     public function index(Request $request)
     {

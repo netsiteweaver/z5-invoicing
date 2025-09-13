@@ -60,11 +60,34 @@ d a pre<!DOCTYPE html>
                 </a>
 
                 <!-- Customers -->
-                <a href="{{ route('customers.index') }}" 
-                   class="group flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('customers.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                    <i class="fas fa-users mr-3 h-5 w-5"></i>
-                    Customers
-                </a>
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.view'))
+                <div x-data="{ customersOpen: {{ request()->routeIs('customers.*') ? 'true' : 'false' }} }">
+                    <button @click="customersOpen = !customersOpen" 
+                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('customers.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                        <div class="flex items-center">
+                            <i class="fas fa-users mr-3 h-5 w-5"></i>
+                            Customers
+                        </div>
+                        <i class="fas fa-chevron-down transition-transform duration-200" :class="customersOpen ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="customersOpen" x-transition class="ml-6 mt-1 space-y-1">
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.view'))
+                        <a href="{{ route('customers.index') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('customers.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            All Customers
+                        </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.create'))
+                        <a href="{{ route('customers.create') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('customers.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Create Customer
+                        </a>
+                        @endif
+                    </div>
+                </div>
+                @endif
 
                 <!-- Products -->
                 <div x-data="{ productsOpen: {{ request()->routeIs('products.*') || request()->routeIs('product-categories.*') || request()->routeIs('product-brands.*') ? 'true' : 'false' }} }">
@@ -96,13 +119,37 @@ d a pre<!DOCTYPE html>
                 </div>
 
                 <!-- Orders -->
-                <a href="{{ route('orders.index') }}" 
-                   class="group flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('orders.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                    <i class="fas fa-shopping-cart mr-3 h-5 w-5"></i>
-                    Orders
-                </a>
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.view'))
+                <div x-data="{ ordersOpen: {{ request()->routeIs('orders.*') ? 'true' : 'false' }} }">
+                    <button @click="ordersOpen = !ordersOpen" 
+                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('orders.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                        <div class="flex items-center">
+                            <i class="fas fa-shopping-cart mr-3 h-5 w-5"></i>
+                            Orders
+                        </div>
+                        <i class="fas fa-chevron-down transition-transform duration-200" :class="ordersOpen ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="ordersOpen" x-transition class="ml-6 mt-1 space-y-1">
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.view'))
+                        <a href="{{ route('orders.index') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('orders.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            All Orders
+                        </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.create'))
+                        <a href="{{ route('orders.create') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('orders.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Create Order
+                        </a>
+                        @endif
+                    </div>
+                </div>
+                @endif
 
                 <!-- Sales -->
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('sales.view'))
                 <div x-data="{ salesOpen: {{ request()->routeIs('sales.*') ? 'true' : 'false' }} }">
                     <button @click="salesOpen = !salesOpen" 
                             class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('sales.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
@@ -113,18 +160,23 @@ d a pre<!DOCTYPE html>
                         <i class="fas fa-chevron-down transition-transform duration-200" :class="salesOpen ? 'rotate-180' : ''"></i>
                     </button>
                     <div x-show="salesOpen" x-transition class="ml-6 mt-1 space-y-1">
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('sales.view'))
                         <a href="{{ route('sales.index') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('sales.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             All Sales
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('sales.create'))
                         <a href="{{ route('sales.create') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('sales.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Create Sale
                         </a>
+                        @endif
                     </div>
                 </div>
+                @endif
 
                 <!-- Invoices -->
                 <div x-data="{ invoicesOpen: false }">
@@ -149,6 +201,7 @@ d a pre<!DOCTYPE html>
                 </div>
 
                 <!-- Inventory -->
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.view'))
                 <div x-data="{ inventoryOpen: {{ request()->routeIs('inventory.*') ? 'true' : 'false' }} }">
                     <button @click="inventoryOpen = !inventoryOpen" 
                             class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('inventory.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
@@ -159,23 +212,30 @@ d a pre<!DOCTYPE html>
                         <i class="fas fa-chevron-down transition-transform duration-200" :class="inventoryOpen ? 'rotate-180' : ''"></i>
                     </button>
                     <div x-show="inventoryOpen" x-transition class="ml-6 mt-1 space-y-1">
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.view'))
                         <a href="{{ route('inventory.index') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('inventory.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             All Inventory
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.low_stock'))
                         <a href="{{ route('inventory.low-stock') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('inventory.low-stock') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Low Stock Alert
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.stock_report'))
                         <a href="{{ route('inventory.stock-report') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('inventory.stock-report') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Stock Report
                         </a>
+                        @endif
                     </div>
                 </div>
+                @endif
 
                 <!-- User Management -->
                 <div x-data="{ userManagementOpen: {{ request()->routeIs('user-management.*') ? 'true' : 'false' }} }">
@@ -218,11 +278,13 @@ d a pre<!DOCTYPE html>
                 </div>
 
                 <!-- Settings -->
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('settings.view'))
                 <a href="{{ route('settings.index') }}" 
                    class="group flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('settings.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
                     <i class="fas fa-cogs mr-3 h-5 w-5"></i>
                     Settings
                 </a>
+                @endif
             </nav>
         </div>
 

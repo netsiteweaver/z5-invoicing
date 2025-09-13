@@ -74,10 +74,10 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
-                                        <a href="{{ route('user-management.roles.edit', $role) }}" class="text-blue-600 hover:text-blue-900">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
                                         @if(!$role->is_system)
+                                            <a href="{{ route('user-management.roles.edit', $role) }}" class="text-blue-600 hover:text-blue-900" title="Edit Role">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
                                             <form method="POST" action="{{ route('user-management.roles.toggle', $role) }}" class="inline">
                                                 @csrf
                                                 @method('PATCH')
@@ -88,10 +88,14 @@
                                             <form method="POST" action="{{ route('user-management.roles.destroy', $role) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this role?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900">
+                                                <button type="submit" class="text-red-600 hover:text-red-900" title="Delete Role">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
+                                        @else
+                                            <a href="{{ route('user-management.roles.show', $role) }}" class="text-gray-600 hover:text-gray-900" title="View Role">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
                                         @endif
                                     </div>
                                 </td>

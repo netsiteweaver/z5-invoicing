@@ -14,6 +14,25 @@ use App\Http\Controllers\Concerns\HasBreadcrumbs;
 class UserManagementController extends Controller
 {
     use HasBreadcrumbs;
+    public function __construct()
+    {
+        $this->middleware(['auth', 'verified']);
+        // Users
+        $this->middleware('permission:users.view')->only(['index', 'show', 'apiIndex', 'apiShow']);
+        $this->middleware('permission:users.create')->only(['create', 'store', 'apiStore']);
+        $this->middleware('permission:users.edit')->only(['edit', 'update', 'apiUpdate']);
+        $this->middleware('permission:users.delete')->only(['destroy', 'apiDestroy']);
+        
+        // Roles
+        $this->middleware('permission:roles.view')->only(['roles']);
+        $this->middleware('permission:roles.create')->only(['createRole', 'storeRole']);
+        $this->middleware('permission:roles.edit')->only(['editRole', 'updateRole', 'toggleRoleStatus']);
+        $this->middleware('permission:roles.delete')->only(['destroyRole']);
+        
+        // Permissions
+        $this->middleware('permission:permissions.view')->only(['permissions']);
+        $this->middleware('permission:permissions.manage')->only(['togglePermissionStatus']);
+    }
     public function index(Request $request)
     {
         $query = User::with('roles');
@@ -234,6 +253,14 @@ class UserManagementController extends Controller
         $rolePermissions = $role->permissions->pluck('id')->toArray();
 
         return view('user-management.edit-role', compact('role', 'permissions', 'rolePermissions'));
+    }
+
+    public function showRole(Role $role)
+    {
+        // View-only details for predefined/system roles or any role
+        $role->load(['permissions', 'users']);
+        $permissions = Permission::active()->orderBy('module')->orderBy('action')->get()->groupBy('module');
+        return view('user-management.show-role', compact('role', 'permissions'));
     }
 
     public function updateRole(Request $request, Role $role)

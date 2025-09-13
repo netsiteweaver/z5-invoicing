@@ -56,6 +56,12 @@ class PermissionSeeder extends Seeder
             ['name' => 'sales.edit', 'display_name' => 'Edit Sales', 'module' => 'sales', 'action' => 'edit'],
             ['name' => 'sales.delete', 'display_name' => 'Delete Sales', 'module' => 'sales', 'action' => 'delete'],
             
+            // Invoices
+            ['name' => 'invoices.view', 'display_name' => 'View Invoices', 'module' => 'invoices', 'action' => 'view'],
+            ['name' => 'invoices.create', 'display_name' => 'Create Invoices', 'module' => 'invoices', 'action' => 'create'],
+            ['name' => 'invoices.edit', 'display_name' => 'Edit Invoices', 'module' => 'invoices', 'action' => 'edit'],
+            ['name' => 'invoices.delete', 'display_name' => 'Delete Invoices', 'module' => 'invoices', 'action' => 'delete'],
+            
             // Inventory
             ['name' => 'inventory.view', 'display_name' => 'View Inventory', 'module' => 'inventory', 'action' => 'view'],
             ['name' => 'inventory.create', 'display_name' => 'Create Inventory', 'module' => 'inventory', 'action' => 'create'],
@@ -80,6 +86,10 @@ class PermissionSeeder extends Seeder
             // Permission Management
             ['name' => 'permissions.view', 'display_name' => 'View Permissions', 'module' => 'permissions', 'action' => 'view'],
             ['name' => 'permissions.manage', 'display_name' => 'Manage Permissions', 'module' => 'permissions', 'action' => 'manage'],
+            
+            // Settings
+            ['name' => 'settings.view', 'display_name' => 'View Settings', 'module' => 'settings', 'action' => 'view'],
+            ['name' => 'settings.update', 'display_name' => 'Update Settings', 'module' => 'settings', 'action' => 'update'],
             
             // Reports
             ['name' => 'reports.view', 'display_name' => 'View Reports', 'module' => 'reports', 'action' => 'view'],

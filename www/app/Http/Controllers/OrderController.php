@@ -15,6 +15,15 @@ use App\Http\Controllers\Concerns\HasBreadcrumbs;
 class OrderController extends Controller
 {
     use HasBreadcrumbs;
+    public function __construct()
+    {
+        $this->middleware(['auth', 'verified']);
+        $this->middleware('permission:orders.view')->only(['index', 'show']);
+        $this->middleware('permission:orders.create')->only(['create', 'store']);
+        $this->middleware('permission:orders.edit')->only(['edit', 'update']);
+        $this->middleware('permission:orders.delete')->only(['destroy']);
+        $this->middleware('permission:orders.convert_to_sale')->only(['convertToSale']);
+    }
     /**
      * Display a listing of orders.
      */

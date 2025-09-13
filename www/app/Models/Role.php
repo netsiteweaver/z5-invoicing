@@ -69,12 +69,18 @@ class Role extends Model
     // Permission management methods
     public function givePermissionTo($permission)
     {
-        if (is_string($permission)) {
-            $permission = Permission::where('name', $permission)->first();
+        if (is_numeric($permission)) {
+            $permissionId = (int) $permission;
+        } elseif (is_string($permission)) {
+            $permissionId = optional(Permission::where('name', $permission)->first())->id;
+        } elseif ($permission instanceof Permission) {
+            $permissionId = $permission->id;
+        } else {
+            $permissionId = null;
         }
 
-        if ($permission && !$this->hasPermissionTo($permission)) {
-            $this->permissions()->attach($permission->id);
+        if ($permissionId && !$this->permissions()->where('permission_id', $permissionId)->exists()) {
+            $this->permissions()->attach($permissionId);
         }
 
         return $this;
@@ -82,12 +88,18 @@ class Role extends Model
 
     public function revokePermissionTo($permission)
     {
-        if (is_string($permission)) {
-            $permission = Permission::where('name', $permission)->first();
+        if (is_numeric($permission)) {
+            $permissionId = (int) $permission;
+        } elseif (is_string($permission)) {
+            $permissionId = optional(Permission::where('name', $permission)->first())->id;
+        } elseif ($permission instanceof Permission) {
+            $permissionId = $permission->id;
+        } else {
+            $permissionId = null;
         }
 
-        if ($permission) {
-            $this->permissions()->detach($permission->id);
+        if ($permissionId) {
+            $this->permissions()->detach($permissionId);
         }
 
         return $this;
@@ -95,21 +107,33 @@ class Role extends Model
 
     public function hasPermissionTo($permission)
     {
-        if (is_string($permission)) {
-            $permission = Permission::where('name', $permission)->first();
+        if (is_numeric($permission)) {
+            $permissionId = (int) $permission;
+        } elseif (is_string($permission)) {
+            $permissionId = optional(Permission::where('name', $permission)->first())->id;
+        } elseif ($permission instanceof Permission) {
+            $permissionId = $permission->id;
+        } else {
+            $permissionId = null;
         }
 
-        return $permission ? $this->permissions()->where('permission_id', $permission->id)->exists() : false;
+        return $permissionId ? $this->permissions()->where('permission_id', $permissionId)->exists() : false;
     }
 
     public function syncPermissions($permissions)
     {
         $permissionIds = collect($permissions)->map(function ($permission) {
-            if (is_string($permission)) {
-                $permission = Permission::where('name', $permission)->first();
+            if (is_numeric($permission)) {
+                return (int) $permission;
             }
-            return $permission ? $permission->id : null;
-        })->filter()->toArray();
+            if (is_string($permission)) {
+                return optional(Permission::where('name', $permission)->first())->id;
+            }
+            if ($permission instanceof Permission) {
+                return $permission->id;
+            }
+            return null;
+        })->filter()->unique()->toArray();
 
         $this->permissions()->sync($permissionIds);
         return $this;

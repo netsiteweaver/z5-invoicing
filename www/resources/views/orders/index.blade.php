@@ -163,19 +163,21 @@
                                         <a href="{{ route('orders.show', $order) }}" class="text-blue-600 hover:text-blue-900">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        @if($order->canBeEdited())
+                                        @if($order->canBeEdited() && (auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.edit')))
                                             <a href="{{ route('orders.edit', $order) }}" class="text-yellow-600 hover:text-yellow-900">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <form method="POST" action="{{ route('orders.destroy', $order) }}" onsubmit="return confirm('Delete this order? This is a soft delete and can\'t be undone.');" style="display:inline">
                                                 @csrf
                                                 @method('DELETE')
+                                                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.delete'))
                                                 <button type="submit" class="text-red-600 hover:text-red-900">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
+                                                @endif
                                             </form>
                                         @endif
-                                        @if($order->order_status === 'confirmed' && ($order->sales_count ?? 0) === 0)
+                                        @if($order->order_status === 'confirmed' && ($order->sales_count ?? 0) === 0 && (auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.convert_to_sale')))
                                             <a href="{{ route('orders.convert-to-sale', $order) }}" class="text-green-600 hover:text-green-900" title="Convert to Sale">
                                                 <i class="fas fa-check"></i>
                                             </a>

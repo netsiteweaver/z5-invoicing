@@ -18,6 +18,14 @@ use App\Http\Controllers\Concerns\HasBreadcrumbs;
 class SaleController extends Controller
 {
     use HasBreadcrumbs;
+    public function __construct()
+    {
+        $this->middleware(['auth', 'verified']);
+        $this->middleware('permission:sales.view')->only(['index', 'show']);
+        $this->middleware('permission:sales.create')->only(['create', 'store', 'convertFromOrder']);
+        $this->middleware('permission:sales.edit')->only(['edit', 'update']);
+        $this->middleware('permission:sales.delete')->only(['destroy']);
+    }
     public function index(Request $request)
     {
         $query = Sale::with(['customer', 'items.product']);

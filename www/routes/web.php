@@ -24,6 +24,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Prevent route parameter conflicts: enforce numeric IDs for user management
+Route::pattern('user_management', '[0-9]+');
+Route::pattern('role', '[0-9]+');
+
 Route::get('/', function () {
     return redirect()->route('login');
 });
@@ -71,18 +75,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('inventory/low-stock', [InventoryController::class, 'lowStock'])->name('inventory.low-stock');
     Route::get('inventory/stock-report', [InventoryController::class, 'stockReport'])->name('inventory.stock-report');
     
-    // User Management routes
-    Route::resource('user-management', UserManagementController::class)->except(['destroy']);
-    Route::delete('user-management/{user_management}', [UserManagementController::class, 'destroy'])->name('user-management.destroy');
+    // User Management routes (specific first to avoid conflict with resource catch-all)
     Route::get('user-management/roles', [UserManagementController::class, 'roles'])->name('user-management.roles');
     Route::get('user-management/roles/create', [UserManagementController::class, 'createRole'])->name('user-management.roles.create');
     Route::post('user-management/roles', [UserManagementController::class, 'storeRole'])->name('user-management.roles.store');
+    Route::get('user-management/roles/{role}', [UserManagementController::class, 'showRole'])->name('user-management.roles.show');
     Route::get('user-management/roles/{role}/edit', [UserManagementController::class, 'editRole'])->name('user-management.roles.edit');
     Route::put('user-management/roles/{role}', [UserManagementController::class, 'updateRole'])->name('user-management.roles.update');
     Route::delete('user-management/roles/{role}', [UserManagementController::class, 'destroyRole'])->name('user-management.roles.destroy');
+    Route::patch('user-management/roles/{role}/toggle', [UserManagementController::class, 'toggleRoleStatus'])->name('user-management.roles.toggle');
     Route::get('user-management/permissions', [UserManagementController::class, 'permissions'])->name('user-management.permissions');
     Route::patch('user-management/permissions/{permission}/toggle', [UserManagementController::class, 'togglePermissionStatus'])->name('user-management.permissions.toggle');
-    Route::patch('user-management/roles/{role}/toggle', [UserManagementController::class, 'toggleRoleStatus'])->name('user-management.roles.toggle');
+    Route::resource('user-management', UserManagementController::class)->except(['destroy']);
+    Route::delete('user-management/{user_management}', [UserManagementController::class, 'destroy'])->name('user-management.destroy');
     
     // Settings routes
     Route::resource('settings', SettingsController::class)->except(['show', 'destroy']);
