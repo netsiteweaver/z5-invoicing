@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             InitialDataSeeder::class,
             CompanySettingsSeeder::class,
+            ParamsSeeder::class,
         ]);
     }
 }

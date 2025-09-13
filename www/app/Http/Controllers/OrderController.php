@@ -20,7 +20,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Order::with(['customer', 'items.product', 'createdBy']);
+        $query = Order::with(['customer', 'items.product', 'createdBy'])->withCount('sales');
 
         // Search functionality
         if ($request->filled('search')) {
@@ -99,19 +99,35 @@ class OrderController extends Controller
         // Calculate totals
         $subtotal = 0;
         $totalDiscount = 0;
+        $totalTax = 0;
         
         foreach ($validated['items'] as $item) {
             $lineTotal = $item['quantity'] * $item['unit_price'];
             $discountAmount = $lineTotal * ($item['discount_percent'] ?? 0) / 100;
             $subtotal += $lineTotal;
             $totalDiscount += $discountAmount;
+            $product = Product::find($item['product_id']);
+            $taxType = $product?->tax_type ?? 'standard';
+            $taxPercent = match ($taxType) {
+                'standard' => 15,
+                'zero' => 0,
+                'exempt' => 0,
+                default => 0,
+            };
+            $taxAmount = ($lineTotal - $discountAmount) * ($taxPercent / 100);
+            $totalTax += $taxAmount;
         }
 
         $validated['subtotal'] = $subtotal;
         $validated['discount_amount'] = $totalDiscount;
-        $validated['total_amount'] = $subtotal - $totalDiscount;
+        $validated['tax_amount'] = $totalTax;
+        $validated['total_amount'] = $subtotal - $totalDiscount + $totalTax;
         $validated['created_by'] = auth()->id();
         $validated['status'] = 1;
+
+        if (empty($validated['delivery_date'])) {
+            $validated['delivery_date'] = $validated['order_date'];
+        }
 
         $order = Order::create($validated);
 
@@ -119,6 +135,15 @@ class OrderController extends Controller
         foreach ($validated['items'] as $item) {
             $lineTotal = $item['quantity'] * $item['unit_price'];
             $discountAmount = $lineTotal * ($item['discount_percent'] ?? 0) / 100;
+            $product = Product::find($item['product_id']);
+            $taxType = $product?->tax_type ?? 'standard';
+            $taxPercent = match ($taxType) {
+                'standard' => 15,
+                'zero' => 0,
+                'exempt' => 0,
+                default => 0,
+            };
+            $taxAmount = ($lineTotal - $discountAmount) * ($taxPercent / 100);
             
             $order->items()->create([
                 'product_id' => $item['product_id'],
@@ -126,7 +151,10 @@ class OrderController extends Controller
                 'unit_price' => $item['unit_price'],
                 'discount_percent' => $item['discount_percent'] ?? 0,
                 'discount_amount' => $discountAmount,
-                'line_total' => $lineTotal - $discountAmount,
+                'tax_type' => $taxType,
+                'tax_percent' => $taxPercent,
+                'tax_amount' => $taxAmount,
+                'line_total' => $lineTotal - $discountAmount + $taxAmount,
                 'created_by' => auth()->id(),
                 'status' => 1,
             ]);
@@ -141,7 +169,7 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        $order->load(['customer', 'items.product', 'createdBy', 'updatedBy']);
+        $order->load(['customer', 'items.product', 'createdBy', 'updatedBy'])->loadCount('sales');
         
         $breadcrumbs = $this->setBreadcrumbs('orders.show', ['order' => $order]);
         
@@ -157,6 +185,9 @@ class OrderController extends Controller
             return redirect()->route('orders.show', $order)
                 ->with('error', 'This order cannot be edited in its current status.');
         }
+
+        // Ensure product relation is available for VAT type defaults in the view
+        $order->load(['items.product']);
 
         $customers = Customer::active()->ordered()->get();
         $products = Product::active()->with(['category', 'brand', 'inventory'])->get();
@@ -191,17 +222,29 @@ class OrderController extends Controller
         // Calculate totals
         $subtotal = 0;
         $totalDiscount = 0;
+        $totalTax = 0;
         
         foreach ($validated['items'] as $item) {
             $lineTotal = $item['quantity'] * $item['unit_price'];
             $discountAmount = $lineTotal * ($item['discount_percent'] ?? 0) / 100;
             $subtotal += $lineTotal;
             $totalDiscount += $discountAmount;
+            $product = Product::find($item['product_id']);
+            $taxType = $product?->tax_type ?? 'standard';
+            $taxPercent = match ($taxType) {
+                'standard' => 15,
+                'zero' => 0,
+                'exempt' => 0,
+                default => 0,
+            };
+            $taxAmount = ($lineTotal - $discountAmount) * ($taxPercent / 100);
+            $totalTax += $taxAmount;
         }
 
         $validated['subtotal'] = $subtotal;
         $validated['discount_amount'] = $totalDiscount;
-        $validated['total_amount'] = $subtotal - $totalDiscount;
+        $validated['tax_amount'] = $totalTax;
+        $validated['total_amount'] = $subtotal - $totalDiscount + $totalTax;
         $validated['updated_by'] = auth()->id();
 
         $order->update($validated);
@@ -211,6 +254,15 @@ class OrderController extends Controller
         foreach ($validated['items'] as $item) {
             $lineTotal = $item['quantity'] * $item['unit_price'];
             $discountAmount = $lineTotal * ($item['discount_percent'] ?? 0) / 100;
+            $product = Product::find($item['product_id']);
+            $taxType = $product?->tax_type ?? 'standard';
+            $taxPercent = match ($taxType) {
+                'standard' => 15,
+                'zero' => 0,
+                'exempt' => 0,
+                default => 0,
+            };
+            $taxAmount = ($lineTotal - $discountAmount) * ($taxPercent / 100);
             
             $order->items()->create([
                 'product_id' => $item['product_id'],
@@ -218,7 +270,10 @@ class OrderController extends Controller
                 'unit_price' => $item['unit_price'],
                 'discount_percent' => $item['discount_percent'] ?? 0,
                 'discount_amount' => $discountAmount,
-                'line_total' => $lineTotal - $discountAmount,
+                'tax_type' => $taxType,
+                'tax_percent' => $taxPercent,
+                'tax_amount' => $taxAmount,
+                'line_total' => $lineTotal - $discountAmount + $taxAmount,
                 'created_by' => auth()->id(),
                 'status' => 1,
             ]);
@@ -254,14 +309,25 @@ class OrderController extends Controller
                 ->with('error', 'Only confirmed orders can be converted to sales.');
         }
 
+        // Ensure items are loaded
+        $order->load(['items']);
+
         DB::beginTransaction();
         try {
+            // Prevent double conversion
+            if (\App\Models\Sale::where('order_id', $order->id)->exists()) {
+                DB::rollBack();
+                return redirect()->route('orders.show', $order)
+                    ->with('error', 'This order has already been converted to a sale.');
+            }
             // Create sale from order
             $sale = \App\Models\Sale::create([
+                'order_id' => $order->id,
                 'customer_id' => $order->customer_id,
                 'sale_date' => now(),
-                'due_date' => $order->delivery_date,
+                'delivery_date' => $order->delivery_date,
                 'subtotal' => $order->subtotal,
+                'tax_amount' => $order->tax_amount,
                 'discount_amount' => $order->discount_amount,
                 'total_amount' => $order->total_amount,
                 'notes' => "Converted from Order #{$order->order_number}",
@@ -274,11 +340,14 @@ class OrderController extends Controller
             foreach ($order->items as $orderItem) {
                 \App\Models\SaleItem::create([
                     'sale_id' => $sale->id,
+                    'order_item_id' => $orderItem->id,
                     'product_id' => $orderItem->product_id,
                     'quantity' => $orderItem->quantity,
                     'unit_price' => $orderItem->unit_price,
-                    'discount_percent' => $orderItem->discount_percent,
-                    'discount_amount' => $orderItem->discount_amount,
+                    'discount_percent' => $orderItem->discount_percent ?? 0,
+                    'discount_amount' => $orderItem->discount_amount ?? 0,
+                    'tax_percent' => $orderItem->tax_percent ?? 0,
+                    'tax_amount' => $orderItem->tax_amount ?? 0,
                     'line_total' => $orderItem->line_total,
                     'status' => 1,
                 ]);
@@ -287,17 +356,17 @@ class OrderController extends Controller
                 $this->updateInventory($orderItem->product_id, $orderItem->quantity, 'out', $sale->id, 'sale_from_order');
             }
 
-            // Update order status
-            $order->update(['order_status' => 'converted']);
+            // Keep status as confirmed (DB enum doesn't include 'converted')
+            $order->update(['order_status' => 'confirmed']);
 
             DB::commit();
 
             return redirect()->route('sales.show', $sale)
                 ->with('success', 'Order converted to sale successfully.');
-        } catch (\Exception $e) {
-            DB::rollback();
+        } catch (\Throwable $e) {
+            DB::rollBack();
             return redirect()->route('orders.show', $order)
-                ->with('error', 'Failed to convert order to sale. Please try again.');
+                ->with('error', 'Failed to convert order to sale: ' . $e->getMessage());
         }
     }
 
@@ -318,7 +387,8 @@ class OrderController extends Controller
 
             // Create stock movement
             \App\Models\StockMovement::create([
-                'inventory_id' => $inventory->id,
+                'product_id' => $inventory->product_id,
+                'department_id' => $inventory->department_id,
                 'movement_type' => $movementType,
                 'quantity' => $quantity,
                 'reference_type' => 'sale',

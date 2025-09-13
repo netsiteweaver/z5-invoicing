@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class Sale extends Model
 {
@@ -60,7 +61,29 @@ class Sale extends Model
                 $model->uuid = Str::uuid();
             }
             if (empty($model->sale_number)) {
-                $model->sale_number = 'SALE-' . strtoupper(Str::random(8));
+                // Generate sequential sale number via params
+                $prefix = \App\Models\Param::getValue('sales.prefix', 'SAL-');
+                $padding = (int) (\App\Models\Param::getValue('sales.padding', '6'));
+                // Ensure the counter keeps up with any existing numbers with same prefix
+                $maxExisting = DB::table('sales')
+                    ->select('sale_number')
+                    ->whereNotNull('sale_number')
+                    ->where('sale_number', 'like', $prefix.'%')
+                    ->orderByDesc('id')
+                    ->value('sale_number');
+                if ($maxExisting) {
+                    $numeric = (int) preg_replace('/\D+/', '', substr($maxExisting, strlen($prefix)));
+                    $current = (int) ((\App\Models\Param::getValue('sales.last_number', '0')) ?? '0');
+                    if ($numeric > $current) {
+                        \App\Models\Param::setValue('sales.last_number', (string) $numeric);
+                    }
+                }
+                // Generate a unique next number
+                do {
+                    $next = \App\Models\Param::incrementAndGet('sales.last_number', 0);
+                    $candidate = $prefix . str_pad((string) $next, $padding, '0', STR_PAD_LEFT);
+                } while (DB::table('sales')->where('sale_number', $candidate)->exists());
+                $model->sale_number = $candidate;
             }
         });
     }
@@ -87,6 +110,12 @@ class Sale extends Model
     }
 
     public function items(): HasMany
+    {
+        return $this->hasMany(SaleItem::class);
+    }
+
+    // Alias for controllers/views referencing $sale->saleItems
+    public function saleItems(): HasMany
     {
         return $this->hasMany(SaleItem::class);
     }

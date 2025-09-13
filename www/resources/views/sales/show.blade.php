@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Order Details')
+@section('title', 'Sale Details')
 
 @section('content')
 <div class="space-y-6">
@@ -28,55 +28,34 @@
             </div>
         </div>
     @endif
+
     <!-- Header -->
     <div class="flex justify-between items-center">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Order Details</h1>
-            <p class="mt-1 text-sm text-gray-500">Order #{{ $order->order_number }}</p>
+            <h1 class="text-2xl font-bold text-gray-900">Sale Details</h1>
+            <p class="mt-1 text-sm text-gray-500">Sale #{{ $sale->sale_number }}</p>
         </div>
         <div class="flex space-x-3">
-            @if($order->canBeEdited())
-                <a href="{{ route('orders.edit', $order) }}" 
+            @if($sale->canBeEdited())
+                <a href="{{ route('sales.edit', $sale) }}" 
                    class="inline-flex items-center h-10 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
-                    Edit Order
+                    Edit Sale
                 </a>
             @endif
-            @if($order->canBeEdited())
-                <form method="POST" action="{{ route('orders.destroy', $order) }}" onsubmit="return confirm('Delete this order? This is a soft delete and can\'t be undone.');" style="display: inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" 
-                            class="inline-flex items-center h-10 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
-                        </svg>
-                        Delete Order
-                    </button>
-                </form>
-            @endif
-            @if($order->order_status === 'confirmed' && ($order->sales_count ?? 0) === 0)
-                <a href="{{ route('orders.convert-to-sale', $order) }}"
-                   class="inline-flex items-center h-10 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" pointer-events="none">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Convert to Sale
-                </a>
-            @endif
-            <a href="{{ route('orders.index') }}" 
+            <a href="{{ route('sales.index') }}" 
                class="inline-flex items-center h-10 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Back to Orders
+                Back to Sales
             </a>
         </div>
     </div>
 
-    <!-- Order Status Cards -->
+    <!-- Sale Status Cards -->
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="p-5">
@@ -88,18 +67,16 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Order Status</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Sale Status</dt>
                             <dd class="text-lg font-medium text-gray-900">
                                 <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                    @if($order->order_status === 'draft') bg-gray-100 text-gray-800
-                                    @elseif($order->order_status === 'pending') bg-yellow-100 text-yellow-800
-                                    @elseif($order->order_status === 'confirmed') bg-blue-100 text-blue-800
-                                    @elseif($order->order_status === 'processing') bg-purple-100 text-purple-800
-                                    @elseif($order->order_status === 'shipped') bg-indigo-100 text-indigo-800
-                                    @elseif($order->order_status === 'delivered') bg-green-100 text-green-800
-                                    @elseif($order->order_status === 'cancelled') bg-red-100 text-red-800
+                                    @if($sale->status === 'draft') bg-gray-100 text-gray-800
+                                    @elseif($sale->status === 'confirmed') bg-blue-100 text-blue-800
+                                    @elseif($sale->status === 'shipped') bg-indigo-100 text-indigo-800
+                                    @elseif($sale->status === 'delivered') bg-green-100 text-green-800
+                                    @elseif($sale->status === 'cancelled') bg-red-100 text-red-800
                                     @endif">
-                                    {{ ucfirst($order->order_status) }}
+                                    {{ ucfirst($sale->status) }}
                                 </span>
                             </dd>
                         </dl>
@@ -121,12 +98,12 @@
                             <dt class="text-sm font-medium text-gray-500 truncate">Payment Status</dt>
                             <dd class="text-lg font-medium text-gray-900">
                                 <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                    @if($order->payment_status === 'pending') bg-yellow-100 text-yellow-800
-                                    @elseif($order->payment_status === 'partial') bg-blue-100 text-blue-800
-                                    @elseif($order->payment_status === 'paid') bg-green-100 text-green-800
-                                    @elseif($order->payment_status === 'overdue') bg-red-100 text-red-800
+                                    @if($sale->payment_status === 'pending') bg-yellow-100 text-yellow-800
+                                    @elseif($sale->payment_status === 'partial') bg-blue-100 text-blue-800
+                                    @elseif($sale->payment_status === 'paid') bg-green-100 text-green-800
+                                    @elseif($sale->payment_status === 'overdue') bg-red-100 text-red-800
                                     @endif">
-                                    {{ ucfirst($order->payment_status) }}
+                                    {{ ucfirst($sale->payment_status) }}
                                 </span>
                             </dd>
                         </dl>
@@ -146,7 +123,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Total Amount</dt>
-                            <dd class="text-lg font-medium text-gray-900">Rs {{ number_format($order->total_amount, 2) }}</dd>
+                            <dd class="text-lg font-medium text-gray-900">Rs {{ number_format($sale->total_amount, 2) }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -164,7 +141,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Items</dt>
-                            <dd class="text-lg font-medium text-gray-900">{{ $order->items->count() }} products</dd>
+                            <dd class="text-lg font-medium text-gray-900">{{ $sale->items->count() }} products</dd>
                         </dl>
                     </div>
                 </div>
@@ -173,59 +150,51 @@
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <!-- Order Information -->
+        <!-- Sale Information -->
         <div class="bg-white shadow rounded-lg p-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Order Information</h3>
-            
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Sale Information</h3>
             <dl class="space-y-3">
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Order Number</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $order->order_number }}</dd>
+                    <dt class="text-sm font-medium text-gray-500">Sale Number</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $sale->sale_number }}</dd>
                 </div>
-                
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Customer</dt>
                     <dd class="mt-1 text-sm text-gray-900">
-                        <a href="{{ route('customers.show', $order->customer) }}" class="text-blue-600 hover:text-blue-900">
-                            {{ $order->customer->display_name }}
+                        <a href="{{ route('customers.show', $sale->customer) }}" class="text-blue-600 hover:text-blue-900">
+                            {{ $sale->customer->display_name }}
                         </a>
-                        <span class="ml-2 text-gray-500">({{ $order->customer->customer_type }})</span>
+                        <span class="ml-2 text-gray-500">({{ $sale->customer->customer_type }})</span>
                     </dd>
                 </div>
-                
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Order Date</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $order->order_date ? \Carbon\Carbon::parse($order->order_date)->format('M d, Y') : 'N/A' }}</dd>
+                    <dt class="text-sm font-medium text-gray-500">Sale Date</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $sale->sale_date ? \Carbon\Carbon::parse($sale->sale_date)->format('M d, Y') : 'N/A' }}</dd>
                 </div>
-                
-                @if($order->delivery_date)
+                @if($sale->due_date)
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Delivery Date</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ \Carbon\Carbon::parse($order->delivery_date)->format('M d, Y') }}</dd>
+                    <dt class="text-sm font-medium text-gray-500">Due Date</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ \Carbon\Carbon::parse($sale->due_date)->format('M d, Y') }}</dd>
                 </div>
                 @endif
-                
-                @if($order->notes)
+                @if($sale->notes)
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Notes</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $order->notes }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $sale->notes }}</dd>
                 </div>
                 @endif
-                
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Created By</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $order->createdBy->name ?? 'N/A' }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $sale->createdBy->name ?? 'N/A' }}</dd>
                 </div>
-                
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Created At</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $order->created_at->format('M d, Y H:i') }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $sale->created_at->format('M d, Y H:i') }}</dd>
                 </div>
-                
-                @if($order->updated_at && $order->updated_at != $order->created_at)
+                @if($sale->updated_at && $sale->updated_at != $sale->created_at)
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Last Updated</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $order->updated_at->format('M d, Y H:i') }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $sale->updated_at->format('M d, Y H:i') }}</dd>
                 </div>
                 @endif
             </dl>
@@ -234,62 +203,54 @@
         <!-- Customer Information -->
         <div class="bg-white shadow rounded-lg p-6">
             <h3 class="text-lg font-medium text-gray-900 mb-4">Customer Information</h3>
-            
             <dl class="space-y-3">
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Name</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $order->customer->display_name }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $sale->customer->display_name }}</dd>
                 </div>
-                
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Type</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ ucfirst($order->customer->customer_type) }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ ucfirst($sale->customer->customer_type) }}</dd>
                 </div>
-                
-                @if($order->customer->email)
+                @if($sale->customer->email)
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Email</dt>
                     <dd class="mt-1 text-sm text-gray-900">
-                        <a href="mailto:{{ $order->customer->email }}" class="text-blue-600 hover:text-blue-900">
-                            {{ $order->customer->email }}
+                        <a href="mailto:{{ $sale->customer->email }}" class="text-blue-600 hover:text-blue-900">
+                            {{ $sale->customer->email }}
                         </a>
                     </dd>
                 </div>
                 @endif
-                
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Phone</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $order->customer->primary_phone }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $sale->customer->primary_phone }}</dd>
                 </div>
-                
-                @if($order->customer->address)
+                @if($sale->customer->address)
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Address</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $order->customer->address }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $sale->customer->address }}</dd>
                 </div>
                 @endif
-                
-                @if($order->customer->city)
+                @if($sale->customer->city)
                 <div>
                     <dt class="text-sm font-medium text-gray-500">City</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $order->customer->city }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $sale->customer->city }}</dd>
                 </div>
                 @endif
             </dl>
         </div>
     </div>
 
-    <!-- Order Items -->
+    <!-- Sale Items -->
     <div class="bg-white shadow rounded-lg p-6">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Order Items</h3>
-        
-        @if($order->items->count() > 0)
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Sale Items</h3>
+        @if($sale->items->count() > 0)
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount</th>
@@ -297,23 +258,17 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach($order->items as $item)
+                        @foreach($sale->items as $item)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">{{ $item->product->name }}</div>
                                     <div class="text-sm text-gray-500">{{ $item->product->sku }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $item->product->category->name ?? 'N/A' }}</div>
-                                    @if($item->product->brand)
-                                        <div class="text-sm text-gray-500">{{ $item->product->brand->name }}</div>
-                                    @endif
-                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $item->quantity }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Rs {{ number_format($item->unit_price, 2) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    @if($item->discount_percentage > 0)
-                                        {{ $item->discount_percentage }}%
+                                    @if($item->discount_percent > 0)
+                                        {{ $item->discount_percent }}%
                                     @else
                                         -
                                     @endif
@@ -326,18 +281,18 @@
                     </tbody>
                     <tfoot class="bg-gray-50">
                         <tr>
-                            <td colspan="5" class="px-6 py-4 text-right text-sm font-medium text-gray-900">Subtotal:</td>
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900">Rs {{ number_format($order->subtotal, 2) }}</td>
+                            <td colspan="4" class="px-6 py-4 text-right text-sm font-medium text-gray-900">Subtotal:</td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">Rs {{ number_format($sale->subtotal, 2) }}</td>
                         </tr>
-                        @if($order->discount_amount > 0)
+                        @if($sale->discount_amount > 0)
                         <tr>
-                            <td colspan="5" class="px-6 py-4 text-right text-sm font-medium text-green-600">Total Discount:</td>
-                            <td class="px-6 py-4 text-sm font-medium text-green-600">-Rs {{ number_format($order->discount_amount, 2) }}</td>
+                            <td colspan="4" class="px-6 py-4 text-right text-sm font-medium text-green-600">Total Discount:</td>
+                            <td class="px-6 py-4 text-sm font-medium text-green-600">-Rs {{ number_format($sale->discount_amount, 2) }}</td>
                         </tr>
                         @endif
                         <tr class="border-t-2 border-gray-200">
-                            <td colspan="5" class="px-6 py-4 text-right text-base font-bold text-gray-900">Total Amount:</td>
-                            <td class="px-6 py-4 text-base font-bold text-gray-900">Rs {{ number_format($order->total_amount, 2) }}</td>
+                            <td colspan="4" class="px-6 py-4 text-right text-base font-bold text-gray-900">Total Amount:</td>
+                            <td class="px-6 py-4 text-base font-bold text-gray-900">Rs {{ number_format($sale->total_amount, 2) }}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -348,9 +303,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
                 <h3 class="mt-2 text-sm font-medium text-gray-900">No items</h3>
-                <p class="mt-1 text-sm text-gray-500">This order has no items.</p>
+                <p class="mt-1 text-sm text-gray-500">This sale has no items.</p>
             </div>
         @endif
     </div>
 </div>
 @endsection
+
+

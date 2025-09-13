@@ -19,6 +19,7 @@ class OrderItem extends Model
         'unit_price',
         'discount_percent',
         'discount_amount',
+        'tax_type',
         'tax_percent',
         'tax_amount',
         'line_total',
@@ -73,7 +74,20 @@ class OrderItem extends Model
     {
         $subtotal = $this->quantity * $this->unit_price;
         $this->discount_amount = $subtotal * ($this->discount_percent / 100);
-        $this->tax_amount = ($subtotal - $this->discount_amount) * ($this->tax_percent / 100);
+
+        // Derive tax_percent from tax_type if not explicitly set
+        $taxPercent = $this->tax_percent;
+        if ($taxPercent === null) {
+            $taxPercent = match ($this->tax_type) {
+                'standard' => 15,
+                'zero' => 0,
+                'exempt' => 0,
+                default => 0,
+            };
+            $this->tax_percent = $taxPercent;
+        }
+
+        $this->tax_amount = ($subtotal - $this->discount_amount) * ($taxPercent / 100);
         $this->line_total = $subtotal - $this->discount_amount + $this->tax_amount;
         $this->save();
     }

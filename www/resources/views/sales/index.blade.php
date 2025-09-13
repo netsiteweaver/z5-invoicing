@@ -95,7 +95,7 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">{{ $sale->sale_number }}</div>
-                                    <div class="text-sm text-gray-500">{{ $sale->saleItems->count() }} items</div>
+                                    <div class="text-sm text-gray-500">{{ $sale->items->count() }} items</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">

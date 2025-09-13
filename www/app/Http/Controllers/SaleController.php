@@ -20,7 +20,7 @@ class SaleController extends Controller
     use HasBreadcrumbs;
     public function index(Request $request)
     {
-        $query = Sale::with(['customer', 'saleItems.product']);
+        $query = Sale::with(['customer', 'items.product']);
 
         // Search functionality
         if ($request->filled('search')) {
@@ -68,7 +68,7 @@ class SaleController extends Controller
 
     public function show(Sale $sale)
     {
-        $sale->load(['customer', 'saleItems.product', 'payments']);
+        $sale->load(['customer', 'items.product', 'payments']);
         
         $breadcrumbs = $this->setBreadcrumbs('sales.show', ['sale' => $sale]);
         
@@ -161,7 +161,7 @@ class SaleController extends Controller
                 ->withErrors(['error' => 'This sale cannot be edited.']);
         }
 
-        $sale->load(['customer', 'saleItems.product']);
+        $sale->load(['customer', 'items.product']);
         $customers = Customer::ordered()->get();
         $products = Product::ordered()->get();
 
@@ -190,12 +190,12 @@ class SaleController extends Controller
         DB::beginTransaction();
         try {
             // Restore inventory for old items
-            foreach ($sale->saleItems as $item) {
+            foreach ($sale->items as $item) {
                 $this->updateInventory($item->product_id, $item->quantity, 'in', $sale->id, 'sale_reversal');
             }
 
             // Delete old sale items
-            $sale->saleItems()->delete();
+            $sale->items()->delete();
 
             // Calculate new totals
             $subtotal = 0;
@@ -260,7 +260,7 @@ class SaleController extends Controller
         DB::beginTransaction();
         try {
             // Restore inventory
-            foreach ($sale->saleItems as $item) {
+            foreach ($sale->items as $item) {
                 $this->updateInventory($item->product_id, $item->quantity, 'in', $sale->id, 'sale_deletion');
             }
 

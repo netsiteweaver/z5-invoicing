@@ -13,7 +13,8 @@ class StockMovement extends Model
 
     protected $fillable = [
         'uuid',
-        'inventory_id',
+        'product_id',
+        'department_id',
         'movement_type',
         'quantity',
         'reference_type',
@@ -39,6 +40,9 @@ class StockMovement extends Model
         static::creating(function ($model) {
             if (empty($model->uuid)) {
                 $model->uuid = Str::uuid();
+            }
+            if (empty($model->movement_date)) {
+                $model->movement_date = now();
             }
         });
     }

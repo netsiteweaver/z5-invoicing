@@ -225,9 +225,10 @@ class InventoryController extends Controller
                 $inventory->decrement('current_stock', $quantity);
             }
 
-            // Create stock movement record
+            // Create stock movement record (movement table uses product/department)
             StockMovement::create([
-                'inventory_id' => $inventory->id,
+                'product_id' => $inventory->product_id,
+                'department_id' => $inventory->department_id,
                 'movement_type' => $movementType,
                 'quantity' => $quantity,
                 'reference_type' => $request->reference_type,
@@ -239,9 +240,9 @@ class InventoryController extends Controller
             DB::commit();
 
             return back()->with('success', 'Stock movement recorded successfully.');
-        } catch (\Exception $e) {
-            DB::rollback();
-            return back()->withErrors(['error' => 'Failed to record stock movement. Please try again.']);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to record stock movement: ' . $e->getMessage()]);
         }
     }
 

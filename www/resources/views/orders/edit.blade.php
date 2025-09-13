@@ -3,7 +3,22 @@
 @section('title', 'Edit Order')
 
 @section('content')
-<div class="space-y-6" x-data="orderForm()">
+@php
+    $itemsForJs = $order->items->map(function($item) {
+        return array(
+            'product_id' => $item->product_id,
+            'quantity' => $item->quantity,
+            'unit_price' => $item->unit_price,
+            'discount_percent' => $item->discount_percent,
+            'tax_type' => $item->tax_type ?? (optional($item->product)->tax_type ?? 'standard'),
+            'line_total' => $item->line_total
+        );
+    })->values()->all();
+@endphp
+<div class="space-y-6" x-data="orderForm()" x-init="init()"
+     data-customer="{{ $order->customer_id }}" data-items='@json($itemsForJs)'
+     data-subtotal="{{ $order->subtotal }}" data-total-discount="{{ $order->discount_amount }}"
+     data-total-amount="{{ $order->total_amount }}">
     <!-- Header -->
     <div class="flex justify-between items-center">
         <div>
@@ -66,7 +81,7 @@
                 <div>
                     <label for="order_date" class="block text-sm font-medium text-gray-700">Order Date <span class="text-red-500">*</span></label>
                     <input type="date" name="order_date" id="order_date" required 
-                           value="{{ old('order_date', $order->order_date ? $order->order_date->format('Y-m-d') : '') }}"
+                           value="{{ old('order_date', ($order->order_date instanceof \Carbon\CarbonInterface) ? $order->order_date->format('Y-m-d') : ($order->order_date ?? '') ) }}"
                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                     @error('order_date')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -77,7 +92,7 @@
                 <div>
                     <label for="delivery_date" class="block text-sm font-medium text-gray-700">Delivery Date</label>
                     <input type="date" name="delivery_date" id="delivery_date" 
-                           value="{{ old('delivery_date', $order->delivery_date ? $order->delivery_date->format('Y-m-d') : '') }}"
+                           value="{{ old('delivery_date', ($order->delivery_date instanceof \Carbon\CarbonInterface) ? $order->delivery_date->format('Y-m-d') : ($order->delivery_date ?? '') ) }}"
                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                     @error('delivery_date')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -152,6 +167,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount %</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VAT</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Line Total</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -160,7 +176,7 @@
                         <template x-for="(item, index) in form.items" :key="index">
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <select :name="`items[${index}][product_id]`" 
+                                    <select :name="'items[' + index + '][product_id]'" 
                                             x-model="item.product_id"
                                             @change="updateItem(index)"
                                             class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
@@ -168,6 +184,7 @@
                                         @foreach($products as $product)
                                             <option value="{{ $product->id }}" 
                                                     data-price="{{ $product->selling_price }}"
+                                                    data-tax-type="{{ $product->tax_type }}"
                                                     data-stock="{{ $product->inventory->sum('current_stock') ?? 0 }}">
                                                 {{ $product->name }} - Rs {{ number_format($product->selling_price, 2) }}
                                                 @if($product->inventory->sum('current_stock') ?? 0 > 0)
@@ -181,7 +198,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <input type="number" 
-                                           :name="`items[${index}][quantity]`"
+                                           :name="'items[' + index + '][quantity]'"
                                            x-model="item.quantity"
                                            @input="updateItem(index)"
                                            min="1"
@@ -189,7 +206,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <input type="number" 
-                                           :name="`items[${index}][unit_price]`"
+                                           :name="'items[' + index + '][unit_price]'"
                                            x-model="item.unit_price"
                                            @input="updateItem(index)"
                                            step="0.01"
@@ -198,13 +215,17 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <input type="number" 
-                                           :name="`items[${index}][discount_percentage]`"
-                                           x-model="item.discount_percentage"
+                                           :name="'items[' + index + '][discount_percent]'"
+                                           x-model="item.discount_percent"
                                            @input="updateItem(index)"
                                            step="0.01"
                                            min="0"
                                            max="100"
                                            class="block w-20 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="text" :value="(item.tax_type === 'standard' ? '15%' : (item.tax_type === 'zero' ? '0%' : 'VAT Exempt'))" 
+                                           class="block w-full border-gray-200 rounded-md shadow-sm bg-gray-50 text-gray-700 sm:text-sm" disabled>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="text-sm font-medium text-gray-900" x-text="formatCurrency(item.line_total)"></span>
@@ -244,9 +265,13 @@
                     <span class="text-sm text-gray-600">Total Discount:</span>
                     <span class="text-sm font-medium text-green-600" x-text="formatCurrency(form.total_discount)"></span>
                 </div>
+                <div class="flex justify-between">
+                    <span class="text-sm text-gray-600">VAT Total:</span>
+                    <span class="text-sm font-medium text-gray-900" x-text="formatCurrency(form.total_tax)"></span>
+                </div>
                 <div class="border-t pt-2">
                     <div class="flex justify-between">
-                        <span class="text-base font-medium text-gray-900">Total Amount:</span>
+                        <span class="text-base font-medium text-gray-900">Total Amount (incl. VAT):</span>
                         <span class="text-base font-bold text-gray-900" x-text="formatCurrency(form.total_amount)"></span>
                     </div>
                 </div>
@@ -272,19 +297,25 @@
 function orderForm() {
     return {
         form: {
-            customer_id: '{{ $order->customer_id }}',
-            items: @json($order->items->map(function($item) {
-                return [
-                    'product_id' => $item->product_id,
-                    'quantity' => $item->quantity,
-                    'unit_price' => $item->unit_price,
-                    'discount_percentage' => $item->discount_percentage,
-                    'line_total' => $item->line_total
-                ];
-            })),
-            subtotal: {{ $order->subtotal }},
-            total_discount: {{ $order->discount_amount }},
-            total_amount: {{ $order->total_amount }}
+            customer_id: '',
+            items: [],
+            subtotal: 0,
+            total_discount: 0,
+            total_tax: 0,
+            total_amount: 0
+        },
+        init() {
+            const rootEl = this.$root;
+            this.form.customer_id = rootEl?.dataset?.customer || '';
+            try { this.form.items = JSON.parse(rootEl?.dataset?.items || '[]'); } catch(e) { this.form.items = []; }
+            // Ensure tax_type is present from server data; default to product's type if missing later
+            this.form.items = this.form.items.map(it => ({
+                tax_type: 'tax_type' in it ? it.tax_type : 'standard',
+                ...it,
+            }));
+            this.form.subtotal = parseFloat(rootEl?.dataset?.subtotal || 0);
+            this.form.total_discount = parseFloat(rootEl?.dataset?.totalDiscount || 0);
+            this.form.total_amount = parseFloat(rootEl?.dataset?.totalAmount || 0);
         },
 
         addItem() {
@@ -292,7 +323,8 @@ function orderForm() {
                 product_id: '',
                 quantity: 1,
                 unit_price: 0,
-                discount_percentage: 0,
+                discount_percent: 0,
+                tax_type: 'standard',
                 line_total: 0
             });
         },
@@ -304,21 +336,25 @@ function orderForm() {
 
         updateItem(index) {
             const item = this.form.items[index];
-            const productSelect = document.querySelector(`select[name="items[${index}][product_id]"]`);
+            const productSelect = document.querySelector('select[name="items[' + index + '][product_id]"]');
             
             if (productSelect && productSelect.selectedOptions[0]) {
                 const selectedOption = productSelect.selectedOptions[0];
                 const price = parseFloat(selectedOption.dataset.price) || 0;
+                const productTaxType = selectedOption.dataset.taxType || 'standard';
                 item.unit_price = price;
+                item.tax_type = productTaxType;
             }
 
             const quantity = parseFloat(item.quantity) || 0;
             const unitPrice = parseFloat(item.unit_price) || 0;
-            const discountPercent = parseFloat(item.discount_percentage) || 0;
+            const discountPercent = parseFloat(item.discount_percent) || 0;
+            const taxPercent = (item.tax_type === 'standard') ? 15 : 0;
             
             const lineSubtotal = quantity * unitPrice;
             const discountAmount = lineSubtotal * (discountPercent / 100);
-            item.line_total = lineSubtotal - discountAmount;
+            const taxAmount = (lineSubtotal - discountAmount) * (taxPercent / 100);
+            item.line_total = lineSubtotal - discountAmount + taxAmount;
             
             this.calculateTotals();
         },
@@ -333,12 +369,22 @@ function orderForm() {
             this.form.total_discount = this.form.items.reduce((sum, item) => {
                 const quantity = parseFloat(item.quantity) || 0;
                 const unitPrice = parseFloat(item.unit_price) || 0;
-                const discountPercent = parseFloat(item.discount_percentage) || 0;
+                const discountPercent = parseFloat(item.discount_percent) || 0;
                 const lineSubtotal = quantity * unitPrice;
                 return sum + (lineSubtotal * (discountPercent / 100));
             }, 0);
 
-            this.form.total_amount = this.form.subtotal - this.form.total_discount;
+            const totalTax = this.form.items.reduce((sum, item) => {
+                const quantity = parseFloat(item.quantity) || 0;
+                const unitPrice = parseFloat(item.unit_price) || 0;
+                const discountPercent = parseFloat(item.discount_percent) || 0;
+                const taxPercent = (item.tax_type === 'standard') ? 15 : 0;
+                const lineSubtotal = quantity * unitPrice;
+                const discountAmount = lineSubtotal * (discountPercent / 100);
+                return sum + ((lineSubtotal - discountAmount) * (taxPercent / 100));
+            }, 0);
+            this.form.total_tax = totalTax;
+            this.form.total_amount = this.form.subtotal - this.form.total_discount + totalTax;
         },
 
         updateCustomerInfo() {

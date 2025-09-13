@@ -51,11 +51,12 @@
 
                     <!-- Product Type -->
                     <div>
-                        <label for="type" class="block text-sm font-medium text-gray-700">Product Type *</label>
+                        <label for="type" class="block text-sm font-medium text-gray-700">Item Type *</label>
                         <select name="type" id="type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('type') border-red-300 @enderror">
                             <option value="">Select type</option>
-                            <option value="product" {{ old('type') === 'product' ? 'selected' : '' }}>Product</option>
-                            <option value="service" {{ old('type') === 'service' ? 'selected' : '' }}>Service</option>
+                            <option value="finished" {{ old('type') === 'finished' ? 'selected' : '' }}>Finished Good</option>
+                            <option value="semi" {{ old('type') === 'semi' ? 'selected' : '' }}>Semi-finished</option>
+                            <option value="raw" {{ old('type') === 'raw' ? 'selected' : '' }}>Raw Material</option>
                         </select>
                         @error('type')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -129,9 +130,9 @@
                         @enderror
                     </div>
 
-                    <!-- Selling Price -->
+                    <!-- Selling Price (VAT exclusive) -->
                     <div>
-                        <label for="selling_price" class="block text-sm font-medium text-gray-700">Selling Price *</label>
+                        <label for="selling_price" class="block text-sm font-medium text-gray-700">Selling Price (VAT excl.) *</label>
                         <div class="mt-1 relative rounded-md shadow-sm">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-500 sm:text-sm">Rs</span>
@@ -142,6 +143,19 @@
                                    placeholder="0.00">
                         </div>
                         @error('selling_price')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- VAT Type -->
+                    <div>
+                        <label for="tax_type" class="block text-sm font-medium text-gray-700">VAT Type</label>
+                        <select name="tax_type" id="tax_type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('tax_type') border-red-300 @enderror">
+                            <option value="standard" {{ old('tax_type', 'standard') === 'standard' ? 'selected' : '' }}>15% (Standard)</option>
+                            <option value="zero" {{ old('tax_type') === 'zero' ? 'selected' : '' }}>0% (Zero-rated)</option>
+                            <option value="exempt" {{ old('tax_type') === 'exempt' ? 'selected' : '' }}>VAT Exempt</option>
+                        </select>
+                        @error('tax_type')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -195,7 +209,7 @@
 
                     <!-- SKU -->
                     <div>
-                        <label for="sku" class="block text-sm font-medium text-gray-700">SKU</label>
+                        <label for="sku" class="block text sm font-medium text-gray-700">SKU</label>
                         <input type="text" name="sku" id="sku" value="{{ old('sku') }}" 
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('sku') border-red-300 @enderror" 
                                placeholder="Stock Keeping Unit">

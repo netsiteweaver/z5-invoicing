@@ -19,6 +19,7 @@ class Product extends Model
         'description',
         'cost_price',
         'selling_price',
+        'tax_type',
         'category_id',
         'brand_id',
         'type',

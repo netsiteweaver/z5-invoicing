@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use App\Models\Param;
+use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
@@ -56,8 +58,30 @@ class Order extends Model
             if (empty($model->uuid)) {
                 $model->uuid = Str::uuid();
             }
+            // Assign final sequential order number before insert (params-backed)
             if (empty($model->order_number)) {
-                $model->order_number = 'ORD-' . strtoupper(Str::random(8));
+                $prefix = Param::getValue('orders.prefix', 'ORD-');
+                $padding = (int) (Param::getValue('orders.padding', '6'));
+                // Ensure the counter is at least the max existing number
+                $maxExisting = DB::table('orders')
+                    ->select('order_number')
+                    ->whereNotNull('order_number')
+                    ->where('order_number', 'like', $prefix.'%')
+                    ->orderByDesc('id')
+                    ->value('order_number');
+                if ($maxExisting) {
+                    $numeric = (int) preg_replace('/\D+/', '', substr($maxExisting, strlen($prefix)));
+                    $current = (int) (Param::getValue('orders.last_number', '0') ?? '0');
+                    if ($numeric > $current) {
+                        Param::setValue('orders.last_number', (string) $numeric);
+                    }
+                }
+                // Generate a unique next number, retry if collision
+                do {
+                    $next = Param::incrementAndGet('orders.last_number', 0);
+                    $candidate = $prefix . str_pad((string) $next, $padding, '0', STR_PAD_LEFT);
+                } while (DB::table('orders')->where('order_number', $candidate)->exists());
+                $model->order_number = $candidate;
             }
         });
     }

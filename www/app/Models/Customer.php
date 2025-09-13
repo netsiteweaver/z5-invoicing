@@ -16,16 +16,22 @@ class Customer extends Model
         'uuid',
         'company_name',
         'legal_name',
+        'contact_person',
         'brn',
         'vat',
         'full_name',
         'address',
         'city',
+        'postal_code',
+        'country',
         'phone_number1',
+        // Virtual attributes accepted for mass-assignment and mapped via mutators
+        'phone_number',
         'phone_number2',
         'email',
         'customer_type',
         'remarks',
+        'notes',
         'created_by',
         'updated_by',
         'status',
@@ -112,5 +118,26 @@ class Customer extends Model
     public function getPrimaryPhoneAttribute(): string
     {
         return $this->phone_number1;
+    }
+
+    // Map form-friendly attributes to database columns
+    public function getPhoneNumberAttribute(): ?string
+    {
+        return $this->getAttributeValue('phone_number1');
+    }
+
+    public function setPhoneNumberAttribute($value): void
+    {
+        $this->attributes['phone_number1'] = $value;
+    }
+
+    public function getNotesAttribute(): ?string
+    {
+        return $this->getAttributeValue('remarks');
+    }
+
+    public function setNotesAttribute($value): void
+    {
+        $this->attributes['remarks'] = $value;
     }
 }

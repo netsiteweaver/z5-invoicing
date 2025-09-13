@@ -15,6 +15,31 @@
 @endsection
 
 @section('content')
+@if(session('success'))
+<div class="mb-4 rounded-md bg-green-50 p-4">
+    <div class="flex">
+        <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.364 7.364a1 1 0 01-1.414 0L3.293 9.836a1 1 0 111.414-1.414l3.222 3.222 6.657-6.657a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+        </div>
+        <div class="ml-3"><p class="text-sm font-medium text-green-800">{{ session('success') }}</p></div>
+    </div>
+  </div>
+@endif
+@if(session('error'))
+  <div class="mb-4 rounded-md bg-red-50 p-4">
+    <div class="flex">
+        <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-5a1 1 0 112 0v2a1 1 0 11-2 0v-2zm0-6a1 1 0 012 0v4a1 1 0 11-2 0V7z" clip-rule="evenodd"/></svg>
+        </div>
+        <div class="ml-3"><p class="text-sm font-medium text-red-800">{{ session('error') }}</p></div>
+    </div>
+  </div>
+@endif
+@if($errors->any())
+  <div class="mb-4 rounded-md bg-red-50 p-4">
+    <p class="text-sm font-medium text-red-800">{{ $errors->first() }}</p>
+  </div>
+@endif
 <!-- Filters -->
 <div class="bg-white shadow rounded-lg mb-6">
     <div class="px-4 py-5 sm:p-6">
@@ -178,12 +203,12 @@
 @endif
 
 <!-- Stock Movement Modal -->
-<div id="stockMovementModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" x-data="{ open: false }" x-show="open" @click.away="open = false">
+<div id="stockMovementModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-medium text-gray-900">Stock Movement</h3>
-                <button @click="open = false" class="text-gray-400 hover:text-gray-600">
+                <button onclick="closeStockMovementModal()" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -231,7 +256,7 @@
 
 <script>
 function openStockMovementModal(inventoryId, productName, currentStock) {
-    document.getElementById('stockMovementForm').action = `/inventory/${inventoryId}/stock-movement`;
+    document.getElementById('stockMovementForm').action = `{{ url('inventory') }}/${inventoryId}/stock-movement`;
     document.getElementById('productName').textContent = productName;
     document.getElementById('currentStock').textContent = `Current Stock: ${currentStock}`;
     document.getElementById('stockMovementModal').classList.remove('hidden');
@@ -240,5 +265,30 @@ function openStockMovementModal(inventoryId, productName, currentStock) {
 function closeStockMovementModal() {
     document.getElementById('stockMovementModal').classList.add('hidden');
 }
+
+// Lightweight toast
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-4 right-4 z-50 px-4 py-3 rounded-md shadow-lg text-white ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.add('opacity-0');
+        toast.style.transition = 'opacity 300ms';
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    @if(session('success'))
+        showToast("{{ session('success') }}", 'success');
+    @endif
+    @if(session('error'))
+        showToast("{{ session('error') }}", 'error');
+    @endif
+    @if($errors->any())
+        showToast("{{ $errors->first() }}", 'error');
+    @endif
+});
 </script>
 @endsection

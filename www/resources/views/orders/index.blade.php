@@ -12,8 +12,16 @@
 
 @section('content')
 <!-- Filters -->
-<div class="bg-white shadow rounded-lg mb-6">
-    <div class="px-4 py-5 sm:p-6">
+<div class="bg-white shadow rounded-lg mb-6" x-data="{ open: false }">
+    <div class="px-4 py-3 sm:px-6 flex items-center justify-between">
+        <h3 class="text-sm font-medium text-gray-900">Filters</h3>
+        <button type="button" @click="open = !open" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
+            <span x-show="!open">Show</span>
+            <span x-show="open">Hide</span>
+            <i class="fas fa-chevron-down ml-2 transform" :class="{'rotate-180': open}"></i>
+        </button>
+    </div>
+    <div class="px-4 pb-5 sm:p-6" x-show="open" x-collapse>
         <form method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-6">
             <div>
                 <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
@@ -159,9 +167,16 @@
                                             <a href="{{ route('orders.edit', $order) }}" class="text-yellow-600 hover:text-yellow-900">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+                                            <form method="POST" action="{{ route('orders.destroy', $order) }}" onsubmit="return confirm('Delete this order? This is a soft delete and can\'t be undone.');" style="display:inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         @endif
-                                        @if($order->order_status === 'confirmed')
-                                            <a href="{{ route('orders.convert-to-sale', $order) }}" class="text-green-600 hover:text-green-900">
+                                        @if($order->order_status === 'confirmed' && ($order->sales_count ?? 0) === 0)
+                                            <a href="{{ route('orders.convert-to-sale', $order) }}" class="text-green-600 hover:text-green-900" title="Convert to Sale">
                                                 <i class="fas fa-check"></i>
                                             </a>
                                         @endif
