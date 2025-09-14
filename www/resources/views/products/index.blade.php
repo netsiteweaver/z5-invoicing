@@ -64,83 +64,51 @@
         </form>
     </div>
 
-    <!-- Products Grid -->
+    <!-- Products Table -->
     @if($products->count() > 0)
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            @foreach($products as $product)
-                <div class="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow">
-                    <div class="p-6">
-                        <!-- Product Header -->
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex-shrink-0">
-                                <div class="h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center">
-                                    <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                    </svg>
-                                </div>
-                            </div>
-                            
-                        </div>
-
-                        <!-- Product Info -->
-                        <div class="mb-4">
-                            <h3 class="text-lg font-medium text-gray-900 truncate">{{ $product->name }}</h3>
-                            @if($product->category)
-                                <p class="text-xs text-blue-600 mt-1">{{ $product->category->name }}</p>
-                            @endif
-                            @if($product->brand)
-                                <p class="text-xs text-gray-500">{{ $product->brand->name }}</p>
-                            @endif
-                        </div>
-
-                        <!-- Pricing -->
-                        <div class="mb-4">
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500">Selling Price:</span>
-                                <span class="text-lg font-semibold text-gray-900">Rs {{ number_format($product->selling_price, 2) }}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500">Cost Price:</span>
-                                <span class="text-sm text-gray-700">Rs {{ number_format($product->cost_price, 2) }}</span>
-                            </div>
-                            @if($product->profit_margin > 0)
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm text-gray-500">Profit Margin:</span>
-                                    <span class="text-sm text-green-600 font-medium">{{ number_format($product->profit_margin, 1) }}%</span>
-                                </div>
-                            @endif
-                        </div>
-
-                        <!-- Stock Info -->
-                        @if($product->inventory->count() > 0)
-                            <div class="mb-4">
-                                <div class="text-sm text-gray-500 mb-2">Stock Levels:</div>
-                                @foreach($product->inventory->take(2) as $inventory)
-                                    <div class="flex justify-between items-center text-xs">
-                                        <span>{{ $inventory->department->name ?? 'Unknown' }}</span>
-                                        <span class="font-medium {{ $inventory->is_low_stock ? 'text-red-600' : 'text-gray-700' }}">
-                                            {{ $inventory->current_stock }} units
-                                        </span>
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Selling Price</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Cost Price</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Profit %</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach($products as $product)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">{{ $product->name }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $product->category->name ?? '-' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $product->brand->name ?? '-' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">Rs {{ number_format($product->selling_price, 2) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">Rs {{ number_format($product->cost_price, 2) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">{{ $product->profit_margin > 0 ? number_format($product->profit_margin, 1) : '0.0' }}%</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
+                                    {{ $product->inventory->sum('current_stock') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex justify-end space-x-2">
+                                        <a href="{{ route('products.show', $product) }}" class="btn btn-view">View</a>
+                                        <a href="{{ route('products.edit', $product) }}" class="btn btn-edit">Edit</a>
                                     </div>
-                                @endforeach
-                                @if($product->inventory->count() > 2)
-                                    <div class="text-xs text-gray-500 mt-1">+{{ $product->inventory->count() - 2 }} more locations</div>
-                                @endif
-                            </div>
-                        @endif
-
-                        <!-- Actions -->
-                        <div class="flex space-x-2">
-                            <a href="{{ route('products.show', $product) }}" class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                View
-                            </a>
-                            <a href="{{ route('products.edit', $product) }}" class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                Edit
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="px-4 py-3 border-t border-gray-200 sm:px-6">
+                {{ $products->links() }}
+            </div>
         </div>
         
         <!-- Pagination -->
