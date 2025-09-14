@@ -11,9 +11,7 @@
             <p class="mt-1 text-sm text-gray-500">Manage product brands and manufacturers</p>
         </div>
         <a href="{{ route('product-brands.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
+            <i class="-ml-1 mr-2 fa-solid fa-plus"></i>
             Add Brand
         </a>
     </div>
@@ -39,91 +37,67 @@
             
             <div class="flex items-end">
                 <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                    <i class="-ml-1 mr-2 fa-solid fa-magnifying-glass"></i>
                     Filter
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- Brands Grid -->
+    <!-- Brands Table -->
     @if($brands->count() > 0)
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            @foreach($brands as $brand)
-                <div class="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow">
-                    <div class="p-6">
-                        <!-- Brand Header -->
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex-shrink-0">
-                                <div class="h-12 w-12 rounded-lg bg-purple-100 flex items-center justify-center">
-                                    <svg class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                {{ $brand->products->count() }} products
-                            </span>
-                        </div>
-
-                        <!-- Brand Info -->
-                        <div class="mb-4">
-                            <h3 class="text-lg font-medium text-gray-900 truncate">{{ $brand->name }}</h3>
-                            @if($brand->description)
-                                <p class="text-sm text-gray-500 mt-1">{{ Str::limit($brand->description, 80) }}</p>
-                            @endif
-                        </div>
-
-                        <!-- Contact Information -->
-                        @if($brand->website || $brand->contact_email || $brand->contact_phone)
-                            <div class="mb-4">
-                                <div class="text-sm text-gray-500 mb-2">Contact Information:</div>
-                                @if($brand->website)
-                                    <div class="flex items-center text-xs text-blue-600 mb-1">
-                                        <svg class="flex-shrink-0 mr-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-                                        </svg>
-                                        <a href="{{ $brand->website }}" target="_blank" class="hover:underline">{{ $brand->website }}</a>
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Website</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach($brands as $brand)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $brand->name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $brand->description ? Str::limit($brand->description, 80) : '-' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    @if($brand->website)
+                                        <a href="{{ $brand->website }}" target="_blank" class="text-blue-600 hover:underline">{{ $brand->website }}</a>
+                                    @else
+                                        <span class="text-gray-500">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{{ $brand->products->count() }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                                    @if(($brand->status ?? 1) == 1)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Inactive</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex justify-end space-x-2">
+                                        <a href="{{ route('product-brands.show', $brand) }}" class="btn btn-view"><i class="btn-icon fa-regular fa-eye"></i>View</a>
+                                        <a href="{{ route('product-brands.edit', $brand) }}" class="btn btn-edit"><i class="btn-icon fa-solid fa-pen"></i>Edit</a>
+                                        <form method="POST" action="{{ route('product-brands.destroy', $brand) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this brand?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-delete"><i class="btn-icon fa-solid fa-trash"></i>Delete</button>
+                                        </form>
                                     </div>
-                                @endif
-                                @if($brand->contact_email)
-                                    <div class="flex items-center text-xs text-gray-600 mb-1">
-                                        <svg class="flex-shrink-0 mr-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                        </svg>
-                                        {{ $brand->contact_email }}
-                                    </div>
-                                @endif
-                                @if($brand->contact_phone)
-                                    <div class="flex items-center text-xs text-gray-600 mb-1">
-                                        <svg class="flex-shrink-0 mr-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                        </svg>
-                                        {{ $brand->contact_phone }}
-                                    </div>
-                                @endif
-                            </div>
-                        @endif
-
-                        <!-- Actions -->
-                        <div class="flex space-x-2">
-                            <a href="{{ route('product-brands.show', $brand) }}" class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                View
-                            </a>
-                            <a href="{{ route('product-brands.edit', $brand) }}" class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                Edit
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-        
-        <!-- Pagination -->
-        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-            {{ $brands->links() }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="px-4 py-3 border-t border-gray-200 sm:px-6">
+                {{ $brands->links() }}
+            </div>
         </div>
     @else
         <div class="text-center py-12">

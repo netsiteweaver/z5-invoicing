@@ -119,13 +119,14 @@ class ProductBrandController extends Controller
      */
     public function destroy(ProductBrand $productBrand)
     {
-        // Check if brand has products
+        // Soft delete (status flag is still set to 0 for consistency)
         if ($productBrand->products()->count() > 0) {
             return redirect()->route('product-brands.index')
                 ->with('error', 'Cannot delete brand with products. Please move or delete products first.');
         }
 
         $productBrand->update(['status' => 0]);
+        $productBrand->delete();
 
         return redirect()->route('product-brands.index')
             ->with('success', 'Product brand deleted successfully.');

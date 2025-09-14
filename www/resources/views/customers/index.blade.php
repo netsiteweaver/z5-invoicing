@@ -11,9 +11,7 @@
             <p class="mt-1 text-sm text-gray-500">Manage your customer database</p>
         </div>
         <a href="{{ route('customers.create') }}" class="btn btn-create">
-            <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6" />
-            </svg>
+            <i class="btn-icon fa-solid fa-plus"></i>
             Add Customer
         </a>
     </div>
@@ -48,9 +46,7 @@
             
             <div class="flex items-end">
                 <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                    <i class="-ml-1 mr-2 fa-solid fa-magnifying-glass"></i>
                     Filter
                 </button>
             </div>
@@ -112,25 +108,18 @@
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     <a href="{{ route('customers.show', $customer) }}" class="btn btn-view">
-                                        <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
+                                        <i class="btn-icon fa-regular fa-eye"></i>
                                         View
                                     </a>
                                     <a href="{{ route('customers.edit', $customer) }}" class="btn btn-edit">
-                                        <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5h2m6 0h.01M4 21h4l10-10a2.828 2.828 0 10-4-4L4 17v4z" />
-                                        </svg>
+                                        <i class="btn-icon fa-solid fa-pen"></i>
                                         Edit
                                     </a>
                                     <form method="POST" action="{{ route('customers.destroy', $customer) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this customer?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-delete">
-                                            <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 7h12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2m-9 0l1 12a2 2 0 002 2h4a2 2 0 002-2l1-12" />
-                                            </svg>
+                                            <i class="btn-icon fa-solid fa-trash"></i>
                                             Delete
                                         </button>
                                     </form>

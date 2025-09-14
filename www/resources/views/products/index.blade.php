@@ -11,9 +11,7 @@
             <p class="mt-1 text-sm text-gray-500">Manage your product catalog</p>
         </div>
         <a href="{{ route('products.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
+            <i class="-ml-1 mr-2 fa-solid fa-plus"></i>
             Add Product
         </a>
     </div>
@@ -55,9 +53,7 @@
             
             <div class="flex items-end">
                 <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                    <i class="-ml-1 mr-2 fa-solid fa-magnifying-glass"></i>
                     Filter
                 </button>
             </div>
@@ -97,8 +93,8 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end space-x-2">
-                                        <a href="{{ route('products.show', $product) }}" class="btn btn-view">View</a>
-                                        <a href="{{ route('products.edit', $product) }}" class="btn btn-edit">Edit</a>
+                                        <a href="{{ route('products.show', $product) }}" class="btn btn-view"><i class="btn-icon fa-regular fa-eye"></i>View</a>
+                                        <a href="{{ route('products.edit', $product) }}" class="btn btn-edit"><i class="btn-icon fa-solid fa-pen"></i>Edit</a>
                                     </div>
                                 </td>
                             </tr>
