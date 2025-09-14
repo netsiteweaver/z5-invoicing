@@ -41,22 +41,6 @@
                             <dd class="mt-1 text-sm text-gray-900">{{ $product->name }}</dd>
                         </div>
                         
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Stock Reference</dt>
-                            <dd class="mt-1 text-sm text-gray-900 font-mono">{{ $product->stockref }}</dd>
-                        </div>
-                        
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Product Type</dt>
-                            <dd class="mt-1">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                    @if($product->type === 'product') bg-green-100 text-green-800
-                                    @else bg-purple-100 text-purple-800
-                                    @endif">
-                                    {{ ucfirst($product->type) }}
-                                </span>
-                            </dd>
-                        </div>
                         
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Category</dt>

@@ -29,12 +29,23 @@
                 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <!-- Product Name -->
-                    <div class="sm:col-span-2">
+                    <div>
                         <label for="name" class="block text-sm font-medium text-gray-700">Product Name *</label>
                         <input type="text" name="name" id="name" value="{{ old('name', $product->name) }}" 
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('name') border-red-300 @enderror" 
                                placeholder="Enter product name">
                         @error('name')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Barcode -->
+                    <div>
+                        <label for="barcode" class="block text-sm font-medium text-gray-700">Barcode</label>
+                        <input type="text" name="barcode" id="barcode" value="{{ old('barcode', $product->barcode) }}" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('barcode') border-red-300 @enderror" 
+                               placeholder="Barcode number">
+                        @error('barcode')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -82,7 +93,7 @@
 
                     <!-- Brand -->
                     <div>
-                        <label for="brand_id" class="block text-sm font-medium text-gray-700">Brand</label>
+                        <label for="brand_id" class="block text-sm font-medium text-gray-700">Brand *</label>
                         <select name="brand_id" id="brand_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('brand_id') border-red-300 @enderror">
                             <option value="">Select brand</option>
                             @foreach($brands as $brand)
@@ -219,16 +230,7 @@
                         @enderror
                     </div>
 
-                    <!-- Barcode -->
-                    <div>
-                        <label for="barcode" class="block text-sm font-medium text-gray-700">Barcode</label>
-                        <input type="text" name="barcode" id="barcode" value="{{ old('barcode', $product->barcode) }}" 
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('barcode') border-red-300 @enderror" 
-                               placeholder="Barcode number">
-                        @error('barcode')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    
 
                     <!-- Notes -->
                     <div class="sm:col-span-2">

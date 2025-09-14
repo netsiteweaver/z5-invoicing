@@ -20,7 +20,7 @@
 
     <!-- Filters -->
     <div class="bg-white shadow rounded-lg p-6">
-        <form method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-5">
+        <form method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-4">
             <div>
                 <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
                 <input type="text" name="search" id="search" value="{{ request('search') }}" 
@@ -52,14 +52,6 @@
                 </select>
             </div>
             
-            <div>
-                <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
-                <select name="type" id="type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                    <option value="">All Types</option>
-                    <option value="product" {{ request('type') === 'product' ? 'selected' : '' }}>Product</option>
-                    <option value="service" {{ request('type') === 'service' ? 'selected' : '' }}>Service</option>
-                </select>
-            </div>
             
             <div class="flex items-end">
                 <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -87,18 +79,12 @@
                                     </svg>
                                 </div>
                             </div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                @if($product->type === 'product') bg-green-100 text-green-800
-                                @else bg-purple-100 text-purple-800
-                                @endif">
-                                {{ ucfirst($product->type) }}
-                            </span>
+                            
                         </div>
 
                         <!-- Product Info -->
                         <div class="mb-4">
                             <h3 class="text-lg font-medium text-gray-900 truncate">{{ $product->name }}</h3>
-                            <p class="text-sm text-gray-500">{{ $product->stockref }}</p>
                             @if($product->category)
                                 <p class="text-xs text-blue-600 mt-1">{{ $product->category->name }}</p>
                             @endif
@@ -133,7 +119,7 @@
                                     <div class="flex justify-between items-center text-xs">
                                         <span>{{ $inventory->department->name ?? 'Unknown' }}</span>
                                         <span class="font-medium {{ $inventory->is_low_stock ? 'text-red-600' : 'text-gray-700' }}">
-                                            {{ $inventory->quantity }} units
+                                            {{ $inventory->current_stock }} units
                                         </span>
                                     </div>
                                 @endforeach

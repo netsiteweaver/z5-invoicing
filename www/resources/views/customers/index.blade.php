@@ -10,9 +10,9 @@
             <h1 class="text-2xl font-bold text-gray-900">Customers</h1>
             <p class="mt-1 text-sm text-gray-500">Manage your customer database</p>
         </div>
-        <a href="{{ route('customers.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        <a href="{{ route('customers.create') }}" class="btn btn-create">
+            <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6" />
             </svg>
             Add Customer
         </a>
@@ -111,16 +111,26 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center space-x-2">
-                                    <a href="{{ route('customers.show', $customer) }}" class="inline-flex justify-center items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <a href="{{ route('customers.show', $customer) }}" class="btn btn-view">
+                                        <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
                                         View
                                     </a>
-                                    <a href="{{ route('customers.edit', $customer) }}" class="inline-flex justify-center items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    <a href="{{ route('customers.edit', $customer) }}" class="btn btn-edit">
+                                        <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5h2m6 0h.01M4 21h4l10-10a2.828 2.828 0 10-4-4L4 17v4z" />
+                                        </svg>
                                         Edit
                                     </a>
                                     <form method="POST" action="{{ route('customers.destroy', $customer) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this customer?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="inline-flex justify-center items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                        <button type="submit" class="btn btn-delete">
+                                            <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 7h12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2m-9 0l1 12a2 2 0 002 2h4a2 2 0 002-2l1-12" />
+                                            </svg>
                                             Delete
                                         </button>
                                     </form>

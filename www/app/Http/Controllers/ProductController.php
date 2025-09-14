@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductBrand;
+use App\Models\Department;
+use App\Models\Inventory;
+use App\Models\Param;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Concerns\HasBreadcrumbs;
@@ -47,10 +50,7 @@ class ProductController extends Controller
             $query->where('brand_id', $request->brand_id);
         }
 
-        // Filter by type
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
-        }
+        // Type filter removed (type is fixed to 'finished')
 
         // Filter by status
         if ($request->filled('status')) {
@@ -73,10 +73,14 @@ class ProductController extends Controller
     {
         $categories = ProductCategory::active()->ordered()->get();
         $brands = ProductBrand::active()->ordered()->get();
+        $defaultBrandId = (int) (Param::getValue('products.default_brand_id') ?? 0);
+        if (!$defaultBrandId && $brands->isNotEmpty()) {
+            $defaultBrandId = (int) $brands->first()->id;
+        }
         
         $breadcrumbs = $this->setBreadcrumbs('products.create');
         
-        return view('products.create', compact('categories', 'brands') + $breadcrumbs);
+        return view('products.create', compact('categories', 'brands', 'defaultBrandId') + $breadcrumbs);
     }
 
     /**
@@ -86,11 +90,11 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'stockref' => ['required', 'string', 'max:100', 'unique:products,stockref'],
+            // 'stockref' is auto-generated
             'description' => ['nullable', 'string'],
             'category_id' => ['required', 'exists:product_categories,id'],
-            'brand_id' => ['nullable', 'exists:product_brands,id'],
-            'type' => ['required', 'in:finished,semi,raw'],
+            'brand_id' => ['required', 'exists:product_brands,id'],
+            // 'type' hidden and forced to 'finished'
             'cost_price' => ['required', 'numeric', 'min:0'],
             'selling_price' => ['required', 'numeric', 'min:0'],
             'tax_type' => ['required', Rule::in(['standard','zero','exempt'])],
@@ -102,10 +106,39 @@ class ProductController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
+        // Generate stock reference automatically
+        $prefix = Param::getValue('products.prefix', 'PROD-') ?? 'PROD-';
+        $padding = (int) (Param::getValue('products.padding', '6') ?? '6');
+        $nextNumber = Param::incrementAndGet('products.last_number', 0);
+        $padded = str_pad((string) $nextNumber, max(1, $padding), '0', STR_PAD_LEFT);
+        $validated['stockref'] = $prefix . $padded;
+
         $validated['created_by'] = auth()->id();
         $validated['status'] = 1;
+        $validated['type'] = 'finished';
 
-        Product::create($validated);
+        $product = Product::create($validated);
+
+        // Auto-create zero-stock inventory entries for all active departments
+        $departments = Department::active()->get();
+        foreach ($departments as $department) {
+            Inventory::firstOrCreate(
+                [
+                    'product_id' => $product->id,
+                    'department_id' => $department->id,
+                ],
+                [
+                    'current_stock' => 0,
+                    'min_stock_level' => 0,
+                    'max_stock_level' => null,
+                    'reorder_point' => 0,
+                    'cost_price' => $product->cost_price,
+                    'selling_price' => $product->selling_price,
+                    'created_by' => auth()->id() ?? 1,
+                    'status' => 1,
+                ]
+            );
+        }
 
         return redirect()->route('products.index')
             ->with('success', 'Product created successfully.');
@@ -143,11 +176,11 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'stockref' => ['required', 'string', 'max:100', Rule::unique('products', 'stockref')->ignore($product->id)],
+            // 'stockref' is not editable from the UI
             'description' => ['nullable', 'string'],
             'category_id' => ['required', 'exists:product_categories,id'],
-            'brand_id' => ['nullable', 'exists:product_brands,id'],
-            'type' => ['required', 'in:finished,semi,raw'],
+            'brand_id' => ['required', 'exists:product_brands,id'],
+            // 'type' is hidden in the UI; keep existing value
             'cost_price' => ['required', 'numeric', 'min:0'],
             'selling_price' => ['required', 'numeric', 'min:0'],
             'tax_type' => ['required', Rule::in(['standard','zero','exempt'])],
@@ -160,6 +193,7 @@ class ProductController extends Controller
         ]);
 
         $validated['updated_by'] = auth()->id();
+        $validated['type'] = 'finished';
 
         $product->update($validated);
 

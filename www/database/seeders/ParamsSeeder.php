@@ -22,5 +22,17 @@ class ParamsSeeder extends Seeder
         if (Param::getValue('sales.last_number') === null) {
             Param::setValue('sales.last_number', '0');
         }
+
+        // Default product brand (optional). Set to an existing brand ID.
+        if (Param::getValue('products.default_brand_id') === null) {
+            Param::setValue('products.default_brand_id', null);
+        }
+
+        // Product numbering params
+        Param::setValue('products.prefix', 'PROD-');
+        Param::setValue('products.padding', '6');
+        if (Param::getValue('products.last_number') === null) {
+            Param::setValue('products.last_number', '0');
+        }
     }
 }
