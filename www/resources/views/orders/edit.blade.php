@@ -224,7 +224,7 @@
                                            class="block w-20 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <input type="text" :value="(item.tax_type === 'standard' ? '15%' : (item.tax_type === 'zero' ? '0%' : 'VAT Exempt'))" 
+                                    <input type="text" :value="(item.tax_type === 'standard' ? '15%' : (item.tax_type === 'zero' ? '0%' : 'EX'))" 
                                            class="block w-full border-gray-200 rounded-md shadow-sm bg-gray-50 text-gray-700 sm:text-sm" disabled>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">

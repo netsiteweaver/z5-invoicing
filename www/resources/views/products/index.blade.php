@@ -70,9 +70,10 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VAT Type</th>
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Selling Price</th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Cost Price</th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Profit %</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">VAT</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount w/ VAT</th>
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -85,9 +86,25 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $product->category->name ?? '-' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $product->brand->name ?? '-' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    @php
+                                        $vatLabel = match($product->tax_type) {
+                                            'standard' => '15%',
+                                            'zero' => '0%',
+                                            'exempt' => '0%',
+                                            default => ucfirst((string) $product->tax_type),
+                                        };
+                                    @endphp
+                                    {{ $vatLabel }}
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">Rs {{ number_format($product->selling_price, 2) }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">Rs {{ number_format($product->cost_price, 2) }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">{{ $product->profit_margin > 0 ? number_format($product->profit_margin, 1) : '0.0' }}%</td>
+                                @php
+                                    $vatRate = $product->tax_type === 'standard' ? 0.15 : 0;
+                                    $vatAmount = $product->selling_price * $vatRate;
+                                    $amountWithVat = $product->selling_price + $vatAmount;
+                                @endphp
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">Rs {{ number_format($vatAmount, 2) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">Rs {{ number_format($amountWithVat, 2) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
                                     {{ $product->inventory->sum('current_stock') }}
                                 </td>

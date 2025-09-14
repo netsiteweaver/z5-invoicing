@@ -50,30 +50,7 @@
                         @enderror
                     </div>
 
-                    <!-- Stock Reference -->
-                    <div>
-                        <label for="stockref" class="block text-sm font-medium text-gray-700">Stock Reference *</label>
-                        <input type="text" name="stockref" id="stockref" value="{{ old('stockref', $product->stockref) }}" 
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('stockref') border-red-300 @enderror" 
-                               placeholder="e.g., PROD-001">
-                        @error('stockref')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Product Type -->
-                    <div>
-                        <label for="type" class="block text-sm font-medium text-gray-700">Item Type *</label>
-                        <select name="type" id="type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('type') border-red-300 @enderror">
-                            <option value="">Select type</option>
-                            <option value="finished" {{ old('type', $product->type) === 'finished' ? 'selected' : '' }}>Finished Good</option>
-                            <option value="semi" {{ old('type', $product->type) === 'semi' ? 'selected' : '' }}>Semi-finished</option>
-                            <option value="raw" {{ old('type', $product->type) === 'raw' ? 'selected' : '' }}>Raw Material</option>
-                        </select>
-                        @error('type')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    
 
                     <!-- Category -->
                     <div>
@@ -123,6 +100,13 @@
             <!-- Pricing Information -->
             <div class="border-b border-gray-200 pb-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Pricing Information</h3>
+                <div class="mb-4">
+                    <label class="inline-flex items-center text-sm text-gray-700">
+                        <input type="hidden" name="prices_inclusive" value="0">
+                        <input type="checkbox" name="prices_inclusive" value="1" id="prices_inclusive" class="mr-2 border-gray-300 rounded" checked>
+                        Enter prices VAT inclusive
+                    </label>
+                </div>
                 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     <!-- Cost Price -->
@@ -137,14 +121,15 @@
                                    class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-12 pr-12 sm:text-sm border-gray-300 rounded-md @error('cost_price') border-red-300 @enderror" 
                                    placeholder="0.00">
                         </div>
+                        <p id="cost_price_excl_note" class="mt-2 text-xs text-gray-500">Excl. VAT: Rs <span id="cost_price_excl_value">0.00</span></p>
                         @error('cost_price')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <!-- Selling Price (VAT exclusive) -->
+                    <!-- Selling Price -->
                     <div>
-                        <label for="selling_price" class="block text-sm font-medium text-gray-700">Selling Price (VAT excl.) *</label>
+                        <label for="selling_price" class="block text-sm font-medium text-gray-700">Selling Price *</label>
                         <div class="mt-1 relative rounded-md shadow-sm">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-500 sm:text-sm">Rs</span>
@@ -154,6 +139,7 @@
                                    class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-12 pr-12 sm:text-sm border-gray-300 rounded-md @error('selling_price') border-red-300 @enderror" 
                                    placeholder="0.00">
                         </div>
+                        <p id="selling_price_excl_note" class="mt-2 text-xs text-gray-500">Excl. VAT: Rs <span id="selling_price_excl_value">0.00</span></p>
                         @error('selling_price')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -163,9 +149,9 @@
                     <div>
                         <label for="tax_type" class="block text-sm font-medium text-gray-700">VAT Type</label>
                         <select name="tax_type" id="tax_type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('tax_type') border-red-300 @enderror">
-                            <option value="standard" {{ old('tax_type', $product->tax_type) === 'standard' ? 'selected' : '' }}>15% (Standard)</option>
-                            <option value="zero" {{ old('tax_type', $product->tax_type) === 'zero' ? 'selected' : '' }}>0% (Zero-rated)</option>
-                            <option value="exempt" {{ old('tax_type', $product->tax_type) === 'exempt' ? 'selected' : '' }}>VAT Exempt</option>
+                            <option value="standard" {{ old('tax_type', $product->tax_type) === 'standard' ? 'selected' : '' }}>15%</option>
+                            <option value="zero" {{ old('tax_type', $product->tax_type) === 'zero' ? 'selected' : '' }}>0%</option>
+                            <option value="exempt" {{ old('tax_type', $product->tax_type) === 'exempt' ? 'selected' : '' }}>EX</option>
                         </select>
                         @error('tax_type')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -198,16 +184,7 @@
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     
 
-                    <!-- SKU -->
-                    <div>
-                        <label for="sku" class="block text-sm font-medium text-gray-700">SKU</label>
-                        <input type="text" name="sku" id="sku" value="{{ old('sku', $product->sku) }}" 
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('sku') border-red-300 @enderror" 
-                               placeholder="Stock Keeping Unit">
-                        @error('sku')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    
 
                     
 
@@ -239,13 +216,24 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-calculate profit margin when prices change
+    // Display VAT-inclusive values in inputs while storing exclusive
     const costPriceInput = document.getElementById('cost_price');
     const sellingPriceInput = document.getElementById('selling_price');
+    const minSellingPriceInput = document.getElementById('min_selling_price');
+    const pricesInclusiveCheckbox = document.getElementById('prices_inclusive');
+    const taxTypeSelect = document.getElementById('tax_type');
+
+    const costExclNote = document.getElementById('cost_price_excl_note');
+    const costExclValue = document.getElementById('cost_price_excl_value');
+    const sellingExclNote = document.getElementById('selling_price_excl_note');
+    const sellingExclValue = document.getElementById('selling_price_excl_value');
     
     function calculateProfitMargin() {
-        const costPrice = parseFloat(costPriceInput.value) || 0;
-        const sellingPrice = parseFloat(sellingPriceInput.value) || 0;
+        const vat = getVatRate();
+        const costBase = parseFloat(costPriceInput.getAttribute('data-base')) || 0;
+        const sellBase = parseFloat(sellingPriceInput.getAttribute('data-base')) || 0;
+        const costPrice = costBase;
+        const sellingPrice = sellBase;
         
         if (costPrice > 0 && sellingPrice > 0) {
             const profitMargin = ((sellingPrice - costPrice) / costPrice) * 100;
@@ -253,8 +241,61 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    costPriceInput.addEventListener('input', calculateProfitMargin);
-    sellingPriceInput.addEventListener('input', calculateProfitMargin);
+    function getVatRate() {
+        const taxType = taxTypeSelect.value || 'standard';
+        if (taxType === 'standard') return 0.15;
+        return 0;
+    }
+
+    function updateInclusiveNotes() {
+        const vat = getVatRate();
+        const baseCost = parseFloat(costPriceInput.getAttribute('data-base')) || parseFloat(costPriceInput.value) || 0;
+        const baseSell = parseFloat(sellingPriceInput.getAttribute('data-base')) || parseFloat(sellingPriceInput.value) || 0;
+
+        if (vat > 0) {
+            const costIncl = baseCost * (1 + vat);
+            const sellIncl = baseSell * (1 + vat);
+            // Notes: show exclusive values
+            costExclValue.textContent = baseCost.toFixed(2);
+            sellingExclValue.textContent = baseSell.toFixed(2);
+            costExclNote.classList.remove('hidden');
+            sellingExclNote.classList.remove('hidden');
+            // Show inputs inclusive
+            costPriceInput.value = costIncl.toFixed(2);
+            sellingPriceInput.value = sellIncl.toFixed(2);
+            if (minSellingPriceInput) {
+                const baseMin = parseFloat(minSellingPriceInput.getAttribute('data-base')) || parseFloat(minSellingPriceInput.value) || 0;
+                minSellingPriceInput.value = (baseMin * (1 + vat)).toFixed(2);
+            }
+        } else {
+            costExclNote.classList.add('hidden');
+            sellingExclNote.classList.add('hidden');
+        }
+    }
+
+    function handlePriceInput(e) {
+        const vat = getVatRate();
+        const val = parseFloat(e.target.value) || 0;
+        const base = vat > 0 ? val / (1 + vat) : val;
+        e.target.setAttribute('data-base', base.toFixed(2));
+        calculateProfitMargin();
+        // Do not rewrite the field while typing to avoid cursor jumps
+        // Only notes are updated here; inputs are recalculated on VAT change/init
+    }
+
+    costPriceInput.addEventListener('input', handlePriceInput);
+    sellingPriceInput.addEventListener('input', handlePriceInput);
+    if (pricesInclusiveCheckbox) {
+        pricesInclusiveCheckbox.addEventListener('change', updateInclusiveNotes);
+    }
+    taxTypeSelect.addEventListener('change', updateInclusiveNotes);
+
+    // Initialize base attributes (exclusive as stored)
+    costPriceInput.setAttribute('data-base', parseFloat(costPriceInput.value) || 0);
+    sellingPriceInput.setAttribute('data-base', parseFloat(sellingPriceInput.value) || 0);
+    if (minSellingPriceInput) minSellingPriceInput.setAttribute('data-base', parseFloat(minSellingPriceInput.value) || 0);
+    updateInclusiveNotes();
 });
 </script>
 @endsection
+

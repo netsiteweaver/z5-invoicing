@@ -117,6 +117,17 @@ class ProductController extends Controller
         $validated['status'] = 1;
         $validated['type'] = 'finished';
 
+        // If user entered VAT-inclusive, convert to exclusive before saving
+        $pricesInclusive = (bool) ($request->input('prices_inclusive') == '1');
+        if ($pricesInclusive && ($validated['tax_type'] ?? 'standard') === 'standard') {
+            $vatRate = 0.15;
+            $validated['cost_price'] = round(($validated['cost_price'] ?? 0) / (1 + $vatRate), 2);
+            $validated['selling_price'] = round(($validated['selling_price'] ?? 0) / (1 + $vatRate), 2);
+            if (isset($validated['min_selling_price'])) {
+                $validated['min_selling_price'] = round(($validated['min_selling_price'] ?? 0) / (1 + $vatRate), 2);
+            }
+        }
+
         $product = Product::create($validated);
 
         // Auto-create zero-stock inventory entries for all active departments
@@ -194,6 +205,17 @@ class ProductController extends Controller
 
         $validated['updated_by'] = auth()->id();
         $validated['type'] = 'finished';
+
+        // If user entered VAT-inclusive (optional via hidden field on edit forms in future), convert to exclusive
+        $pricesInclusive = (bool) ($request->input('prices_inclusive') == '1');
+        if ($pricesInclusive && ($validated['tax_type'] ?? $product->tax_type) === 'standard') {
+            $vatRate = 0.15;
+            $validated['cost_price'] = round(($validated['cost_price'] ?? 0) / (1 + $vatRate), 2);
+            $validated['selling_price'] = round(($validated['selling_price'] ?? 0) / (1 + $vatRate), 2);
+            if (isset($validated['min_selling_price'])) {
+                $validated['min_selling_price'] = round(($validated['min_selling_price'] ?? 0) / (1 + $vatRate), 2);
+            }
+        }
 
         $product->update($validated);
 
