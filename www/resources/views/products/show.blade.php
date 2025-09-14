@@ -66,19 +66,7 @@
                             </div>
                         @endif
                         
-                        @if($product->weight)
-                            <div>
-                                <dt class="text-sm font-medium text-gray-500">Weight</dt>
-                                <dd class="mt-1 text-sm text-gray-900">{{ $product->weight }} kg</dd>
-                            </div>
-                        @endif
                         
-                        @if($product->dimensions)
-                            <div>
-                                <dt class="text-sm font-medium text-gray-500">Dimensions</dt>
-                                <dd class="mt-1 text-sm text-gray-900">{{ $product->dimensions }}</dd>
-                            </div>
-                        @endif
                         
                         @if($product->description)
                             <div class="sm:col-span-2">

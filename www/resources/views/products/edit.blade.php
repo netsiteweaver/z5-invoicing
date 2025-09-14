@@ -196,28 +196,7 @@
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Additional Information</h3>
                 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <!-- Weight -->
-                    <div>
-                        <label for="weight" class="block text-sm font-medium text-gray-700">Weight (kg)</label>
-                        <input type="number" name="weight" id="weight" value="{{ old('weight', $product->weight) }}" 
-                               step="0.01" min="0"
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('weight') border-red-300 @enderror" 
-                               placeholder="0.00">
-                        @error('weight')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Dimensions -->
-                    <div>
-                        <label for="dimensions" class="block text-sm font-medium text-gray-700">Dimensions</label>
-                        <input type="text" name="dimensions" id="dimensions" value="{{ old('dimensions', $product->dimensions) }}" 
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('dimensions') border-red-300 @enderror" 
-                               placeholder="L x W x H">
-                        @error('dimensions')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    
 
                     <!-- SKU -->
                     <div>
