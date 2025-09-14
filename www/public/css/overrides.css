@@ -1,0 +1,42 @@
+/* Standalone button styles (no Tailwind build required) */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    padding: 0 1rem;
+    border: 0;
+    color: #ffffff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    line-height: 1;
+    border-radius: 0;
+    white-space: nowrap;
+}
+
+.btn:hover { opacity: 0.95; }
+.btn:focus { outline: 2px solid rgba(59,130,246,0.5); outline-offset: 2px; }
+
+/* Colors (Tailwind equivalents) */
+.btn-create { background-color: #059669; }       /* emerald-600 */
+.btn-create:hover { background-color: #047857; }  /* emerald-700 */
+
+.btn-view { background-color: #0284c7; }         /* sky-600 */
+.btn-view:hover { background-color: #0369a1; }    /* sky-700 */
+
+.btn-edit { background-color: #d97706; }         /* amber-600 */
+.btn-edit:hover { background-color: #b45309; }    /* amber-700 */
+
+.btn-delete { background-color: #e11d48; }       /* rose-600 */
+.btn-delete:hover { background-color: #be123c; }  /* rose-700 */
+
+.btn-icon {
+    margin-left: -0.25rem;
+    margin-right: 0.5rem;
+    font-size: 0.9rem;
+    line-height: 1;
+}
+
+
