@@ -101,7 +101,7 @@
             <!-- Pricing Information -->
             <div class="border-b border-gray-200 pb-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Pricing Information</h3>
-                <div class="mb-4">
+                <div class="mb-4 hidden">
                     <label class="inline-flex items-center text-sm text-gray-700">
                         <input type="hidden" name="prices_inclusive" value="0">
                         <input type="checkbox" name="prices_inclusive" value="1" id="prices_inclusive" class="mr-2 border-gray-300 rounded" checked>
@@ -112,7 +112,7 @@
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     <!-- Cost Price -->
                     <div>
-                        <label for="cost_price" class="block text-sm font-medium text-gray-700">Cost Price *</label>
+                        <label for="cost_price" class="block text-sm font-medium text-gray-700">Cost Price (VAT incl.) *</label>
                         <div class="mt-1 relative rounded-md shadow-sm">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-500 sm:text-sm">Rs</span>
@@ -130,7 +130,7 @@
 
                     <!-- Selling Price (VAT exclusive) -->
                     <div>
-                        <label for="selling_price" class="block text-sm font-medium text-gray-700">Selling Price (VAT excl.) *</label>
+                        <label for="selling_price" class="block text-sm font-medium text-gray-700">Selling Price (VAT incl.) *</label>
                         <div class="mt-1 relative rounded-md shadow-sm">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-500 sm:text-sm">Rs</span>
@@ -161,7 +161,7 @@
 
                     <!-- Minimum Selling Price -->
                     <div>
-                        <label for="min_selling_price" class="block text-sm font-medium text-gray-700">Min. Selling Price</label>
+                        <label for="min_selling_price" class="block text-sm font-medium text-gray-700">Min. Selling Price (VAT incl.)</label>
                         <div class="mt-1 relative rounded-md shadow-sm">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-500 sm:text-sm">Rs</span>
@@ -171,6 +171,7 @@
                                    class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-12 pr-12 sm:text-sm border-gray-300 rounded-md @error('min_selling_price') border-red-300 @enderror" 
                                    placeholder="0.00">
                         </div>
+                        <p id="min_selling_price_excl_note" class="mt-2 text-xs text-gray-500 hidden">Excl. VAT: Rs <span id="min_selling_price_excl_value">0.00</span></p>
                         @error('min_selling_price')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -228,6 +229,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const costExclValue = document.getElementById('cost_price_excl_value');
     const sellingExclNote = document.getElementById('selling_price_excl_note');
     const sellingExclValue = document.getElementById('selling_price_excl_value');
+    const minSellExclNote = document.getElementById('min_selling_price_excl_note');
+    const minSellExclValue = document.getElementById('min_selling_price_excl_value');
 
     let baseCost = parseFloat(costPriceInput.value) || 0;
     let baseSell = parseFloat(sellingPriceInput.value) || 0;
@@ -260,12 +263,17 @@ document.addEventListener('DOMContentLoaded', function() {
             sellingExclValue.textContent = baseSell.toFixed(2);
             costExclNote.classList.remove('hidden');
             sellingExclNote.classList.remove('hidden');
+            if (minSellExclNote && minSellExclValue) {
+                minSellExclValue.textContent = baseMin.toFixed(2);
+                minSellExclNote.classList.remove('hidden');
+            }
         } else {
             costPriceInput.value = baseCost.toFixed(2);
             sellingPriceInput.value = baseSell.toFixed(2);
             if (minSellingPriceInput) minSellingPriceInput.value = baseMin.toFixed(2);
             costExclNote.classList.add('hidden');
             sellingExclNote.classList.add('hidden');
+            if (minSellExclNote) minSellExclNote.classList.add('hidden');
         }
         calculateProfitMargin();
     }
@@ -286,6 +294,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Keep hints updated
         costExclValue.textContent = baseCost.toFixed(2);
         sellingExclValue.textContent = baseSell.toFixed(2);
+        const minSellExclValue = document.getElementById('min_selling_price_excl_value');
+        const minSellExclNote = document.getElementById('min_selling_price_excl_note');
+        if (minSellExclValue && minSellExclNote) {
+            minSellExclValue.textContent = baseMin.toFixed(2);
+        }
     }
 
     costPriceInput.addEventListener('input', handleUserInput);

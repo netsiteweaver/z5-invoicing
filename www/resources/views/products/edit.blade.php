@@ -100,7 +100,7 @@
             <!-- Pricing Information -->
             <div class="border-b border-gray-200 pb-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Pricing Information</h3>
-                <div class="mb-4">
+                <div class="mb-4 hidden">
                     <label class="inline-flex items-center text-sm text-gray-700">
                         <input type="hidden" name="prices_inclusive" value="0">
                         <input type="checkbox" name="prices_inclusive" value="1" id="prices_inclusive" class="mr-2 border-gray-300 rounded" checked>
@@ -111,7 +111,7 @@
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     <!-- Cost Price -->
                     <div>
-                        <label for="cost_price" class="block text-sm font-medium text-gray-700">Cost Price *</label>
+                        <label for="cost_price" class="block text-sm font-medium text-gray-700">Cost Price (VAT incl.) *</label>
                         <div class="mt-1 relative rounded-md shadow-sm">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-500 sm:text-sm">Rs</span>
@@ -129,7 +129,7 @@
 
                     <!-- Selling Price -->
                     <div>
-                        <label for="selling_price" class="block text-sm font-medium text-gray-700">Selling Price *</label>
+                        <label for="selling_price" class="block text-sm font-medium text-gray-700">Selling Price (VAT incl.) *</label>
                         <div class="mt-1 relative rounded-md shadow-sm">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-500 sm:text-sm">Rs</span>
@@ -160,7 +160,7 @@
 
                     <!-- Minimum Selling Price -->
                     <div>
-                        <label for="min_selling_price" class="block text-sm font-medium text-gray-700">Min. Selling Price</label>
+                        <label for="min_selling_price" class="block text-sm font-medium text-gray-700">Min. Selling Price (VAT incl.)</label>
                         <div class="mt-1 relative rounded-md shadow-sm">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-500 sm:text-sm">Rs</span>
@@ -170,6 +170,7 @@
                                    class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-12 pr-12 sm:text-sm border-gray-300 rounded-md @error('min_selling_price') border-red-300 @enderror" 
                                    placeholder="0.00">
                         </div>
+                        <p id="min_selling_price_excl_note" class="mt-2 text-xs text-gray-500">Excl. VAT: Rs <span id="min_selling_price_excl_value">0.00</span></p>
                         @error('min_selling_price')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -266,6 +267,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (minSellingPriceInput) {
                 const baseMin = parseFloat(minSellingPriceInput.getAttribute('data-base')) || parseFloat(minSellingPriceInput.value) || 0;
                 minSellingPriceInput.value = (baseMin * (1 + vat)).toFixed(2);
+                const minSellExclValue = document.getElementById('min_selling_price_excl_value');
+                if (minSellExclValue) minSellExclValue.textContent = baseMin.toFixed(2);
             }
         } else {
             costExclNote.classList.add('hidden');
@@ -281,10 +284,23 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateProfitMargin();
         // Do not rewrite the field while typing to avoid cursor jumps
         // Only notes are updated here; inputs are recalculated on VAT change/init
+        // Update exclusive notes live
+        const baseCostNow = parseFloat(costPriceInput.getAttribute('data-base')) || 0;
+        const baseSellNow = parseFloat(sellingPriceInput.getAttribute('data-base')) || 0;
+        if (costExclValue) costExclValue.textContent = baseCostNow.toFixed(2);
+        if (sellingExclValue) sellingExclValue.textContent = baseSellNow.toFixed(2);
+        if (minSellingPriceInput) {
+            const baseMinNow = parseFloat(minSellingPriceInput.getAttribute('data-base')) || 0;
+            const minExclSpan = document.getElementById('min_selling_price_excl_value');
+            if (minExclSpan) minExclSpan.textContent = baseMinNow.toFixed(2);
+        }
     }
 
     costPriceInput.addEventListener('input', handlePriceInput);
     sellingPriceInput.addEventListener('input', handlePriceInput);
+    if (minSellingPriceInput) {
+        minSellingPriceInput.addEventListener('input', handlePriceInput);
+    }
     if (pricesInclusiveCheckbox) {
         pricesInclusiveCheckbox.addEventListener('change', updateInclusiveNotes);
     }

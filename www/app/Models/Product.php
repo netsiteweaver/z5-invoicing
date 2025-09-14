@@ -19,6 +19,7 @@ class Product extends Model
         'description',
         'cost_price',
         'selling_price',
+        'min_selling_price',
         'tax_type',
         'category_id',
         'brand_id',
@@ -38,6 +39,7 @@ class Product extends Model
         return [
             'cost_price' => 'decimal:2',
             'selling_price' => 'decimal:2',
+            'min_selling_price' => 'decimal:2',
             'status' => 'integer',
         ];
     }
