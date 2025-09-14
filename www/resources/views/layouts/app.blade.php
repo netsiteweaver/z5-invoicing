@@ -44,10 +44,10 @@
             <!-- Brand Logo -->
             <div class="flex items-center justify-center h-16 px-4 bg-gradient-to-r from-blue-600 to-purple-600">
                 <div class="flex items-center">
-                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
-                        <span class="text-blue-600 font-bold text-sm">Z5</span>
+                    <div class="w-8 h-8 bg-white rounded flex items-center justify-center mr-3 overflow-hidden">
+                        <img src="{{ asset('favicon-32x32.png') }}" alt="Logo" class="h-8 w-8 object-contain">
                     </div>
-                    <h1 class="text-xl font-bold text-white">Distribution</h1>
+                    <h1 class="text-xl font-bold text-white">{{ $companySettings ? $companySettings->company_name : config('app.name', 'Welcome') }}</h1>
                 </div>
             </div>
 
