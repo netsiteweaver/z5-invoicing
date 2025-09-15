@@ -8,6 +8,7 @@ use App\Models\Sale;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Inventory;
+use App\Models\LoginActivity;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -35,7 +36,12 @@ class DashboardController extends Controller
                 ->orderBy('month')
                 ->get();
 
-            return view('dashboard', compact('stats', 'monthlySales'));
+            $recentLogins = LoginActivity::with('user')
+                ->orderByDesc('created_at')
+                ->limit(20)
+                ->get();
+
+            return view('dashboard', compact('stats', 'monthlySales', 'recentLogins'));
         } catch (\Exception $e) {
             // Fallback to basic stats if there are any issues
             $stats = [
@@ -51,7 +57,8 @@ class DashboardController extends Controller
             
             $monthlySales = collect();
             
-            return view('dashboard', compact('stats', 'monthlySales'));
+            $recentLogins = collect();
+            return view('dashboard', compact('stats', 'monthlySales', 'recentLogins'));
         }
     }
 
