@@ -166,6 +166,56 @@ class BreadcrumbService
                 $this->add($params['inventory']->product->name, null, true);
                 break;
 
+            // Goods Receipts
+            case 'goods-receipts.index':
+                $this->add('Inventory', route('inventory.index'));
+                $this->add('Goods Receipts', null, true);
+                break;
+
+            case 'goods-receipts.create':
+                $this->add('Inventory', route('inventory.index'));
+                $this->add('Goods Receipts', route('goods-receipts.index'));
+                $this->add('Create Receipt', null, true);
+                break;
+
+            case 'goods-receipts.show':
+                $this->add('Inventory', route('inventory.index'));
+                $this->add('Goods Receipts', route('goods-receipts.index'));
+                $this->add($params['receipt']->grn_number ?? 'Receipt', null, true);
+                break;
+
+            case 'goods-receipts.edit':
+                $this->add('Inventory', route('inventory.index'));
+                $this->add('Goods Receipts', route('goods-receipts.index'));
+                $this->add($params['receipt']->grn_number ?? 'Receipt', route('goods-receipts.show', $params['receipt']));
+                $this->add('Edit Receipt', null, true);
+                break;
+
+            // Stock Transfers
+            case 'stock-transfers.index':
+                $this->add('Inventory', route('inventory.index'));
+                $this->add('Stock Transfers', null, true);
+                break;
+
+            case 'stock-transfers.create':
+                $this->add('Inventory', route('inventory.index'));
+                $this->add('Stock Transfers', route('stock-transfers.index'));
+                $this->add('Create Transfer', null, true);
+                break;
+
+            case 'stock-transfers.show':
+                $this->add('Inventory', route('inventory.index'));
+                $this->add('Stock Transfers', route('stock-transfers.index'));
+                $this->add($params['transfer']->transfer_number ?? 'Transfer', null, true);
+                break;
+
+            case 'stock-transfers.edit':
+                $this->add('Inventory', route('inventory.index'));
+                $this->add('Stock Transfers', route('stock-transfers.index'));
+                $this->add($params['transfer']->transfer_number ?? 'Transfer', route('stock-transfers.show', $params['transfer']));
+                $this->add('Edit Transfer', null, true);
+                break;
+
             case 'product-categories.index':
                 $this->add('Product Categories', null, true);
                 break;

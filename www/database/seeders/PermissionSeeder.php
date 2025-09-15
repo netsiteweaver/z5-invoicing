@@ -70,6 +70,22 @@ class PermissionSeeder extends Seeder
             ['name' => 'inventory.stock_movement', 'display_name' => 'Record Stock Movements', 'module' => 'inventory', 'action' => 'stock_movement'],
             ['name' => 'inventory.low_stock', 'display_name' => 'View Low Stock Alerts', 'module' => 'inventory', 'action' => 'low_stock'],
             ['name' => 'inventory.stock_report', 'display_name' => 'View Stock Reports', 'module' => 'inventory', 'action' => 'stock_report'],
+
+            // Goods Receipts
+            ['name' => 'goods_receipts.view', 'display_name' => 'View Goods Receipts', 'module' => 'goods_receipts', 'action' => 'view'],
+            ['name' => 'goods_receipts.create', 'display_name' => 'Create Goods Receipts', 'module' => 'goods_receipts', 'action' => 'create'],
+            ['name' => 'goods_receipts.edit', 'display_name' => 'Edit Goods Receipts', 'module' => 'goods_receipts', 'action' => 'edit'],
+            ['name' => 'goods_receipts.delete', 'display_name' => 'Delete Goods Receipts', 'module' => 'goods_receipts', 'action' => 'delete'],
+            ['name' => 'goods_receipts.approve', 'display_name' => 'Approve Goods Receipts', 'module' => 'goods_receipts', 'action' => 'approve'],
+            ['name' => 'goods_receipts.print', 'display_name' => 'Print Goods Receipts', 'module' => 'goods_receipts', 'action' => 'print'],
+
+            // Stock Transfers
+            ['name' => 'stock_transfers.view', 'display_name' => 'View Stock Transfers', 'module' => 'stock_transfers', 'action' => 'view'],
+            ['name' => 'stock_transfers.create', 'display_name' => 'Create Stock Transfers', 'module' => 'stock_transfers', 'action' => 'create'],
+            ['name' => 'stock_transfers.edit', 'display_name' => 'Edit Stock Transfers', 'module' => 'stock_transfers', 'action' => 'edit'],
+            ['name' => 'stock_transfers.delete', 'display_name' => 'Delete Stock Transfers', 'module' => 'stock_transfers', 'action' => 'delete'],
+            ['name' => 'stock_transfers.approve', 'display_name' => 'Approve Stock Transfers', 'module' => 'stock_transfers', 'action' => 'approve'],
+            ['name' => 'stock_transfers.print', 'display_name' => 'Print Stock Transfers', 'module' => 'stock_transfers', 'action' => 'print'],
             
             // User Management
             ['name' => 'users.view', 'display_name' => 'View Users', 'module' => 'users', 'action' => 'view'],
@@ -155,6 +171,8 @@ class PermissionSeeder extends Seeder
             'sales.view', 'sales.create', 'sales.edit',
             'inventory.view', 'inventory.create', 'inventory.edit', 'inventory.stock_movement',
             'inventory.low_stock', 'inventory.stock_report',
+            'goods_receipts.view', 'goods_receipts.create', 'goods_receipts.edit', 'goods_receipts.approve', 'goods_receipts.print',
+            'stock_transfers.view', 'stock_transfers.create', 'stock_transfers.edit', 'stock_transfers.approve', 'stock_transfers.print',
             'reports.view', 'reports.sales', 'reports.inventory',
         ]);
 
@@ -173,6 +191,8 @@ class PermissionSeeder extends Seeder
             'products.view',
             'inventory.view', 'inventory.create', 'inventory.edit', 'inventory.stock_movement',
             'inventory.low_stock', 'inventory.stock_report',
+            'goods_receipts.view', 'goods_receipts.create', 'goods_receipts.edit', 'goods_receipts.approve', 'goods_receipts.print',
+            'stock_transfers.view', 'stock_transfers.create', 'stock_transfers.edit', 'stock_transfers.approve', 'stock_transfers.print',
             'reports.view', 'reports.inventory',
         ]);
 

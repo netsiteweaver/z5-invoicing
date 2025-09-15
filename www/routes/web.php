@@ -74,6 +74,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('inventory/{inventory}/stock-movement', [InventoryController::class, 'stockMovement'])->name('inventory.stock-movement');
     Route::get('inventory/low-stock', [InventoryController::class, 'lowStock'])->name('inventory.low-stock');
     Route::get('inventory/stock-report', [InventoryController::class, 'stockReport'])->name('inventory.stock-report');
+
+    // Goods Receipt routes
+    Route::resource('goods-receipts', \App\Http\Controllers\GoodsReceiptController::class);
+    Route::get('goods-receipts/{goods_receipt}/print', [\App\Http\Controllers\GoodsReceiptController::class, 'print'])->name('goods-receipts.print')->middleware('permission:goods_receipts.print');
+    Route::post('goods-receipts/{goods_receipt}/approve', [\App\Http\Controllers\GoodsReceiptController::class, 'approve'])->name('goods-receipts.approve')->middleware('permission:goods_receipts.approve');
+
+    // Stock Transfer routes
+    Route::resource('stock-transfers', \App\Http\Controllers\StockTransferController::class);
+    Route::get('stock-transfers/{stock_transfer}/print', [\App\Http\Controllers\StockTransferController::class, 'print'])->name('stock-transfers.print')->middleware('permission:stock_transfers.print');
+    Route::post('stock-transfers/{stock_transfer}/receive', [\App\Http\Controllers\StockTransferController::class, 'receive'])->name('stock-transfers.receive')->middleware('permission:stock_transfers.approve');
     
     // User Management routes (specific first to avoid conflict with resource catch-all)
     Route::get('user-management/roles', [UserManagementController::class, 'roles'])->name('user-management.roles');

@@ -29,10 +29,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('css/overrides.css') }}">
 </head>
-<body class="font-sans antialiased bg-gray-50" x-data="{ sidebarOpen: false }">
-    <div class="min-h-screen flex">
+<body class="font-sans antialiased bg-gray-50" x-data="{ sidebarOpen: true }">
+    <div class="min-h-screen flex transition-all duration-300" :style="{ paddingLeft: sidebarOpen ? '16rem' : '0' }">
         <!-- Sidebar -->
-        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0"
+        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out"
              :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="-translate-x-full"
@@ -245,6 +245,22 @@
                             Stock Report
                         </a>
                         @endif
+
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('goods_receipts.view'))
+                        <a href="{{ route('goods-receipts.index') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('goods-receipts.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Goods Receipts
+                        </a>
+                        @endif
+
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('stock_transfers.view'))
+                        <a href="{{ route('stock-transfers.index') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('stock-transfers.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Stock Transfers
+                        </a>
+                        @endif
                     </div>
                 </div>
                 @endif
@@ -301,12 +317,12 @@
         </div>
 
         <!-- Main content -->
-        <div class="flex-1 flex flex-col lg:ml-64">
+        <div class="flex-1 flex flex-col">
             <!-- Top navigation -->
             <div class="bg-white shadow-sm border-b border-gray-200">
                 <div class="flex justify-between items-center h-16 px-4">
                     <!-- Mobile menu button -->
-                    <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500">
+                    <button @click="sidebarOpen = !sidebarOpen" title="Toggle sidebar" aria-label="Toggle sidebar" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500">
                         <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                             <path :class="{'hidden': sidebarOpen, 'inline-flex': ! sidebarOpen }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                             <path :class="{'hidden': ! sidebarOpen, 'inline-flex': sidebarOpen }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

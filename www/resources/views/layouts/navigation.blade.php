@@ -27,6 +27,18 @@
                     <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
                         {{ __('Orders') }}
                     </x-nav-link>
+
+                    @can('goods_receipts.view')
+                    <x-nav-link :href="route('goods-receipts.index')" :active="request()->routeIs('goods-receipts.*')">
+                        {{ __('Goods Receipts') }}
+                    </x-nav-link>
+                    @endcan
+
+                    @can('stock_transfers.view')
+                    <x-nav-link :href="route('stock-transfers.index')" :active="request()->routeIs('stock-transfers.*')">
+                        {{ __('Stock Transfers') }}
+                    </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -94,6 +106,18 @@
             <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
                 {{ __('Orders') }}
             </x-responsive-nav-link>
+
+            @can('goods_receipts.view')
+            <x-responsive-nav-link :href="route('goods-receipts.index')" :active="request()->routeIs('goods-receipts.*')">
+                {{ __('Goods Receipts') }}
+            </x-responsive-nav-link>
+            @endcan
+
+            @can('stock_transfers.view')
+            <x-responsive-nav-link :href="route('stock-transfers.index')" :active="request()->routeIs('stock-transfers.*')">
+                {{ __('Stock Transfers') }}
+            </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->
