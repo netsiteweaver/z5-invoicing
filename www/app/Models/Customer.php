@@ -117,7 +117,9 @@ class Customer extends Model
 
     public function getPrimaryPhoneAttribute(): string
     {
-        return $this->phone_number1;
+        return $this->phone_number1
+            ?? $this->phone_number2
+            ?? '';
     }
 
     // Map form-friendly attributes to database columns
