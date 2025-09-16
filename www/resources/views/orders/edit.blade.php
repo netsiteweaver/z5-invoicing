@@ -119,17 +119,9 @@
 
                 <!-- Payment Status -->
                 <div>
-                    <label for="payment_status" class="block text-sm font-medium text-gray-700">Payment Status <span class="text-red-500">*</span></label>
-                    <select name="payment_status" id="payment_status" required 
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        <option value="pending" {{ old('payment_status', $order->payment_status) === 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="partial" {{ old('payment_status', $order->payment_status) === 'partial' ? 'selected' : '' }}>Partial</option>
-                        <option value="paid" {{ old('payment_status', $order->payment_status) === 'paid' ? 'selected' : '' }}>Paid</option>
-                        <option value="overdue" {{ old('payment_status', $order->payment_status) === 'overdue' ? 'selected' : '' }}>Overdue</option>
-                    </select>
-                    @error('payment_status')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    <label class="block text-sm font-medium text-gray-700">Payment Status</label>
+                    <input type="text" value="{{ ucfirst($order->payment_status) }}" disabled class="mt-1 block w-full border-gray-200 rounded-md shadow-sm bg-gray-50 text-gray-700 sm:text-sm">
+                    <p class="mt-1 text-xs text-gray-500">Automatically managed.</p>
                 </div>
 
                 <!-- Notes -->

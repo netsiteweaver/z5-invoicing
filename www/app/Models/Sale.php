@@ -182,12 +182,61 @@ class Sale extends Model
         return $this->payment_status === 'overdue';
     }
 
+    public function getPaidAmountAttribute(): float
+    {
+        return (float) $this->payments()
+            ->where('status', 1)
+            ->where('payment_type', 'receipt')
+            ->where('payment_status', 'paid')
+            ->sum('amount');
+    }
+
+    public function getOutstandingAmountAttribute(): float
+    {
+        $totalAmount = (float) ($this->total_amount ?? 0);
+        $paidAmount = (float) $this->paid_amount;
+        $outstanding = $totalAmount - $paidAmount;
+        return $outstanding > 0 ? $outstanding : 0.0;
+    }
+
     // Methods
     public function calculateTotals(): void
     {
         $this->subtotal = $this->items()->sum('line_total');
         $this->total_amount = $this->subtotal + $this->tax_amount + $this->shipping_amount - $this->discount_amount;
         $this->save();
+    }
+
+    public function refreshPaymentStatus(): void
+    {
+        $paidAmount = (float) $this->paid_amount;
+        $totalAmount = (float) ($this->total_amount ?? 0);
+
+        $newStatus = 'pending';
+        if ($paidAmount >= $totalAmount && $totalAmount > 0) {
+            $newStatus = 'paid';
+        } elseif ($paidAmount > 0 && $paidAmount < $totalAmount) {
+            $newStatus = 'partial';
+        } else {
+            $newStatus = 'pending';
+        }
+
+        // Mark overdue if past due date and not fully paid
+        if (!empty($this->due_date) && $newStatus !== 'paid') {
+            try {
+                $isPastDue = now()->greaterThan(\Carbon\Carbon::parse($this->due_date));
+                if ($isPastDue) {
+                    $newStatus = 'overdue';
+                }
+            } catch (\Throwable $e) {
+                // Ignore parsing issues and keep computed status
+            }
+        }
+
+        if ($this->payment_status !== $newStatus) {
+            $this->payment_status = $newStatus;
+            $this->save();
+        }
     }
 
     public function canBeEdited(): bool

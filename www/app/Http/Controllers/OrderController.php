@@ -96,7 +96,7 @@ class OrderController extends Controller
             'order_date' => ['required', 'date'],
             'delivery_date' => ['nullable', 'date', 'after_or_equal:order_date'],
             'order_status' => ['required', 'in:draft,pending,confirmed,processing,shipped,delivered,cancelled'],
-            'payment_status' => ['required', 'in:pending,partial,paid,overdue'],
+            // payment_status is managed automatically
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
@@ -133,6 +133,7 @@ class OrderController extends Controller
         $validated['total_amount'] = $subtotal - $totalDiscount + $totalTax;
         $validated['created_by'] = auth()->id();
         $validated['status'] = 1;
+        $validated['payment_status'] = 'pending';
 
         if (empty($validated['delivery_date'])) {
             $validated['delivery_date'] = $validated['order_date'];
@@ -219,7 +220,7 @@ class OrderController extends Controller
             'order_date' => ['required', 'date'],
             'delivery_date' => ['nullable', 'date', 'after_or_equal:order_date'],
             'order_status' => ['required', 'in:draft,pending,confirmed,processing,shipped,delivered,cancelled'],
-            'payment_status' => ['required', 'in:pending,partial,paid,overdue'],
+            // payment_status is managed automatically
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
@@ -255,6 +256,8 @@ class OrderController extends Controller
         $validated['tax_amount'] = $totalTax;
         $validated['total_amount'] = $subtotal - $totalDiscount + $totalTax;
         $validated['updated_by'] = auth()->id();
+        // Do not accept payment_status from request
+        unset($validated['payment_status']);
 
         $order->update($validated);
 

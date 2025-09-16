@@ -77,10 +77,11 @@ class SaleController extends Controller
     public function show(Sale $sale)
     {
         $sale->load(['customer', 'items.product', 'payments']);
+        $paymentTypes = \App\Models\PaymentType::orderBy('display_order')->orderBy('name')->get();
         
         $breadcrumbs = $this->setBreadcrumbs('sales.show', ['sale' => $sale]);
         
-        return view('sales.show', compact('sale') + $breadcrumbs);
+        return view('sales.show', compact('sale', 'paymentTypes') + $breadcrumbs);
     }
 
     public function create()

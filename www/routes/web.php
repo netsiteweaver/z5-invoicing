@@ -12,6 +12,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -68,6 +69,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Sales routes
     Route::resource('sales', SaleController::class);
+    // Payments routes (minimal for sale payments)
+    Route::post('sales/{sale}/payments', [PaymentController::class, 'storeForSale'])
+        ->name('sales.payments.store')
+        ->middleware('permission:sales.edit');
     // Supplier routes
     Route::resource('suppliers', SupplierController::class);
 

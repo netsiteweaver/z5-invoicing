@@ -191,4 +191,54 @@ class Order extends Model
     {
         return !in_array($this->order_status, ['delivered', 'cancelled']);
     }
+
+    // Payments aggregates and status refresh
+    public function getPaidAmountAttribute(): float
+    {
+        return (float) $this->payments()
+            ->where('status', 1)
+            ->where('payment_type', 'receipt')
+            ->where('payment_status', 'paid')
+            ->sum('amount');
+    }
+
+    public function getOutstandingAmountAttribute(): float
+    {
+        $totalAmount = (float) ($this->total_amount ?? 0);
+        $paidAmount = (float) $this->paid_amount;
+        $outstanding = $totalAmount - $paidAmount;
+        return $outstanding > 0 ? $outstanding : 0.0;
+    }
+
+    public function refreshPaymentStatus(): void
+    {
+        // If there is a converted sale, mirror its payment status
+        $relatedSale = $this->sales()->latest('id')->first();
+        if ($relatedSale) {
+            $computed = $relatedSale->payment_status;
+            if ($this->payment_status !== $computed) {
+                $this->payment_status = $computed;
+                $this->save();
+            }
+            return;
+        }
+
+        // Otherwise compute from order-level payments
+        $paidAmount = (float) $this->paid_amount;
+        $totalAmount = (float) ($this->total_amount ?? 0);
+
+        $newStatus = 'pending';
+        if ($paidAmount >= $totalAmount && $totalAmount > 0) {
+            $newStatus = 'paid';
+        } elseif ($paidAmount > 0 && $paidAmount < $totalAmount) {
+            $newStatus = 'partial';
+        } else {
+            $newStatus = 'pending';
+        }
+
+        if ($this->payment_status !== $newStatus) {
+            $this->payment_status = $newStatus;
+            $this->save();
+        }
+    }
 }

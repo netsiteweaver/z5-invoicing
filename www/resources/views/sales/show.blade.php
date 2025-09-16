@@ -307,6 +307,98 @@
             </div>
         @endif
     </div>
+
+    <!-- Payments -->
+    <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-medium text-gray-900">Payments</h3>
+            <div class="text-sm text-gray-600">
+                <span>Paid: <span class="font-semibold">Rs {{ number_format($sale->paid_amount, 2) }}</span></span>
+                <span class="mx-2">|</span>
+                <span>Outstanding: <span class="font-semibold">Rs {{ number_format($sale->outstanding_amount, 2) }}</span></span>
+            </div>
+        </div>
+
+        @if($sale->payments->count() > 0)
+            <div class="overflow-x-auto mb-6">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach($sale->payments as $payment)
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($payment->payment_date)->format('M d, Y') }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $payment->payment_method }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Rs {{ number_format($payment->amount, 2) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($payment->payment_status === 'pending')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
+                                    @elseif($payment->payment_status === 'partial')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Partial</span>
+                                    @elseif($payment->payment_status === 'paid')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Paid</span>
+                                    @elseif($payment->payment_status === 'overdue')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Overdue</span>
+                                    @elseif($payment->payment_status === 'cancelled')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Cancelled</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $payment->reference_number ?? '-' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="text-sm text-gray-500 mb-6">No payments recorded yet.</div>
+        @endif
+
+        @can('sales.edit')
+        <form method="POST" action="{{ route('sales.payments.store', $sale) }}" class="grid grid-cols-1 gap-4 sm:grid-cols-5">
+            @csrf
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Date</label>
+                <input type="date" name="payment_date" value="{{ date('Y-m-d') }}" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                @error('payment_date')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Method</label>
+                <select name="payment_type_id" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <option value="">Select</option>
+                    @foreach(($paymentTypes ?? []) as $type)
+                        <option value="{{ $type->id }}">{{ $type->name }}</option>
+                    @endforeach
+                </select>
+                @error('payment_type_id')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Amount</label>
+                <input type="number" name="amount" step="0.01" min="0.01" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                @error('amount')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Reference</label>
+                <input type="text" name="reference_number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Ref # (optional)">
+                @error('reference_number')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Record Payment</button>
+            </div>
+            <div class="sm:col-span-5">
+                <label class="block text-sm font-medium text-gray-700">Notes</label>
+                <textarea name="notes" rows="2" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Notes (optional)"></textarea>
+                @error('notes')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+            </div>
+        </form>
+        @endcan
+    </div>
 </div>
 @endsection
 

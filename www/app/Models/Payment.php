@@ -53,6 +53,27 @@ class Payment extends Model
                 $model->payment_number = 'PAY-' . strtoupper(Str::random(8));
             }
         });
+
+        $recalc = function ($model) {
+            try {
+                if (!empty($model->sale_id) && $model->sale) {
+                    $model->sale->refreshPaymentStatus();
+                }
+            } catch (\Throwable $e) {
+                // swallow to avoid breaking save
+            }
+            try {
+                if (!empty($model->order_id) && $model->order && method_exists($model->order, 'refreshPaymentStatus')) {
+                    $model->order->refreshPaymentStatus();
+                }
+            } catch (\Throwable $e) {
+                // swallow to avoid breaking save
+            }
+        };
+
+        static::created($recalc);
+        static::updated($recalc);
+        static::deleted($recalc);
     }
 
     // Relationships
