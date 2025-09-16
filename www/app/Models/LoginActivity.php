@@ -10,6 +10,9 @@ class LoginActivity extends Model
 {
     use HasFactory;
 
+    protected $table = 'login_activities';
+    public $timestamps = true;
+
     protected $fillable = [
         'user_id', 'email', 'status', 'ip_address', 'country', 'city',
         'device', 'os', 'browser', 'user_agent',

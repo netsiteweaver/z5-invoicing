@@ -111,10 +111,10 @@
     </div>
 </div>
 
-<!-- Revenue and Pending Orders -->
-<div class="grid grid-cols-1 gap-5 lg:grid-cols-2 mb-6">
+<!-- Revenue and Pending Orders + Sales Trend -->
+<div class="grid grid-cols-1 gap-5 lg:grid-cols-3 mb-6">
     <!-- Revenue Overview -->
-    <div class="bg-white shadow rounded-lg">
+    <div class="bg-white shadow rounded-lg lg:col-span-1">
         <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
                 <i class="fas fa-dollar-sign mr-2"></i>
@@ -133,8 +133,34 @@
         </div>
     </div>
 
+    <!-- Sales Trend -->
+    <div class="bg-white shadow rounded-lg lg:col-span-2">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    <i class="fas fa-chart-area mr-2"></i>
+                    Sales Trend
+                </h3>
+                <form method="GET" action="{{ route('dashboard') }}" class="flex items-center space-x-2 text-sm">
+                    <select name="sales_view" class="border-gray-300 rounded-md shadow-sm" onchange="this.form.submit()">
+                        <option value="month" {{ ($salesChart['filters']['view'] ?? 'month') === 'month' ? 'selected' : '' }}>Month</option>
+                        <option value="year" {{ ($salesChart['filters']['view'] ?? 'month') === 'year' ? 'selected' : '' }}>Year</option>
+                        <option value="custom" {{ ($salesChart['filters']['view'] ?? 'month') === 'custom' ? 'selected' : '' }}>Custom</option>
+                    </select>
+                    <input type="number" name="sales_year" min="2000" max="2100" value="{{ $salesChart['filters']['year'] ?? now()->year }}" class="border-gray-300 rounded-md shadow-sm {{ ($salesChart['filters']['view'] ?? 'month') === 'year' ? '' : 'hidden' }}" />
+                    <input type="date" name="sales_start" value="{{ $salesChart['filters']['start'] ?? '' }}" class="border-gray-300 rounded-md shadow-sm {{ ($salesChart['filters']['view'] ?? 'month') === 'custom' ? '' : 'hidden' }}" />
+                    <input type="date" name="sales_end" value="{{ $salesChart['filters']['end'] ?? '' }}" class="border-gray-300 rounded-md shadow-sm {{ ($salesChart['filters']['view'] ?? 'month') === 'custom' ? '' : 'hidden' }}" />
+                    <button class="px-3 py-2 bg-blue-600 text-white rounded-md">Apply</button>
+                </form>
+            </div>
+            <div class="h-64 md:h-80">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Stats -->
-    <div class="bg-white shadow rounded-lg">
+    <div class="bg-white shadow rounded-lg lg:col-span-1">
         <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
                 <i class="fas fa-chart-pie mr-2"></i>
@@ -298,7 +324,6 @@
 @endif
 
 <!-- Recent Logins -->
-@if(isset($recentLogins) && $recentLogins->count() > 0)
 <div class="bg-white shadow rounded-lg mb-6">
     <div class="px-4 py-5 sm:p-6">
         <div class="flex justify-between items-center mb-4">
@@ -307,6 +332,7 @@
                 Recent Logins
             </h3>
         </div>
+        @if(isset($recentLogins) && $recentLogins->count() > 0)
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -322,8 +348,8 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($recentLogins as $log)
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $log->created_at->format('Y-m-d H:i') }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $log->user->name ?? $log->email ?? 'Unknown' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($log->created_at)->format('Y-m-d H:i') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $log->user_name ?? $log->email ?? 'Unknown' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($log->status === 'success')
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Success</span>
@@ -339,9 +365,11 @@
                 </tbody>
             </table>
         </div>
+        @else
+        <div class="text-sm text-gray-500">No login activity yet.</div>
+        @endif
     </div>
 </div>
-@endif
 
 <!-- Quick Actions -->
 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -414,3 +442,45 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const ctx = document.getElementById('salesChart');
+  if (!ctx) return;
+  const labels = @json($salesChart['labels'] ?? []);
+  const data = @json($salesChart['data'] ?? []);
+
+  if (ctx._chartInstance) {
+    ctx._chartInstance.destroy();
+  }
+  ctx._chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Sales',
+        data: data,
+        borderColor: 'rgb(59, 130, 246)',
+        backgroundColor: 'rgba(59, 130, 246, 0.15)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: (v) => 'Rs ' + Number(v).toLocaleString() } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: (ctx) => 'Rs ' + Number(ctx.parsed.y).toLocaleString() } }
+      }
+    }
+  });
+});
+</script>
+@endpush

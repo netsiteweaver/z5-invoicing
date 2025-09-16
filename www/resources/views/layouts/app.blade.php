@@ -499,5 +499,6 @@
              x-transition:leave-end="opacity-0">
         </div>
     </div>
+@stack('scripts')
 </body>
 </html>

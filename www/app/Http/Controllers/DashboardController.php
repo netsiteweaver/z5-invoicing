@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
             // Get dashboard statistics with safe fallbacks
@@ -28,20 +28,69 @@ class DashboardController extends Controller
                 'recent_orders' => $this->getRecentOrders(),
             ];
 
-            // Get monthly sales data for chart
-            $monthlySales = Sale::active()
-                ->selectRaw('DATE_FORMAT(sale_date, "%Y-%m") as month, SUM(total_amount) as total')
-                ->where('sale_date', '>=', now()->subMonths(12))
-                ->groupBy('month')
-                ->orderBy('month')
-                ->get();
+            // Placeholder for legacy variable used by the view
+            $monthlySales = collect();
 
-            $recentLogins = LoginActivity::with('user')
-                ->orderByDesc('created_at')
+            // Sales chart filters
+            $view = $request->input('sales_view', 'month'); // month|year|custom
+            $year = (int) $request->input('sales_year', now()->year);
+            $startInput = $request->input('sales_start');
+            $endInput = $request->input('sales_end');
+
+            if ($view === 'month') {
+                $startDate = now()->copy()->startOfMonth();
+                $endDate = now()->copy()->endOfDay();
+                $groupDaily = true;
+            } elseif ($view === 'year') {
+                $startDate = now()->setYear($year)->startOfYear();
+                $endDate = now()->setYear($year)->endOfYear();
+                $groupDaily = false;
+            } else { // custom
+                $startDate = $startInput ? \Carbon\Carbon::parse($startInput)->startOfDay() : now()->subMonths(1)->startOfDay();
+                $endDate = $endInput ? \Carbon\Carbon::parse($endInput)->endOfDay() : now()->endOfDay();
+                $groupDaily = $startDate->diffInDays($endDate) <= 62;
+            }
+
+            if ($groupDaily) {
+                $raw = Sale::active()
+                    ->whereBetween('sale_date', [$startDate->toDateString(), $endDate->toDateString()])
+                    ->selectRaw('DATE(sale_date) as period, SUM(total_amount) as total')
+                    ->groupBy('period')
+                    ->orderBy('period')
+                    ->get();
+                $labels = $raw->pluck('period')->map(fn($d) => \Carbon\Carbon::parse($d)->format('d M'))->toArray();
+                $data = $raw->pluck('total')->map(fn($v) => (float) $v)->toArray();
+            } else {
+                $raw = Sale::active()
+                    ->whereBetween('sale_date', [$startDate->toDateString(), $endDate->toDateString()])
+                    ->selectRaw('DATE_FORMAT(sale_date, "%Y-%m") as period, SUM(total_amount) as total')
+                    ->groupBy('period')
+                    ->orderBy('period')
+                    ->get();
+                $labels = $raw->pluck('period')->map(fn($m) => \Carbon\Carbon::parse($m . '-01')->format('M Y'))->toArray();
+                $data = $raw->pluck('total')->map(fn($v) => (float) $v)->toArray();
+            }
+
+            $salesChart = [
+                'labels' => $labels,
+                'data' => $data,
+                'filters' => [
+                    'view' => $view,
+                    'year' => $year,
+                    'start' => optional($startDate)->toDateString(),
+                    'end' => optional($endDate)->toDateString(),
+                ],
+            ];
+
+            // Recent logins (robust via join to ensure names show regardless of relation)
+            $recentLogins = DB::table('login_activities as la')
+                ->leftJoin('users as u', 'u.id', '=', 'la.user_id')
+                ->orderByDesc('la.created_at')
                 ->limit(20)
+                ->select('la.*', 'u.name as user_name')
                 ->get();
-
-            return view('dashboard', compact('stats', 'monthlySales', 'recentLogins'));
+                
+            return view('dashboard', compact('stats', 'monthlySales', 'recentLogins', 'salesChart'));
         } catch (\Exception $e) {
             // Fallback to basic stats if there are any issues
             $stats = [
@@ -58,7 +107,8 @@ class DashboardController extends Controller
             $monthlySales = collect();
             
             $recentLogins = collect();
-            return view('dashboard', compact('stats', 'monthlySales', 'recentLogins'));
+            $salesChart = ['labels' => [], 'data' => [], 'filters' => ['view' => 'month', 'year' => now()->year, 'start' => now()->startOfMonth()->toDateString(), 'end' => now()->toDateString()]];
+            return view('dashboard', compact('stats', 'monthlySales', 'recentLogins', 'salesChart'));
         }
     }
 
@@ -66,8 +116,8 @@ class DashboardController extends Controller
     {
         try {
             return Inventory::with(['product', 'department'])
-                ->whereColumn('quantity', '<=', 'reorder_point')
-                ->where('quantity', '>', 0)
+                ->whereColumn('current_stock', '<=', 'reorder_point')
+                ->where('current_stock', '>', 0)
                 ->get();
         } catch (\Exception $e) {
             return collect();
