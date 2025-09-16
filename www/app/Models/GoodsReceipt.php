@@ -18,6 +18,7 @@ class GoodsReceipt extends Model
         'grn_number',
         'department_id',
         'receipt_date',
+        'supplier_id',
         'supplier_name',
         'supplier_ref',
         'container_no',
@@ -90,6 +91,11 @@ class GoodsReceipt extends Model
     public function items(): HasMany
     {
         return $this->hasMany(GoodsReceiptItem::class);
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
     }
 }
 

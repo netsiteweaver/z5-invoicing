@@ -36,7 +36,7 @@
       </div>
       <div>
         <div class="text-xs text-gray-500">Supplier</div>
-        <div class="text-sm font-medium text-gray-900">{{ $receipt->supplier_name ?? '-' }}</div>
+        <div class="text-sm font-medium text-gray-900">{{ $receipt->supplier->name ?? ($receipt->supplier_name ?? '-') }}</div>
       </div>
     </div>
 

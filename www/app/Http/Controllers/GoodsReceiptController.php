@@ -6,6 +6,7 @@ use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
 use App\Models\Product;
 use App\Models\Department;
+use App\Models\Supplier;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +26,7 @@ class GoodsReceiptController extends Controller
 
     public function index(Request $request)
     {
-        $query = GoodsReceipt::with(['department'])->orderByDesc('created_at');
+        $query = GoodsReceipt::with(['department', 'supplier'])->orderByDesc('created_at');
 
         if ($request->filled('department_id')) {
             $query->where('department_id', $request->department_id);
@@ -34,14 +35,20 @@ class GoodsReceiptController extends Controller
         if ($request->filled('search')) {
             $s = $request->search;
             $query->where(function ($q) use ($s) {
-                $q->where('grn_number', 'like', "%{$s}%")
-                  ->orWhere('supplier_name', 'like', "%{$s}%")
-                  ->orWhere('supplier_ref', 'like', "%{$s}%");
+                $q->where(function ($q2) use ($s) {
+                    $q2->where('grn_number', 'like', "%{$s}%")
+                      ->orWhere('supplier_name', 'like', "%{$s}%")
+                      ->orWhere('supplier_ref', 'like', "%{$s}%");
+                })
+                ->orWhereHas('supplier', function ($q3) use ($s) {
+                    $q3->where('name', 'like', "%{$s}%");
+                });
             });
         }
 
         $receipts = $query->paginate(20);
         $departments = Department::ordered()->get();
+        $suppliers = Supplier::active()->ordered()->get();
 
         $breadcrumbs = [
             ['title' => 'Inventory', 'url' => route('inventory.index'), 'current' => false],
@@ -59,7 +66,7 @@ class GoodsReceiptController extends Controller
             ['title' => 'Goods Receipts', 'url' => route('goods-receipts.index'), 'current' => false],
             ['title' => 'Create Receipt', 'url' => null, 'current' => true],
         ];
-        return view('goods-receipts.create', compact('departments', 'products', 'breadcrumbs'));
+        return view('goods-receipts.create', compact('departments', 'products', 'suppliers', 'breadcrumbs'));
     }
 
     public function store(Request $request)
@@ -67,6 +74,7 @@ class GoodsReceiptController extends Controller
         $request->validate([
             'department_id' => 'required|exists:departments,id',
             'receipt_date' => 'required|date',
+            'supplier_id' => 'required|exists:suppliers,id',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -80,7 +88,7 @@ class GoodsReceiptController extends Controller
                 // grn_number auto-generated in model using Params
                 'department_id' => $request->department_id,
                 'receipt_date' => $request->receipt_date,
-                'supplier_name' => $request->supplier_name,
+                'supplier_id' => $request->supplier_id,
                 'supplier_ref' => $request->supplier_ref,
                 'container_no' => $request->container_no,
                 'bill_of_lading' => $request->bill_of_lading,
@@ -115,7 +123,7 @@ class GoodsReceiptController extends Controller
 
     public function show(GoodsReceipt $goods_receipt)
     {
-        $goods_receipt->load(['items.product', 'department']);
+        $goods_receipt->load(['items.product', 'department', 'supplier']);
         $breadcrumbs = [
             ['title' => 'Inventory', 'url' => route('inventory.index'), 'current' => false],
             ['title' => 'Goods Receipts', 'url' => route('goods-receipts.index'), 'current' => false],
@@ -129,23 +137,28 @@ class GoodsReceiptController extends Controller
         $goods_receipt->load(['items']);
         $departments = Department::ordered()->get();
         $products = Product::ordered()->get();
+        $suppliers = Supplier::active()->ordered()->get();
         $breadcrumbs = [
             ['title' => 'Inventory', 'url' => route('inventory.index'), 'current' => false],
             ['title' => 'Goods Receipts', 'url' => route('goods-receipts.index'), 'current' => false],
             ['title' => $goods_receipt->grn_number, 'url' => route('goods-receipts.show', $goods_receipt), 'current' => false],
             ['title' => 'Edit Receipt', 'url' => null, 'current' => true],
         ];
-        return view('goods-receipts.edit', ['receipt' => $goods_receipt, 'departments' => $departments, 'products' => $products, 'breadcrumbs' => $breadcrumbs]);
+        return view('goods-receipts.edit', ['receipt' => $goods_receipt, 'departments' => $departments, 'products' => $products, 'suppliers' => $suppliers, 'breadcrumbs' => $breadcrumbs]);
     }
 
     public function update(Request $request, GoodsReceipt $goods_receipt)
     {
         $request->validate([
             'receipt_date' => 'required|date',
+            'supplier_id' => 'required|exists:suppliers,id',
+            'supplier_ref' => 'nullable|string',
+            'container_no' => 'nullable|string',
+            'bill_of_lading' => 'nullable|string',
             'notes' => 'nullable|string',
         ]);
 
-        $goods_receipt->update($request->only(['receipt_date', 'supplier_name', 'supplier_ref', 'container_no', 'bill_of_lading', 'notes']));
+        $goods_receipt->update($request->only(['receipt_date', 'supplier_id', 'supplier_ref', 'container_no', 'bill_of_lading', 'notes']));
         return redirect()->route('goods-receipts.show', $goods_receipt)->with('success', 'Goods receipt updated.');
     }
 
@@ -161,7 +174,7 @@ class GoodsReceiptController extends Controller
 
     public function print(GoodsReceipt $goods_receipt)
     {
-        $goods_receipt->load(['items.product', 'department']);
+        $goods_receipt->load(['items.product', 'department', 'supplier']);
         $pdf = Pdf::loadView('goods-receipts.print', ['receipt' => $goods_receipt]);
         return $pdf->download($goods_receipt->grn_number . '.pdf');
     }

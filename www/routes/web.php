@@ -11,6 +11,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -67,6 +68,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Sales routes
     Route::resource('sales', SaleController::class);
+    // Supplier routes
+    Route::resource('suppliers', SupplierController::class);
+
     Route::post('sales/convert-from-order/{order}', [SaleController::class, 'convertFromOrder'])->name('sales.convert-from-order');
     
     // Inventory routesiki

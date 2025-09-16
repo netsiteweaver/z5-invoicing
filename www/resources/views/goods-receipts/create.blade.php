@@ -23,7 +23,12 @@
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700">Supplier</label>
-        <input type="text" name="supplier_name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Supplier name">
+        <select name="supplier_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+          <option value="">Select supplier</option>
+          @foreach($suppliers as $s)
+            <option value="{{ $s->id }}">{{ $s->name }}</option>
+          @endforeach
+        </select>
       </div>
     </div>
 
