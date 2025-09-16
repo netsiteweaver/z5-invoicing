@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout :title="'Please sign in'" :bgClass="'bg-cover bg-center bg-no-repeat'" :bgStyle="'background-image: url(' . asset('images/login-bg.jpg') . ');'">
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
