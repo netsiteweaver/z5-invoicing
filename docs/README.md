@@ -5,6 +5,9 @@ This documentation provides comprehensive specifications for building a new Lara
 
 ## Documentation Structure
 
+### User Documentation
+- [End-User Manual](./user-manual.md) - How to use the application
+
 ### Core Business Features
 - [Orders Management](./orders-management.md) - Complete order lifecycle management
 - [Sales Management](./sales-management.md) - Sales processing and tracking
