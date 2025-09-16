@@ -86,6 +86,25 @@ class BreadcrumbService
         $this->clear();
 
         switch ($page) {
+            case 'suppliers.index':
+                $this->add('Suppliers', null, true);
+                break;
+
+            case 'suppliers.create':
+                $this->add('Suppliers', route('suppliers.index'));
+                $this->add('Create Supplier', null, true);
+                break;
+
+            case 'suppliers.show':
+                $this->add('Suppliers', route('suppliers.index'));
+                $this->add($params['supplier']->name, null, true);
+                break;
+
+            case 'suppliers.edit':
+                $this->add('Suppliers', route('suppliers.index'));
+                $this->add($params['supplier']->name, route('suppliers.show', $params['supplier']));
+                $this->add('Edit Supplier', null, true);
+                break;
             case 'orders.index':
                 $this->add('Orders', null, true);
                 break;

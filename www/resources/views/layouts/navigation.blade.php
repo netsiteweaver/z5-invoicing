@@ -28,6 +28,10 @@
                         {{ __('Orders') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')">
+                        {{ __('Suppliers') }}
+                    </x-nav-link>
+
                     @can('goods_receipts.view')
                     <x-nav-link :href="route('goods-receipts.index')" :active="request()->routeIs('goods-receipts.*')">
                         {{ __('Goods Receipts') }}
@@ -105,6 +109,10 @@
             
             <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
                 {{ __('Orders') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')">
+                {{ __('Suppliers') }}
             </x-responsive-nav-link>
 
             @can('goods_receipts.view')

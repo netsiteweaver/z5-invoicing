@@ -15,7 +15,7 @@
     <div class="title">Goods Receipt Note</div>
     <div>GRN: {{ $receipt->grn_number }} | Date: {{ $receipt->receipt_date->format('Y-m-d') }}</div>
     <div>Location: {{ $receipt->department->name ?? '-' }}</div>
-    <div>Supplier: {{ $receipt->supplier_name ?? '-' }}</div>
+    <div>Supplier: {{ $receipt->supplier->name ?? ($receipt->supplier_name ?? '-') }}</div>
   </div>
 
   <table>

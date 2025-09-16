@@ -29,7 +29,7 @@
             <td class="px-6 py-4 whitespace-nowrap">{{ $receipt->grn_number }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ optional($receipt->receipt_date instanceof \Carbon\Carbon ? $receipt->receipt_date : \Carbon\Carbon::parse($receipt->receipt_date))->format('Y-m-d') }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ $receipt->department->name ?? '-' }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">{{ $receipt->supplier_name ?? '-' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ $receipt->supplier->name ?? ($receipt->supplier_name ?? '-') }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
               <a href="{{ route('goods-receipts.show', $receipt) }}" class="text-blue-600 hover:text-blue-900"><i class="fas fa-eye"></i></a>
               <a href="{{ route('goods-receipts.edit', $receipt) }}" class="text-yellow-600 hover:text-yellow-900 ml-3"><i class="fas fa-edit"></i></a>
