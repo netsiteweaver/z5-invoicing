@@ -101,6 +101,36 @@
                 </div>
                 @endif
 
+                <!-- Suppliers -->
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('suppliers.view'))
+                <div x-data="{ suppliersOpen: {{ request()->routeIs('suppliers.*') ? 'true' : 'false' }} }">
+                    <button @click="suppliersOpen = !suppliersOpen" 
+                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('suppliers.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                        <div class="flex items-center">
+                            <i class="fas fa-truck mr-3 h-5 w-5"></i>
+                            Suppliers
+                        </div>
+                        <i class="fas fa-chevron-down transition-transform duration-200" :class="suppliersOpen ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="suppliersOpen" x-transition class="ml-6 mt-1 space-y-1">
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('suppliers.view'))
+                        <a href="{{ route('suppliers.index') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('suppliers.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            All Suppliers
+                        </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('suppliers.create'))
+                        <a href="{{ route('suppliers.create') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('suppliers.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Create Supplier
+                        </a>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
                 <!-- Products -->
                 <div x-data="{ productsOpen: {{ request()->routeIs('products.*') || request()->routeIs('product-categories.*') || request()->routeIs('product-brands.*') ? 'true' : 'false' }} }">
                     <button @click="productsOpen = !productsOpen" 
