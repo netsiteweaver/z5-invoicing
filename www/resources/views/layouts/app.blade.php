@@ -51,8 +51,8 @@
                 </div>
             </div>
 
-            <!-- User Panel -->
-            <div class="flex items-center px-4 py-3 border-b border-gray-700">
+            <!-- User Panel (clickable to profile) -->
+            <a href="{{ route('profile.edit') }}" class="flex items-center px-4 py-3 border-b border-gray-700 hover:bg-gray-800">
                 <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
                     <span class="text-white font-medium text-sm">{{ substr(Auth::user()->name, 0, 1) }}</span>
                 </div>
@@ -60,7 +60,7 @@
                     <p class="text-white text-sm font-medium">{{ Auth::user()->name }}</p>
                     <p class="text-gray-400 text-xs">{{ Auth::user()->user_level ?? 'User' }}</p>
                 </div>
-            </div>
+            </a>
 
             <!-- Navigation -->
             <nav class="mt-2 px-2">
