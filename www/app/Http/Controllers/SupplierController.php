@@ -31,6 +31,9 @@ class SupplierController extends Controller
 
         if ($request->filled('status')) {
             $query->where('status', (int) $request->status);
+        } else {
+            // Default to active suppliers for consistency with soft-delete behavior
+            $query->where('status', 1);
         }
 
         $suppliers = $query->orderBy('name')->paginate(15);
