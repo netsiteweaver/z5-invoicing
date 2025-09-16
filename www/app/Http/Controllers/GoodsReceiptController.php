@@ -61,6 +61,7 @@ class GoodsReceiptController extends Controller
     {
         $departments = Department::ordered()->get();
         $products = Product::ordered()->get();
+        $suppliers = Supplier::active()->ordered()->get();
         $breadcrumbs = [
             ['title' => 'Inventory', 'url' => route('inventory.index'), 'current' => false],
             ['title' => 'Goods Receipts', 'url' => route('goods-receipts.index'), 'current' => false],
