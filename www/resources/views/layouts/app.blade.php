@@ -27,7 +27,6 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="{{ asset('css/overrides.css') }}">
 </head>
 <body class="font-sans antialiased bg-gray-50" x-data="{ sidebarOpen: true }">
     <div class="min-h-screen flex transition-all duration-300" :style="{ paddingLeft: sidebarOpen ? '16rem' : '0' }">
