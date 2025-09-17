@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Manual v1.0 — Z5 Invoicing System</title>
+    <style>
+      :root { 
+        --fg:#374151; /* slate-700 */
+        --muted:#6b7280; /* gray-500 */
+        --bg:#fafaff; /* soft pastel background */
+        --link:#6b8cff; /* pastel indigo/blue */
+        --border:#e9ecf5; /* light pastel border */
+        --card:#ffffff; /* white card */
+        --tocbg:#f6f7ff; /* very light indigo */
+        --highlight:#ecf2ff; /* pastel highlight */
+      }
+      html, body { 
+        margin:0; padding:0; 
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; 
+        color:var(--fg); 
+        background: linear-gradient(180deg, #fdfbff 0%, var(--bg) 100%);
+      }
+      .container { max-width: 1160px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+      .layout { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; align-items: start; }
+      h1 { font-size: 1.875rem; line-height: 2.25rem; margin: 0 0 0.25rem; }
+      h2 { font-size: 1.25rem; margin-top: 2rem; margin-bottom: 0.75rem; }
+      h3 { font-size: 1.05rem; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+      p { margin: 0.25rem 0 0.75rem; }
+      ul { margin: 0.25rem 0 0.75rem 1.25rem; }
+      li { margin: 0.25rem 0; }
+      .muted { color: var(--muted); }
+      .card { border:1px solid var(--border); border-radius: 0.75rem; padding: 1rem; background: var(--card); box-shadow: 0 6px 14px rgba(107,140,255,0.06); }
+      .toc { background: var(--tocbg); border:1px solid var(--border); padding: 1rem; border-radius: 0.75rem; position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow: auto; box-shadow: 0 6px 14px rgba(107,140,255,0.06); }
+      .toc ul { list-style: none; margin-left: 0; padding-left: 0; }
+      .toc a { display: block; padding: .25rem .5rem; border-left: 2px solid transparent; color: var(--link); border-radius: .25rem; }
+      .toc a.active { font-weight: 600; color: var(--fg); border-left-color: var(--link); background: var(--highlight); }
+      /* Section visuals */
+      .section h2 { display: flex; align-items: center; justify-content: space-between; }
+      /* Fancy animations */
+      @keyframes fxFadeZoomIn { from { opacity: 0; transform: translateY(6px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+      @keyframes fxFadeOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(6px) scale(.985); } }
+      .fx-in { animation: fxFadeZoomIn 320ms cubic-bezier(.2,.7,.2,1) both; }
+      .fx-out { animation: fxFadeOut 200ms ease both; }
+      @media (prefers-reduced-motion: reduce) { .fx-in, .fx-out { animation: none !important; } }
+      a { color: var(--link); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      hr { border: 0; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+      .small { font-size: .875rem; }
+      .section + .section { margin-top: 1.25rem; }
+      @media (max-width: 1024px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; max-height: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <header class="section">
+        <h1>User Manual v1.0 — Z5 Invoicing System</h1>
+        <p class="muted small">Last updated: 2025-09-17</p>
+        <p class="small">Audience:
+          <strong>Normal users</strong> (customers, orders, sales, inventory),
+          <strong>Administrators</strong> (catalogs, users, settings),
+          <strong>Root users</strong> (full access).
+        </p>
+      </header>
+
+      <div class="layout">
+      <aside class="toc section">
+        <strong>Contents</strong>
+        <ul>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#access">Access & Accounts</a></li>
+          <li><a href="#ui">Navigation & UI Basics</a></li>
+          <li><a href="#roles">Roles & Permissions</a></li>
+          <li><a href="#customers">Customers</a></li>
+          <li><a href="#suppliers">Suppliers</a></li>
+          <li><a href="#products">Products (Catalog)</a></li>
+          <li><a href="#orders">Orders</a></li>
+          <li><a href="#sales">Sales</a></li>
+          <li><a href="#inventory">Inventory</a></li>
+          <li><a href="#goods-receipts">Goods Receipts</a></li>
+          <li><a href="#stock-transfers">Stock Transfers</a></li>
+          <li><a href="#profile">Profile & Password</a></li>
+          <li><a href="#settings">Settings (Admin)</a></li>
+          <li><a href="#user-mgmt">User Management (Admin)</a></li>
+          <li><a href="#docs">Documents & Printing</a></li>
+          <li><a href="#tips">Tips & Troubleshooting</a></li>
+          <li><a href="#support">Support</a></li>
+        </ul>
+      </aside>
+      <div class="content">
+
+      <section id="overview" class="section card">
+        <h2>1. Overview</h2>
+        <p>The Z5 Invoicing System manages products, customers, orders, sales, inventory, suppliers, and user access across departments/locations. It provides dashboards, role-based permissions, and printable documents.</p>
+      </section>
+
+      <section id="access" class="section card">
+        <h2>2. Access & Accounts</h2>
+        <ul>
+          <li><strong>URL</strong>: Provided by your administrator</li>
+          <li><strong>Browsers</strong>: Latest Chrome, Edge, Firefox, Safari</li>
+          <li><strong>Login</strong>: Enter email/username and password; optionally enable Remember Me</li>
+          <li><strong>Forgot password</strong>: Use “Forgot your password?” to get a reset link</li>
+          <li><strong>Sign out</strong>: Profile menu → Logout</li>
+          <li><strong>Account issues</strong>: Contact an administrator</li>
+        </ul>
+      </section>
+
+      <section id="ui" class="section card">
+        <h2>3. Navigation & UI Basics</h2>
+        <ul>
+          <li><strong>Main navigation</strong>: Left sidebar modules (Dashboard, Customers, Products, Orders, Sales, Inventory, Suppliers, Settings, Users)</li>
+          <li><strong>Search and filters</strong>: List pages include search and filter controls</li>
+          <li><strong>Pagination</strong>: Controls at the bottom of list pages</li>
+          <li><strong>Common actions</strong>: View, Edit, Delete/Deactivate, Print/Export</li>
+        </ul>
+      </section>
+
+      <section id="roles" class="section card">
+        <h2>4. Roles & Permissions</h2>
+        <ul>
+          <li><strong>Normal</strong>: Access to assigned features</li>
+          <li><strong>Admin</strong>: Broad access including configuration and user management</li>
+          <li><strong>Root</strong>: Full access; can manage roles and permissions</li>
+        </ul>
+        <p class="muted small">If a menu or button is missing, your role may not allow it.</p>
+      </section>
+
+      <section id="customers" class="section card">
+        <h2>5. Customers</h2>
+        <h3>What you can do</h3>
+        <ul>
+          <li>Create, edit, and deactivate customers; search and filter the list</li>
+          <li>View basic customer details on the list and a full detail page</li>
+        </ul>
+        <h3>Create a customer</h3>
+        <ol>
+          <li>Go to Customers → Add Customer</li>
+          <li>Enter company and contact details</li>
+          <li>Save</li>
+        </ol>
+        <h3>Find and manage customers</h3>
+        <ul>
+          <li>Use the search bar (name, email, phone) and status filters</li>
+          <li>Open a customer to view details and edit</li>
+        </ul>
+      </section>
+
+      <section id="suppliers" class="section card">
+        <h2>6. Suppliers</h2>
+        <h3>What you can do</h3>
+        <ul>
+          <li>Create, edit, and soft-delete suppliers (inactive suppliers are hidden by default)</li>
+          <li>Search by name, contact, phone, email; filter by status</li>
+        </ul>
+      </section>
+
+      <section id="products" class="section card">
+        <h2>7. Products (Catalog)</h2>
+        <h3>What you can do</h3>
+        <ul>
+          <li>Create and edit products with pricing</li>
+          <li>Manage categories and brands</li>
+        </ul>
+      </section>
+
+      <section id="orders" class="section card">
+        <h2>8. Orders</h2>
+        <h3>Create an order</h3>
+        <ol>
+          <li>Orders → New</li>
+          <li>Select a customer and add items</li>
+          <li>Save</li>
+        </ol>
+        <h3>Manage</h3>
+        <ul>
+          <li>Edit while allowed; convert a confirmed order to a sale</li>
+        </ul>
+      </section>
+
+      <section id="sales" class="section card">
+        <h2>9. Sales</h2>
+        <h3>Create a sale</h3>
+        <ul>
+          <li>Direct: Sales → New</li>
+          <li>From Order: Orders → open order → Convert to Sale</li>
+        </ul>
+      </section>
+
+      <section id="inventory" class="section card">
+        <h2>10. Inventory</h2>
+        <h3>What you can do</h3>
+        <ul>
+          <li>View stock by product and department</li>
+          <li>Record stock movements (in/out/transfer)</li>
+          <li>Low stock view and stock reports</li>
+        </ul>
+      </section>
+
+      <section id="goods-receipts" class="section card">
+        <h2>11. Goods Receipts</h2>
+        <ul>
+          <li>Record received goods with multiple items, costs and VAT breakdown</li>
+          <li>Approve receipts to update inventory; print GRN as PDF</li>
+        </ul>
+      </section>
+
+      <section id="stock-transfers" class="section card">
+        <h2>12. Stock Transfers</h2>
+        <ul>
+          <li>Create transfers between departments; receive transfers; print documents</li>
+        </ul>
+      </section>
+
+      <section id="profile" class="section card">
+        <h2>13. Profile & Password</h2>
+        <ul>
+          <li>Profile: Update name/email via Profile page (top-left avatar)</li>
+          <li>Password: Update password on the Profile page</li>
+          <li>Delete account: Available on the Profile page (requires password confirmation)</li>
+        </ul>
+      </section>
+
+      <section id="settings" class="section card">
+        <h2>14. Settings (Admin)</h2>
+        <ul>
+          <li>Company settings and general configuration</li>
+        </ul>
+      </section>
+
+      <section id="user-mgmt" class="section card">
+        <h2>15. User Management (Admin)</h2>
+        <ul>
+          <li>Manage users, roles, and permissions</li>
+        </ul>
+      </section>
+
+      <section id="docs" class="section card">
+        <h2>16. Documents & Printing</h2>
+        <ul>
+          <li>Many details pages provide printable/PDF documents (e.g., Goods Receipts, Stock Transfers)</li>
+        </ul>
+      </section>
+
+      <section id="tips" class="section card">
+        <h2>17. Tips & Troubleshooting</h2>
+        <ul>
+          <li>Can’t log in: Use Forgot Password; if still blocked, contact admin</li>
+          <li>Missing options: Your role might not allow it</li>
+          <li>PDF blocked: Allow popups for the site</li>
+        </ul>
+      </section>
+
+      <section id="support" class="section card">
+        <h2>18. Support</h2>
+        <ul>
+          <li>Contact your system administrator for access issues or feature requests</li>
+        </ul>
+      </section>
+
+      </div>
+      </div>
+      <hr />
+      <footer class="small muted">— End of User Manual v1.0 —</footer>
+    </main>
+    <script>
+      (function() {
+        const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+        const sections = tocLinks
+          .map(l => document.querySelector(l.getAttribute('href')))
+          .filter(Boolean);
+
+        const setActive = (id) => {
+          tocLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === id));
+        };
+
+        let currentId = null;
+        function showSectionById(id) {
+          if (currentId === id) return;
+          const current = sections.find(sec => sec.style.display !== 'none');
+          const next = document.getElementById(id);
+          if (!next) return;
+
+          // Hide current with animation
+          if (current) {
+            current.classList.remove('fx-in');
+            current.classList.add('fx-out');
+            const onEnd = () => {
+              current.style.display = 'none';
+              current.classList.remove('fx-out');
+              current.removeEventListener('animationend', onEnd);
+            };
+            current.addEventListener('animationend', onEnd);
+            // Fallback in case animationend doesn't fire
+            setTimeout(onEnd, 220);
+          }
+
+          // Show next with animation
+          next.style.display = '';
+          next.classList.add('fx-in');
+          const onInEnd = () => { next.classList.remove('fx-in'); next.removeEventListener('animationend', onInEnd); };
+          next.addEventListener('animationend', onInEnd);
+
+          currentId = id;
+          setActive('#' + id);
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+
+        // Initialize: show hash section or first
+        let initial = (location.hash || '').replace('#', '');
+        if (!initial && sections.length) initial = sections[0].id;
+        if (initial) { sections.forEach(sec => sec.style.display = (sec.id === initial) ? '' : 'none'); currentId = initial; setActive('#' + initial); }
+
+        // Handle TOC clicks
+        tocLinks.forEach(link => {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.getAttribute('href').replace('#', '');
+            showSectionById(id);
+            history.replaceState(null, '', '#' + id);
+          });
+        });
+      })();
+    </script>
+  </body>
+  </html>

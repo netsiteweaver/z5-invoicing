@@ -343,6 +343,7 @@
                     Settings
                 </a>
                 @endif
+
             </nav>
         </div>
 
@@ -425,6 +426,9 @@
                             </button>
 
                             <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border">
+                                <a href="{{ route('manual') }}" target="_blank" rel="noopener" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-book mr-2"></i> User Manual
+                                </a>
                                 <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     <i class="fas fa-user mr-2"></i> Profile
                                 </a>
@@ -514,6 +518,7 @@
                     </div>
                 </div>
             </main>
+
         </div>
 
         <!-- Mobile sidebar overlay -->

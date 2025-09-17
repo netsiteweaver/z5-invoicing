@@ -116,4 +116,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/alpine-test', function () {
         return view('alpine-test');
     })->name('alpine-test');
+
+    // User Manual (HTML) - serves file from project docs
+    Route::get('/manual', function () {
+        $path = base_path('..' . DIRECTORY_SEPARATOR . 'docs' . DIRECTORY_SEPARATOR . 'User Manual v1.0.html');
+        if (!file_exists($path)) {
+            abort(404);
+        }
+        return response()->file($path, [
+            'Content-Type' => 'text/html; charset=UTF-8',
+        ]);
+    })->name('manual');
 });
