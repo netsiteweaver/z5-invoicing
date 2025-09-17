@@ -515,9 +515,18 @@
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         @yield('content')
+                        @include('components.release-notes-modal')
                     </div>
                 </div>
             </main>
+
+            <!-- Footer: version info -->
+            <div class="bg-white border-t border-gray-200">
+                <div class="px-4 py-2 text-xs text-gray-500 flex items-center justify-between">
+                    <span>{{ config('app.name') }}</span>
+                    <span>Version {{ config('app.version') }}</span>
+                </div>
+            </div>
 
         </div>
 

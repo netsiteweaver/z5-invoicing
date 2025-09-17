@@ -158,30 +158,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Quick Stats -->
-    <div class="bg-white shadow rounded-lg lg:col-span-1">
-        <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                <i class="fas fa-chart-pie mr-2"></i>
-                Quick Stats
-            </h3>
-            <div class="space-y-3">
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-500">Orders Today</span>
-                    <span class="text-sm font-medium text-gray-900">{{ $stats['total_orders'] ?? 0 }}</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-500">Active Customers</span>
-                    <span class="text-sm font-medium text-gray-900">{{ $stats['total_customers'] ?? 0 }}</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-500">Products in Stock</span>
-                    <span class="text-sm font-medium text-gray-900">{{ $stats['total_products'] ?? 0 }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Low Stock Products -->
@@ -368,77 +344,6 @@
         @else
         <div class="text-sm text-gray-500">No login activity yet.</div>
         @endif
-    </div>
-</div>
-
-<!-- Quick Actions -->
-<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                <i class="fas fa-shopping-cart text-2xl"></i>
-            </div>
-            <div class="ml-4">
-                <h3 class="text-lg font-medium">{{ $stats['total_orders'] ?? 0 }}</h3>
-                <p class="text-blue-100">Total Orders</p>
-            </div>
-        </div>
-        <div class="mt-4">
-            <a href="{{ route('orders.create') }}" class="text-blue-100 hover:text-white text-sm font-medium">
-                Create New Order <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-    </div>
-
-    <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                <i class="fas fa-users text-2xl"></i>
-            </div>
-            <div class="ml-4">
-                <h3 class="text-lg font-medium">{{ $stats['total_customers'] ?? 0 }}</h3>
-                <p class="text-green-100">Customers</p>
-            </div>
-        </div>
-        <div class="mt-4">
-            <a href="{{ route('customers.create') }}" class="text-green-100 hover:text-white text-sm font-medium">
-                Add New Customer <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-    </div>
-
-    <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg shadow-lg p-6 text-white">
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                <i class="fas fa-box text-2xl"></i>
-            </div>
-            <div class="ml-4">
-                <h3 class="text-lg font-medium">{{ $stats['total_products'] ?? 0 }}</h3>
-                <p class="text-yellow-100">Products</p>
-            </div>
-        </div>
-        <div class="mt-4">
-            <a href="{{ route('products.create') }}" class="text-yellow-100 hover:text-white text-sm font-medium">
-                Add New Product <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-    </div>
-
-    <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-lg shadow-lg p-6 text-white">
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                <i class="fas fa-clock text-2xl"></i>
-            </div>
-            <div class="ml-4">
-                <h3 class="text-lg font-medium">{{ $stats['pending_orders'] ?? 0 }}</h3>
-                <p class="text-red-100">Pending Orders</p>
-            </div>
-        </div>
-        <div class="mt-4">
-            <a href="{{ route('orders.index', ['status' => 'pending']) }}" class="text-red-100 hover:text-white text-sm font-medium">
-                View Pending <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
     </div>
 </div>
 @endsection
