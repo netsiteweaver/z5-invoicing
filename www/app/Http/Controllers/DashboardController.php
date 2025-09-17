@@ -86,7 +86,7 @@ class DashboardController extends Controller
             $recentLogins = DB::table('login_activities as la')
                 ->leftJoin('users as u', 'u.id', '=', 'la.user_id')
                 ->orderByDesc('la.created_at')
-                ->limit(20)
+                ->limit(10)
                 ->select('la.*', 'u.name as user_name')
                 ->get();
                 

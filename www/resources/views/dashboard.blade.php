@@ -4,10 +4,11 @@
 @section('description', 'Overview of your business metrics and recent activity')
 
 @section('content')
+<div id="vue-dashboard-stagger" v-cloak x-ignore>
 <!-- Info Boxes -->
 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-6">
     <!-- Total Orders -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="bg-white overflow-hidden shadow rounded-lg transform transition duration-300 ease-out" :class="show.infoBoxes ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
         <div class="p-5">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -33,7 +34,7 @@
     </div>
 
     <!-- Total Sales -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="bg-white overflow-hidden shadow rounded-lg transform transition duration-300 ease-out" :class="show.infoBoxes ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
         <div class="p-5">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -59,7 +60,7 @@
     </div>
 
     <!-- Total Customers -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="bg-white overflow-hidden shadow rounded-lg transform transition duration-300 ease-out" :class="show.infoBoxes ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
         <div class="p-5">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -85,7 +86,7 @@
     </div>
 
     <!-- Total Products -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="bg-white overflow-hidden shadow rounded-lg transform transition duration-300 ease-out" :class="show.infoBoxes ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
         <div class="p-5">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -114,7 +115,7 @@
 <!-- Revenue and Pending Orders + Sales Trend -->
 <div class="grid grid-cols-1 gap-5 lg:grid-cols-3 mb-6">
     <!-- Revenue Overview -->
-    <div class="bg-white shadow rounded-lg lg:col-span-1">
+    <div class="bg-white shadow rounded-lg lg:col-span-1 transform transition duration-300 ease-out" :class="show.revenue ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
         <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
                 <i class="fas fa-dollar-sign mr-2"></i>
@@ -134,7 +135,7 @@
     </div>
 
     <!-- Sales Trend -->
-    <div class="bg-white shadow rounded-lg lg:col-span-2">
+    <div class="bg-white shadow rounded-lg lg:col-span-2 transform transition duration-300 ease-out" :class="show.sales ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
         <div class="px-4 py-5 sm:p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -162,7 +163,7 @@
 
 <!-- Low Stock Products -->
 @if(isset($stats['low_stock_products']) && $stats['low_stock_products']->count() > 0)
-<div class="bg-white shadow rounded-lg mb-6">
+<div class="bg-white shadow rounded-lg mb-6 transform transition duration-300 ease-out" :class="show.lowStock ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
     <div class="px-4 py-5 sm:p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -225,7 +226,7 @@
 
 <!-- Recent Orders -->
 @if(isset($stats['recent_orders']) && $stats['recent_orders']->count() > 0)
-<div class="bg-white shadow rounded-lg mb-6">
+<div class="bg-white shadow rounded-lg mb-6 transform transition duration-300 ease-out" :class="show.recentOrders ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
     <div class="px-4 py-5 sm:p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -300,7 +301,7 @@
 @endif
 
 <!-- Recent Logins -->
-<div class="bg-white shadow rounded-lg mb-6">
+<div class="bg-white shadow rounded-lg mb-6 transform transition duration-300 ease-out" :class="show.recentLogins ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
     <div class="px-4 py-5 sm:p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -316,7 +317,9 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">When</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        @if(auth()->user()->is_root)
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
+                        @endif
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OS / Browser</th>
                     </tr>
@@ -333,7 +336,9 @@
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Failed</span>
                             @endif
                         </td>
+                        @if(auth()->user()->is_root)
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $log->ip_address }}</td>
+                        @endif
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $log->device }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $log->os }} / {{ $log->browser }}</td>
                     </tr>
@@ -345,6 +350,8 @@
         <div class="text-sm text-gray-500">No login activity yet.</div>
         @endif
     </div>
+</div>
+<!-- /vue-dashboard-stagger root -->
 </div>
 @endsection
 
