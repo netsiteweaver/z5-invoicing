@@ -40,9 +40,9 @@
               {!! file_get_contents(base_path('..'.DIRECTORY_SEPARATOR.'docs'.DIRECTORY_SEPARATOR.'CHANGELOG.html')) !!}
             @else
               <ul class="list-disc pl-5">
-                <li>Welcome to the latest version of the application.</li>
+                <!-- <li>Welcome to the latest version of the application.</li>
                 <li>UI improvements and bug fixes.</li>
-                <li>Performance enhancements.</li>
+                <li>Performance enhancements.</li> -->
               </ul>
             @endif
           </div>

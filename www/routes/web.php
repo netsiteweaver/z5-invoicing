@@ -108,15 +108,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('settings', SettingsController::class)->except(['show', 'destroy']);
     Route::get('settings/current', [SettingsController::class, 'getCurrent'])->name('settings.current');
     Route::post('settings/{setting}/logo', [SettingsController::class, 'updateLogo'])->name('settings.logo');
-    
-    // Test routes (for development)
-    Route::get('/test', function () {
-        return view('test');
-    })->name('test');
-    
-    Route::get('/alpine-test', function () {
-        return view('alpine-test');
-    })->name('alpine-test');
+
+    Route::get('/changelog.json', [ChangelogController::class, 'feed'])->name('changelog.feed');
 
     // User Manual (HTML) - serves file from project docs
     Route::get('/manual', function () {
@@ -128,7 +121,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'Content-Type' => 'text/html; charset=UTF-8',
         ]);
     })->name('manual');
-
-    Route::get('/changelog.json', [ChangelogController::class, 'feed'])->name('changelog.feed');
 
 });
