@@ -10,6 +10,7 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Inventory;
 use App\Models\StockMovement;
+use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -91,7 +92,7 @@ class SaleController extends Controller
         return view('sales.create', compact('customers', 'products'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, InventoryService $inventoryService)
     {
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
@@ -149,8 +150,23 @@ class SaleController extends Controller
                     'total_amount' => $itemTotal - $discountAmount,
                 ]);
 
-                // Update inventory
-                $this->updateInventory($item['product_id'], $item['quantity'], 'out', $sale->id, 'sale');
+                // Update inventory for the user's assigned department
+                $departmentId = auth()->user()->department_id;
+                if (!$departmentId) {
+                    throw new \Exception('User is not assigned to any department.');
+                }
+                $inventoryService->adjustStockOut(
+                    (int) $item['product_id'],
+                    (int) $departmentId,
+                    (int) $item['quantity'],
+                    [
+                        'movement_type' => 'out',
+                        'reference_type' => 'sale',
+                        'reference_id' => $sale->id,
+                        'reference_number' => $sale->sale_number,
+                        'notes' => 'Sale',
+                    ]
+                );
             }
 
             DB::commit();
@@ -177,7 +193,7 @@ class SaleController extends Controller
         return view('sales.edit', compact('sale', 'customers', 'products'));
     }
 
-    public function update(Request $request, Sale $sale)
+    public function update(Request $request, Sale $sale, InventoryService $inventoryService)
     {
         if (!$sale->canBeEdited()) {
             return redirect()->route('sales.show', $sale)
@@ -198,9 +214,24 @@ class SaleController extends Controller
 
         DB::beginTransaction();
         try {
-            // Restore inventory for old items
+            // Restore inventory for old items to the user's department
+            $departmentId = auth()->user()->department_id;
+            if (!$departmentId) {
+                throw new \Exception('User is not assigned to any department.');
+            }
             foreach ($sale->items as $item) {
-                $this->updateInventory($item->product_id, $item->quantity, 'in', $sale->id, 'sale_reversal');
+                $inventoryService->adjustStockIn(
+                    (int) $item->product_id,
+                    (int) $departmentId,
+                    (int) $item->quantity,
+                    [
+                        'movement_type' => 'in',
+                        'reference_type' => 'sale_reversal',
+                        'reference_id' => $sale->id,
+                        'reference_number' => $sale->sale_number,
+                        'notes' => 'Sale updated - reversal of previous items',
+                    ]
+                );
             }
 
             // Delete old sale items
@@ -245,8 +276,19 @@ class SaleController extends Controller
                     'total_amount' => $itemTotal - $discountAmount,
                 ]);
 
-                // Update inventory
-                $this->updateInventory($item['product_id'], $item['quantity'], 'out', $sale->id, 'sale');
+                // Update inventory for new items
+                $inventoryService->adjustStockOut(
+                    (int) $item['product_id'],
+                    (int) $departmentId,
+                    (int) $item['quantity'],
+                    [
+                        'movement_type' => 'out',
+                        'reference_type' => 'sale',
+                        'reference_id' => $sale->id,
+                        'reference_number' => $sale->sale_number,
+                        'notes' => 'Sale updated - new items',
+                    ]
+                );
             }
 
             DB::commit();
@@ -259,7 +301,7 @@ class SaleController extends Controller
         }
     }
 
-    public function destroy(Sale $sale)
+    public function destroy(Sale $sale, InventoryService $inventoryService)
     {
         if (!$sale->canBeEdited()) {
             return redirect()->route('sales.show', $sale)
@@ -268,9 +310,24 @@ class SaleController extends Controller
 
         DB::beginTransaction();
         try {
-            // Restore inventory
+            // Restore inventory to the user's department
+            $departmentId = auth()->user()->department_id;
+            if (!$departmentId) {
+                throw new \Exception('User is not assigned to any department.');
+            }
             foreach ($sale->items as $item) {
-                $this->updateInventory($item->product_id, $item->quantity, 'in', $sale->id, 'sale_deletion');
+                $inventoryService->adjustStockIn(
+                    (int) $item->product_id,
+                    (int) $departmentId,
+                    (int) $item->quantity,
+                    [
+                        'movement_type' => 'in',
+                        'reference_type' => 'sale_deletion',
+                        'reference_id' => $sale->id,
+                        'reference_number' => $sale->sale_number,
+                        'notes' => 'Sale deleted',
+                    ]
+                );
             }
 
             $sale->delete();
@@ -285,7 +342,7 @@ class SaleController extends Controller
         }
     }
 
-    public function convertFromOrder(Order $order)
+    public function convertFromOrder(Order $order, InventoryService $inventoryService)
     {
         if ($order->order_status !== 'confirmed') {
             return redirect()->route('orders.show', $order)
@@ -309,6 +366,10 @@ class SaleController extends Controller
             ]);
 
             // Create sale items from order items
+            $departmentId = auth()->user()->department_id;
+            if (!$departmentId) {
+                throw new \Exception('User is not assigned to any department.');
+            }
             foreach ($order->orderItems as $orderItem) {
                 SaleItem::create([
                     'sale_id' => $sale->id,
@@ -320,8 +381,19 @@ class SaleController extends Controller
                     'total_amount' => $orderItem->total_amount,
                 ]);
 
-                // Update inventory
-                $this->updateInventory($orderItem->product_id, $orderItem->quantity, 'out', $sale->id, 'sale_from_order');
+                // Update inventory from the user's department
+                $inventoryService->adjustStockOut(
+                    (int) $orderItem->product_id,
+                    (int) $departmentId,
+                    (int) $orderItem->quantity,
+                    [
+                        'movement_type' => 'out',
+                        'reference_type' => 'sale_from_order',
+                        'reference_id' => $sale->id,
+                        'reference_number' => $sale->sale_number,
+                        'notes' => 'Converted from order',
+                    ]
+                );
             }
 
             // Update order status
@@ -337,31 +409,5 @@ class SaleController extends Controller
         }
     }
 
-    private function updateInventory($productId, $quantity, $movementType, $referenceId, $notes)
-    {
-        // Find inventory for the product (assuming main department for now)
-        $inventory = Inventory::where('product_id', $productId)->first();
-        
-        if ($inventory) {
-            if ($movementType === 'out') {
-                if ($inventory->current_stock < $quantity) {
-                    throw new \Exception("Insufficient stock for product. Available: {$inventory->current_stock}");
-                }
-                $inventory->decrement('current_stock', $quantity);
-            } else {
-                $inventory->increment('current_stock', $quantity);
-            }
-
-            // Create stock movement
-            StockMovement::create([
-                'inventory_id' => $inventory->id,
-                'movement_type' => $movementType,
-                'quantity' => $quantity,
-                'reference_type' => 'sale',
-                'reference_id' => $referenceId,
-                'notes' => $notes,
-                'created_by' => auth()->id(),
-            ]);
-        }
-    }
+    // Removed legacy updateInventory; InventoryService is now used consistently
 }
