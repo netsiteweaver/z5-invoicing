@@ -23,7 +23,6 @@ class Sale extends Model
         'due_date',
         'sale_status',
         'payment_status',
-        'payment_method',
         'subtotal',
         'tax_amount',
         'discount_amount',

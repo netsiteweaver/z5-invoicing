@@ -49,10 +49,7 @@ class OrderController extends Controller
             $query->where('order_status', $request->status);
         }
 
-        // Filter by payment status
-        if ($request->filled('payment_status')) {
-            $query->where('payment_status', $request->payment_status);
-        }
+        // Note: Orders no longer track payment status
 
         // Filter by customer
         if ($request->filled('customer_id')) {
@@ -96,7 +93,6 @@ class OrderController extends Controller
             'order_date' => ['required', 'date'],
             'delivery_date' => ['nullable', 'date', 'after_or_equal:order_date'],
             'order_status' => ['required', 'in:draft,pending,confirmed,processing,shipped,delivered,cancelled'],
-            'payment_status' => ['required', 'in:pending,partial,paid,overdue'],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
@@ -219,7 +215,6 @@ class OrderController extends Controller
             'order_date' => ['required', 'date'],
             'delivery_date' => ['nullable', 'date', 'after_or_equal:order_date'],
             'order_status' => ['required', 'in:draft,pending,confirmed,processing,shipped,delivered,cancelled'],
-            'payment_status' => ['required', 'in:pending,partial,paid,overdue'],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],

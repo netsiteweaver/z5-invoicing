@@ -21,8 +21,6 @@ class Order extends Model
         'order_date',
         'delivery_date',
         'order_status',
-        'payment_status',
-        'payment_method',
         'subtotal',
         'tax_amount',
         'discount_amount',
@@ -112,11 +110,6 @@ class Order extends Model
         return $this->hasMany(Sale::class);
     }
 
-    public function payments(): HasMany
-    {
-        return $this->hasMany(Payment::class);
-    }
-
     // Scopes
     public function scopeActive($query)
     {
@@ -128,10 +121,6 @@ class Order extends Model
         return $query->where('order_status', $status);
     }
 
-    public function scopeByPaymentStatus($query, $status)
-    {
-        return $query->where('payment_status', $status);
-    }
 
     public function scopeByDateRange($query, $startDate, $endDate)
     {
@@ -164,15 +153,6 @@ class Order extends Model
         return $this->order_status === 'cancelled';
     }
 
-    public function getIsPaidAttribute(): bool
-    {
-        return $this->payment_status === 'paid';
-    }
-
-    public function getIsOverdueAttribute(): bool
-    {
-        return $this->payment_status === 'overdue';
-    }
 
     // Methods
     public function calculateTotals(): void

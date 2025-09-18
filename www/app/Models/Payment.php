@@ -19,7 +19,6 @@ class Payment extends Model
         'payment_method',
         'amount',
         'payment_type_id',
-        'order_id',
         'sale_id',
         'customer_id',
         'reference_number',
@@ -59,11 +58,6 @@ class Payment extends Model
     public function paymentType(): BelongsTo
     {
         return $this->belongsTo(PaymentType::class);
-    }
-
-    public function order(): BelongsTo
-    {
-        return $this->belongsTo(Order::class);
     }
 
     public function sale(): BelongsTo
