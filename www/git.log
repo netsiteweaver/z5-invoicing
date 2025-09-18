@@ -1,0 +1,386 @@
+commit 2ad17995516b9671481b4fbec42b93649b52c92f
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 18 04:42:09 2025 +0400
+
+    fixed dashboard graph not loading
+
+commit 8a09c3599f81e7c88184d8e1db7d84f639b83163
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 18 04:06:31 2025 +0400
+
+    removed invoices from nav
+
+commit b5ceb41d3b7d374c658b55279e8c1221de791b1f
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 18 03:55:30 2025 +0400
+
+    assets
+
+commit 2bc6f98dbe0377ed66497c04cdd393f28e7053ce
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 18 03:51:26 2025 +0400
+
+    Dashboard analytics and dashboard app
+
+commit 820f103935f3d999feb4b2964847923b42222396
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 18 02:28:56 2025 +0400
+
+    releae notes modal updated
+
+commit d92a17cfc876cb98d39ffd89a5591595f5a1d9c4
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 18 02:12:22 2025 +0400
+
+    added whats new modal
+
+commit 77fad5f326699291d5df0e32e764fc6baca20c73
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 18 01:31:41 2025 +0400
+
+    removed delete from profile and updated manual
+
+commit 9a04a8c98bf110d7b99be21a3679a2fc61dac19f
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 18 00:56:58 2025 +0400
+
+    added user manual (html)
+
+commit 497467c381a1cdfc148baa8ad1663432e04a5a59
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Tue Sep 16 12:44:24 2025 +0400
+
+    login image updated
+
+commit f4b9f727045bdbc888ed7e93163fd768b0601ee2
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Tue Sep 16 12:32:15 2025 +0400
+
+    add bg image to login page
+
+commit 90ae67d56edfaa7eb827e131eb6ee27556ad3bb1
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Tue Sep 16 12:06:36 2025 +0400
+
+    user profile
+
+commit 94376d06498d4c181f7c0d30d8fb4e489223cf54
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Tue Sep 16 12:02:09 2025 +0400
+
+    suppliers listing
+
+commit 67a3cf310ced0abb34e9db92ce7ac79d31fc4bf2
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Tue Sep 16 11:50:28 2025 +0400
+
+    show product cost for new GR
+
+commit 0d67a5af5969054e97116445cdc3a8101cfdbc44
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Tue Sep 16 11:49:58 2025 +0400
+
+    fix error on create GR
+
+commit e9c00e8e86a30534229f0b900c1c65996e95db5a
+Merge: d2d980d 093fb15
+Author: Reeaz Ramoly <19675977+netsiteweaver@users.noreply.github.com>
+Date:   Tue Sep 16 11:43:06 2025 +0400
+
+    Merge pull request #6 from netsiteweaver/cursor/add-supplier-navigation-entries-0c23
+    
+    Add supplier navigation entries
+
+commit 093fb154bb20b6505bdf352942c5a7d7e84ca9d9
+Author: Cursor Agent <cursoragent@cursor.com>
+Date:   Tue Sep 16 07:41:38 2025 +0000
+
+    feat: Add suppliers section to sidebar navigation
+    
+    Co-authored-by: reeazr <reeazr@gmail.com>
+
+commit d2d980d56d76701ede455e36f5f98593f1a4e36a
+Merge: 655591b 3d94dbc
+Author: Reeaz Ramoly <19675977+netsiteweaver@users.noreply.github.com>
+Date:   Tue Sep 16 11:35:43 2025 +0400
+
+    Merge pull request #5 from netsiteweaver/cursor/supplier-management-and-goods-receipt-integration-a945
+    
+    Supplier management and goods receipt integration
+
+commit 3d94dbcc0722ead09d9cd6d84affde96c3774e72
+Author: Cursor Agent <cursoragent@cursor.com>
+Date:   Tue Sep 16 06:49:43 2025 +0000
+
+    feat: Integrate suppliers and refactor goods receipts
+    
+    Co-authored-by: reeazr <reeazr@gmail.com>
+
+commit 655591b4741424434b068f62ba88b6e7e0e08cea
+Merge: 6166469 1ac2e75
+Author: Reeaz Ramoly <19675977+netsiteweaver@users.noreply.github.com>
+Date:   Tue Sep 16 10:46:31 2025 +0400
+
+    Merge pull request #4 from netsiteweaver/cursor/create-application-user-manual-e671
+    
+    Create application user manual
+
+commit 1ac2e75917eddf7cb4236ab5fe82698c124e6d35
+Author: Cursor Agent <cursoragent@cursor.com>
+Date:   Tue Sep 16 06:42:01 2025 +0000
+
+    Add user manual documentation
+    
+    Co-authored-by: reeazr <reeazr@gmail.com>
+
+commit 61664691eb002df5b2efde51e75006f869825445
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Tue Sep 16 04:01:19 2025 +0400
+
+    misc
+
+commit 548d001254316316e7d8247a7dfe5e1aa16196de
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Tue Sep 16 03:07:44 2025 +0400
+
+    record login activities
+
+commit fad7ccacfb8dfd64a5757e3fea5bf0db38ae1a34
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Tue Sep 16 02:49:26 2025 +0400
+
+    goods receipt & stock transfer wip
+
+commit 9fde5f93185af58d47e214f23759d463d76f0151
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Tue Sep 16 01:11:54 2025 +0400
+
+    fixed error when creating customer
+
+commit a0ab169c5f57806c9b555757af7e452aedd20432
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sun Sep 14 17:30:35 2025 +0400
+
+    min selling price
+
+commit c95e0ea60b1789f9ca72b1c0af317b3cd285b6d3
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sun Sep 14 11:04:35 2025 +0400
+
+    style to button categories
+
+commit 871d1ef0560f1e8cd4a90922e9c59e0bbd1ef238
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sun Sep 14 10:20:19 2025 +0400
+
+    style to button categories
+
+commit 91828b2d0324ecced3dd9aad907ec45bf6beb8a6
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sun Sep 14 10:12:30 2025 +0400
+
+    favicons
+
+commit 579b0ff2a4c0e63fde650575e450ea69910554ac
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sun Sep 14 10:08:28 2025 +0400
+
+    favicons
+
+commit ef779e384d0c8e3194b2aada67ad30feea6ca6bc
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sun Sep 14 10:00:56 2025 +0400
+
+    .
+
+commit a0da3fb885d830adaa7095ab3e4987eea19f2890
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sun Sep 14 09:56:06 2025 +0400
+
+    misc
+
+commit 78d446953bdd0c7662495e60143d80aad5f7681f
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sun Sep 14 09:48:53 2025 +0400
+
+    categories
+
+commit bcb47648b17d1f8cf47f2ac2760bfc1e441ab791
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sun Sep 14 09:23:43 2025 +0400
+
+    removed weight in products
+
+commit f8405114f7930da92d7a7948b598206d7c162fc6
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sun Sep 14 09:14:25 2025 +0400
+
+    product list in tabular format
+
+commit 22e2f77d9f03df00a11bec32888936ee678a595f
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sun Sep 14 09:04:17 2025 +0400
+
+    products: brand mandatory, removed sku, product code
+
+commit 320cb184fda541561966497ab91b6de74f7bd022
+Merge: 5ea56eb ff13c47
+Author: Reeaz Ramoly <19675977+netsiteweaver@users.noreply.github.com>
+Date:   Sun Sep 14 00:27:09 2025 +0400
+
+    Merge pull request #3 from netsiteweaver/cursor/generate-formatted-sales-invoice-3377
+    
+    Generate formatted sales invoice
+
+commit 5ea56eb926de53c1f9d34f0cdd0cb643007d062c
+Merge: 16f54ef 3382938
+Author: Reeaz Ramoly <19675977+netsiteweaver@users.noreply.github.com>
+Date:   Sun Sep 14 00:21:43 2025 +0400
+
+    Merge pull request #2 from netsiteweaver/cursor/convert-customer-links-to-buttons-170f
+    
+    Convert customer links to buttons
+
+commit ff13c47c601b883ef420f3ad5b2326a8da67d656
+Author: Cursor Agent <cursoragent@cursor.com>
+Date:   Sat Sep 13 20:20:02 2025 +0000
+
+    feat: Add HTML invoice generator
+    
+    Co-authored-by: reeazr <reeazr@gmail.com>
+
+commit 3382938fdd31051d76ee976896f1df2e4ea6d0d0
+Author: Cursor Agent <cursoragent@cursor.com>
+Date:   Sat Sep 13 20:16:53 2025 +0000
+
+    Refactor: Style customer action buttons with Tailwind CSS
+    
+    Co-authored-by: reeazr <reeazr@gmail.com>
+
+commit 16f54ef4cff1fd5de502b40f38846064682ffb48
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sun Sep 14 00:04:42 2025 +0400
+
+    assign role
+
+commit 0b6bee2fc4b493356565493d0a87f9eed8c94d93
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sun Sep 14 00:00:13 2025 +0400
+
+    user listed as deleted fix
+
+commit c8a2e93c2124ffe3ce9d0c3d9613d9e8d5d286a8
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sat Sep 13 23:53:22 2025 +0400
+
+    misc
+
+commit 163c3190ebfefe4816cc1d3d4665b6c6a74c58a1
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sat Sep 13 23:29:43 2025 +0400
+
+    added categories
+
+commit e78e97fea4aec6d210dff6b1c14c1cd50a316b0c
+Author: SimpleGuy <reeaz@netsiteweaver.com>
+Date:   Sat Sep 13 21:24:48 2025 +0400
+
+    removed npm from update script
+
+commit b0871cccd8f3227edd503d4d89685edffbfd82e1
+Author: SimpleGuy <reeaz@netsiteweaver.com>
+Date:   Sat Sep 13 21:22:37 2025 +0400
+
+    bash file to update server
+
+commit 3e5ca07f8a648851ab89a5a324ff2569116a37a2
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sat Sep 13 19:00:44 2025 +0400
+
+    user roles and permissions
+
+commit 06b53483211e68992e62353c73c27e41cfa4cf29
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Sat Sep 13 18:05:32 2025 +0400
+
+    misc
+
+commit 1d8ba2e6f8a7dd9132faf9b75cc8b1b5475b1d87
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Fri Sep 12 00:38:41 2025 +0400
+
+    additional fields for users
+
+commit 830f8856190e369b0aac092f3d77a1146bdee399
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Fri Sep 12 00:20:51 2025 +0400
+
+    docs
+
+commit 09ffd119251e9f53aa8a03ef908da196e501cb22
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 11 23:53:34 2025 +0400
+
+    server deployment instructions
+
+commit a8143b5a5ed572bceee7e47d0f7ad3752af9341d
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 11 23:13:31 2025 +0400
+
+    renamed folder to www
+
+commit eae809c17d87c33cd2a23416ca9e11169b30364e
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 11 16:54:37 2025 +0400
+
+    change default page title
+
+commit 0518cfd215810c72f01a0bfa3886c4d650e0436a
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 11 13:51:19 2025 +0400
+
+    wip
+
+commit 8097a9eba1cfa869c111a6140c797e4ed9b90eb7
+Merge: 48f8c1e 5b2c718
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 11 05:51:40 2025 +0400
+
+    Merge branch 'master' of github.com:netsiteweaver/z5-invoicing
+
+commit 48f8c1ee214b3fe4d788b801aa3ac6ce866cd385
+Author: SimpleGuy <reeazr@gmail.com>
+Date:   Thu Sep 11 05:50:22 2025 +0400
+
+    wip
+
+commit 5b2c718e8182aa54b92c416ad2fe7323b091c9c9
+Author: SimpleGuy <reeaz@netsiteweaver.com>
+Date:   Wed Sep 10 21:20:02 2025 +0400
+
+    misc
+
+commit e524c44bedd869ecdbcb55357a6768bbf52ce184
+Merge: cc4dae9 4fd78f3
+Author: Reeaz Ramoly <19675977+netsiteweaver@users.noreply.github.com>
+Date:   Tue Sep 9 16:54:33 2025 +0400
+
+    Merge pull request #1 from netsiteweaver/cursor/scaffold-new-laravel-project-and-configure-0926
+    
+    Scaffold new laravel project and configure
+
+commit 4fd78f345db61d6bbf928eea346546aaa7f80770
+Author: Cursor Agent <cursoragent@cursor.com>
+Date:   Tue Sep 9 12:48:53 2025 +0000
+
+    feat: Initialize Laravel project structure
+    
+    This commit sets up the basic directory structure and configuration files for a new Laravel project, including essential files like .env.example, composer.json, and the application's core directories.
+    
+    Co-authored-by: reeazr <reeazr@gmail.com>
+
+commit cc4dae933e437b183fa72683d45e055ee0fe76ca
+Author: SimpleGuy <reeaz@netsiteweaver.com>
+Date:   Tue Sep 9 16:28:39 2025 +0400
+
+    docs

@@ -12,6 +12,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\ChangelogController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -127,4 +128,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'Content-Type' => 'text/html; charset=UTF-8',
         ]);
     })->name('manual');
+
+    Route::get('/changelog.json', [ChangelogController::class, 'feed'])->name('changelog.feed');
+
 });
