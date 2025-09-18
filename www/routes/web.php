@@ -40,6 +40,9 @@ require __DIR__.'/auth.php';
 
 
 
+// Public changelog feed (no auth)
+Route::get('/changelog', [ChangelogController::class, 'feed'])->name('changelog.feed');
+
 // Protected routes
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
@@ -109,7 +112,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('settings/current', [SettingsController::class, 'getCurrent'])->name('settings.current');
     Route::post('settings/{setting}/logo', [SettingsController::class, 'updateLogo'])->name('settings.logo');
 
-    Route::get('/changelog.json', [ChangelogController::class, 'feed'])->name('changelog.feed');
+    // (moved) changelog feed is public
 
     // User Manual (HTML) - serves file from project docs
     Route::get('/manual', function () {

@@ -71,7 +71,7 @@
         lastLogin: null,
         async fetchChangelog() {
           try {
-            const res = await fetch('/changelog.json', { cache: 'no-cache' });
+            const res = await fetch('{{ route('changelog.feed') }}', { cache: 'no-cache' });
             if (!res.ok) return;
             const data = await res.json();
             const items = Array.isArray(data.releases) ? data.releases : [];
