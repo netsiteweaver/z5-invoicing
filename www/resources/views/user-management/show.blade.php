@@ -60,6 +60,11 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm font-medium text-gray-500">Department/Location</label>
+                        <div class="mt-1 text-sm text-gray-900">{{ optional($user_management->department)->name ?? 'Unassigned' }}</div>
+                    </div>
+
+                    <div>
                         <label class="block text-sm font-medium text-gray-500">Status</label>
                         <div class="mt-1">
                             @if($user_management->status === 1)

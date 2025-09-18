@@ -95,6 +95,23 @@
                         @enderror
                     </div>
 
+                    <!-- Department -->
+                    <div>
+                        <label for="department_id" class="block text-sm font-medium text-gray-700">Department/Location</label>
+                        <select name="department_id" id="department_id"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('department_id') border-red-300 @enderror">
+                            <option value="">Unassigned</option>
+                            @foreach($departments as $dept)
+                                <option value="{{ $dept->id }}" {{ old('department_id') == $dept->id ? 'selected' : '' }}>
+                                    {{ $dept->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('department_id')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Roles -->
                     <div class="sm:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Assign Roles</label>

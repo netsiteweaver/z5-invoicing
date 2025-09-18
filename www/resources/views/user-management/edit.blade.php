@@ -103,6 +103,23 @@
                         @enderror
                     </div>
 
+                    <!-- Department -->
+                    <div>
+                        <label for="department_id" class="block text-sm font-medium text-gray-700">Department/Location</label>
+                        <select name="department_id" id="department_id"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('department_id') border-red-300 @enderror">
+                            <option value="">Unassigned</option>
+                            @foreach($departments as $dept)
+                                <option value="{{ $dept->id }}" {{ (string) old('department_id', $user_management->department_id) === (string) $dept->id ? 'selected' : '' }}>
+                                    {{ $dept->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('department_id')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Status -->
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700">Status *</label>
@@ -151,10 +168,14 @@
                             <span class="text-sm text-gray-500">Last Updated:</span>
                             <span class="text-sm font-medium text-gray-900">{{ $user_management->updated_at->format('M d, Y H:i') }}</span>
                         </div>
-                        <div>
+                    <div>
                             <span class="text-sm text-gray-500">Last Login:</span>
                             <span class="text-sm font-medium text-gray-900">{{ $user_management->last_login ? \Carbon\Carbon::parse($user_management->last_login)->format('M d, Y H:i') : 'Never' }}</span>
                         </div>
+                    <div>
+                        <span class="text-sm text-gray-500">Department:</span>
+                        <span class="text-sm font-medium text-gray-900">{{ optional($user_management->department)->name ?? 'Unassigned' }}</span>
+                    </div>
                         <div>
                             <span class="text-sm text-gray-500">Current Roles:</span>
                             <span class="text-sm font-medium text-gray-900">{{ $user_management->roles->count() }} roles</span>

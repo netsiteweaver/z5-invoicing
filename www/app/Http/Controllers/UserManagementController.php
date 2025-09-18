@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Permission;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -81,10 +82,11 @@ class UserManagementController extends Controller
     public function create()
     {
         $roles = Role::active()->orderBy('name')->get();
+        $departments = Department::active()->ordered()->get();
         
         $breadcrumbs = $this->setBreadcrumbs('user-management.create');
         
-        return view('user-management.create', compact('roles') + $breadcrumbs);
+        return view('user-management.create', compact('roles', 'departments') + $breadcrumbs);
     }
 
     public function store(Request $request)
@@ -96,6 +98,7 @@ class UserManagementController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'user_level' => 'required|in:Normal,Admin,Root',
             'job_title' => 'nullable|string|max:255',
+            'department_id' => 'nullable|exists:departments,id',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
         ]);
@@ -109,6 +112,7 @@ class UserManagementController extends Controller
                 'password' => Hash::make($request->password),
                 'user_level' => $request->user_level,
                 'job_title' => $request->job_title,
+                'department_id' => $request->department_id,
                 'status' => 1,
                 'created_by' => auth()->id() ?? 1,
             ]);
@@ -130,11 +134,12 @@ class UserManagementController extends Controller
     public function edit(User $user_management)
     {
         $roles = Role::active()->orderBy('name')->get();
+        $departments = Department::active()->ordered()->get();
         $userRoles = $user_management->roles->pluck('id')->toArray();
 
         $breadcrumbs = $this->setBreadcrumbs('user-management.edit', ['user' => $user_management]);
 
-        return view('user-management.edit', compact('user_management', 'roles', 'userRoles') + $breadcrumbs);
+        return view('user-management.edit', compact('user_management', 'roles', 'departments', 'userRoles') + $breadcrumbs);
     }
 
     public function update(Request $request, User $user_management)
@@ -147,6 +152,7 @@ class UserManagementController extends Controller
             'user_level' => 'required|in:Normal,Admin,Root',
             'job_title' => 'nullable|string|max:255',
             'status' => 'required|in:0,1,2',
+            'department_id' => 'nullable|exists:departments,id',
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,id',
         ]);
@@ -159,6 +165,7 @@ class UserManagementController extends Controller
                 'username' => $request->username,
                 'user_level' => $request->user_level,
                 'job_title' => $request->job_title,
+                'department_id' => $request->department_id,
                 'status' => $request->status,
                 'updated_by' => auth()->id() ?? 1,
             ];

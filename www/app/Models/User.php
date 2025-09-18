@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'user_level',
         'job_title',
+        'department_id',
         'photo',
         'store_id',
         'landing_page',
@@ -61,6 +62,11 @@ class User extends Authenticatable
     }
 
     // Relationships
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
