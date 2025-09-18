@@ -154,9 +154,7 @@
                     <button class="px-3 py-2 bg-blue-600 text-white rounded-md">Apply</button>
                 </form>
             </div>
-            <div class="h-64 md:h-80">
-                <canvas id="salesChart"></canvas>
-            </div>
+            <div id="vue-dashboard-root" v-pre class="h-64 md:h-80" data-labels='@json($salesChart['labels'] ?? [])' data-series='@json($salesChart['data'] ?? [])'></div>
         </div>
     </div>
 </div>
@@ -356,43 +354,4 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const ctx = document.getElementById('salesChart');
-  if (!ctx) return;
-  const labels = @json($salesChart['labels'] ?? []);
-  const data = @json($salesChart['data'] ?? []);
-
-  if (ctx._chartInstance) {
-    ctx._chartInstance.destroy();
-  }
-  ctx._chartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Sales',
-        data: data,
-        borderColor: 'rgb(59, 130, 246)',
-        backgroundColor: 'rgba(59, 130, 246, 0.15)',
-        fill: true,
-        tension: 0.3,
-        pointRadius: 2,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: { beginAtZero: true, ticks: { callback: (v) => 'Rs ' + Number(v).toLocaleString() } }
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: (ctx) => 'Rs ' + Number(ctx.parsed.y).toLocaleString() } }
-      }
-    }
-  });
-});
-</script>
 @endpush

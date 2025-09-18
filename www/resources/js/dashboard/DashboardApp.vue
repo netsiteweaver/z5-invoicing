@@ -1,19 +1,12 @@
 <template>
-  <div class="space-y-4">
-    <div class="flex items-center justify-between">
-      <h3 class="text-lg leading-6 font-medium text-gray-900">
-        <i class="fas fa-chart-area mr-2"></i>
-        Sales Trend (Vue)
-      </h3>
-    </div>
-    <div class="h-64 md:h-80">
-      <canvas ref="chartEl"></canvas>
-    </div>
+  <div class="h-64 md:h-80">
+    <canvas ref="chartEl" class="w-full h-full"></canvas>
   </div>
+  
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, nextTick } from 'vue';
 import Chart from 'chart.js/auto';
 
 const props = defineProps({
@@ -50,7 +43,7 @@ function render() {
   });
 }
 
-onMounted(render);
+onMounted(() => nextTick(render));
 watch(() => [props.labels, props.data], render);
 </script>
 
