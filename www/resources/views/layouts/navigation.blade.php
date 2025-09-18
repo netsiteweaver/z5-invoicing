@@ -28,6 +28,16 @@
                         {{ __('Orders') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
+                        {{ __('Sales') }}
+                    </x-nav-link>
+
+                    @can('invoices.view')
+                    <x-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
+                        {{ __('Invoices') }}
+                    </x-nav-link>
+                    @endcan
+
                     <x-nav-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')">
                         {{ __('Suppliers') }}
                     </x-nav-link>
@@ -113,6 +123,16 @@
             <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
                 {{ __('Orders') }}
             </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
+                {{ __('Sales') }}
+            </x-responsive-nav-link>
+
+            @can('invoices.view')
+            <x-responsive-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*')">
+                {{ __('Invoices') }}
+            </x-responsive-nav-link>
+            @endcan
 
             <x-responsive-nav-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')">
                 {{ __('Suppliers') }}

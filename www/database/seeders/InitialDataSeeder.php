@@ -272,8 +272,6 @@ class InitialDataSeeder extends Seeder
                 'order_date' => now()->subDays(rand(1, 30)),
                 'delivery_date' => now()->addDays(rand(1, 7)),
                 'order_status' => ['draft', 'pending', 'confirmed', 'processing', 'shipped', 'delivered'][rand(0, 5)],
-                'payment_status' => ['pending', 'partial', 'paid', 'overdue'][rand(0, 3)],
-                'payment_method' => 'Bank Transfer',
                 'subtotal' => 0,
                 'total_amount' => 0,
                 'currency' => 'MUR',

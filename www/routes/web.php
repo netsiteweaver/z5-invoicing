@@ -12,6 +12,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ChangelogController;
 use Illuminate\Support\Facades\Route;
 
@@ -72,6 +73,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Sales routes
     Route::resource('sales', SaleController::class);
+    // Invoice routes
+    Route::resource('invoices', InvoiceController::class)->except(['create', 'store', 'edit', 'update', 'destroy']);
+    Route::post('invoices/create-from-sale/{sale}', [InvoiceController::class, 'createFromSale'])->name('invoices.create-from-sale');
     // Supplier routes
     Route::resource('suppliers', SupplierController::class);
 
