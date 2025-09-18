@@ -92,22 +92,22 @@
                                 <label for="logo" class="block text-sm font-medium text-gray-700">Company Logo</label>
                                 @if($setting->logo_path)
                                     <div class="mb-2">
-                                        <p class="text-sm font-medium text-gray-700 mb-2">Current logo:</p>
+                                        <!-- <p class="text-sm font-medium text-gray-700 mb-2">Current logo:</p> -->
                                         <img src="{{ Storage::disk('public')->url($setting->logo_path) }}" 
                                              alt="Current Logo" 
                                              class="h-20 w-20 object-cover rounded-lg border border-gray-200">
                                     </div>
                                 @endif
-                                <input type="file" 
+                                <!-- <input type="file" 
                                        class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 @error('logo') border-red-300 @enderror" 
                                        id="logo" 
                                        name="logo" 
                                        accept="image/*"
-                                       onchange="previewLogo(this)">
+                                       onchange="previewLogo(this)"> -->
                                 @error('logo')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    <!-- <p class="mt-2 text-sm text-red-600">{{ $message }}</p> -->
                                 @enderror
-                                <p class="mt-2 text-sm text-gray-500">Upload a new logo image (max 2MB)</p>
+                                <!-- <p class="mt-2 text-sm text-gray-500">Upload a new logo image (max 2MB)</p> -->
                                 
                                 <!-- Logo Preview -->
                                 <div id="logo-preview" class="mt-3 hidden">

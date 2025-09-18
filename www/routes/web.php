@@ -13,6 +13,7 @@ use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ChangelogController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,6 +40,9 @@ require __DIR__.'/auth.php';
 
 
 
+
+// Public changelog feed (no auth)
+Route::get('/changelog', [ChangelogController::class, 'feed'])->name('changelog.feed');
 
 // Protected routes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -112,13 +116,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('settings', SettingsController::class)->except(['show', 'destroy']);
     Route::get('settings/current', [SettingsController::class, 'getCurrent'])->name('settings.current');
     Route::post('settings/{setting}/logo', [SettingsController::class, 'updateLogo'])->name('settings.logo');
-    
-    // Test routes (for development)
-    Route::get('/test', function () {
-        return view('test');
-    })->name('test');
-    
-    Route::get('/alpine-test', function () {
-        return view('alpine-test');
-    })->name('alpine-test');
+
+    // (moved) changelog feed is public
+
+    // User Manual (HTML) - serves file from project docs
+    Route::get('/manual', function () {
+        $path = base_path('..' . DIRECTORY_SEPARATOR . 'docs' . DIRECTORY_SEPARATOR . 'User Manual v1.0.html');
+        if (!file_exists($path)) {
+            abort(404);
+        }
+        return response()->file($path, [
+            'Content-Type' => 'text/html; charset=UTF-8',
+        ]);
+    })->name('manual');
+
 });

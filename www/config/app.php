@@ -16,7 +16,8 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Z5 Invoicing System'),
+    'version' => env('APP_VERSION', 'v0.0.24'),
 
     /*
     |--------------------------------------------------------------------------

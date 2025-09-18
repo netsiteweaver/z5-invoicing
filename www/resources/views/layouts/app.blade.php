@@ -50,8 +50,8 @@
                 </div>
             </div>
 
-            <!-- User Panel -->
-            <div class="flex items-center px-4 py-3 border-b border-gray-700">
+            <!-- User Panel (clickable to profile) -->
+            <a href="{{ route('profile.edit') }}" class="flex items-center px-4 py-3 border-b border-gray-700 hover:bg-gray-800">
                 <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
                     <span class="text-white font-medium text-sm">{{ substr(Auth::user()->name, 0, 1) }}</span>
                 </div>
@@ -59,7 +59,7 @@
                     <p class="text-white text-sm font-medium">{{ Auth::user()->name }}</p>
                     <p class="text-gray-400 text-xs">{{ Auth::user()->user_level ?? 'User' }}</p>
                 </div>
-            </div>
+            </a>
 
             <!-- Navigation -->
             <nav class="mt-2 px-2">
@@ -94,6 +94,36 @@
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('customers.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Create Customer
+                        </a>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
+                <!-- Suppliers -->
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('suppliers.view'))
+                <div x-data="{ suppliersOpen: {{ request()->routeIs('suppliers.*') ? 'true' : 'false' }} }">
+                    <button @click="suppliersOpen = !suppliersOpen" 
+                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('suppliers.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                        <div class="flex items-center">
+                            <i class="fas fa-truck mr-3 h-5 w-5"></i>
+                            Suppliers
+                        </div>
+                        <i class="fas fa-chevron-down transition-transform duration-200" :class="suppliersOpen ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="suppliersOpen" x-transition class="ml-6 mt-1 space-y-1">
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('suppliers.view'))
+                        <a href="{{ route('suppliers.index') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('suppliers.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            All Suppliers
+                        </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('suppliers.create'))
+                        <a href="{{ route('suppliers.create') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('suppliers.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Create Supplier
                         </a>
                         @endif
                     </div>
@@ -189,27 +219,7 @@
                 </div>
                 @endif
 
-                <!-- Invoices -->
-                <div x-data="{ invoicesOpen: false }">
-                    <button @click="invoicesOpen = !invoicesOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white">
-                        <div class="flex items-center">
-                            <i class="fas fa-file-invoice mr-3 h-5 w-5"></i>
-                            Invoices
-                        </div>
-                        <i class="fas fa-chevron-down transition-transform duration-200" :class="invoicesOpen ? 'rotate-180' : ''"></i>
-                    </button>
-                    <div x-show="invoicesOpen" x-transition class="ml-6 mt-1 space-y-1">
-                        <a href="#" class="block px-3 py-2 text-sm rounded-md text-gray-400 hover:bg-gray-700 hover:text-white">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Create Invoice
-                        </a>
-                        <a href="#" class="block px-3 py-2 text-sm rounded-md text-gray-400 hover:bg-gray-700 hover:text-white">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Invoice List
-                        </a>
-                    </div>
-                </div>
+                
 
                 <!-- Inventory -->
                 @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.view'))
@@ -312,6 +322,7 @@
                     Settings
                 </a>
                 @endif
+
             </nav>
         </div>
 
@@ -394,6 +405,9 @@
                             </button>
 
                             <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border">
+                                <a href="{{ route('manual') }}" target="_blank" rel="noopener" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-book mr-2"></i> User Manual
+                                </a>
                                 <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     <i class="fas fa-user mr-2"></i> Profile
                                 </a>
@@ -480,9 +494,19 @@
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         @yield('content')
+                        @include('components.release-notes-modal')
                     </div>
                 </div>
             </main>
+
+            <!-- Footer: version info -->
+            <div class="bg-white border-t border-gray-200">
+                <div class="px-4 py-2 text-xs text-gray-500 flex items-center justify-between">
+                    <span>{{ config('app.name') }}</span>
+                    <span>Version {{ config('app.version') }}</span>
+                </div>
+            </div>
+
         </div>
 
         <!-- Mobile sidebar overlay -->

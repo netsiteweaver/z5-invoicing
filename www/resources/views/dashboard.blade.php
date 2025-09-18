@@ -4,10 +4,11 @@
 @section('description', 'Overview of your business metrics and recent activity')
 
 @section('content')
+<div id="vue-dashboard-stagger" v-cloak x-ignore>
 <!-- Info Boxes -->
 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-6">
     <!-- Total Orders -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="bg-white overflow-hidden shadow rounded-lg transform transition duration-300 ease-out" :class="show.infoBoxes ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
         <div class="p-5">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -33,7 +34,7 @@
     </div>
 
     <!-- Total Sales -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="bg-white overflow-hidden shadow rounded-lg transform transition duration-300 ease-out" :class="show.infoBoxes ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
         <div class="p-5">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -59,7 +60,7 @@
     </div>
 
     <!-- Total Customers -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="bg-white overflow-hidden shadow rounded-lg transform transition duration-300 ease-out" :class="show.infoBoxes ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
         <div class="p-5">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -85,7 +86,7 @@
     </div>
 
     <!-- Total Products -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="bg-white overflow-hidden shadow rounded-lg transform transition duration-300 ease-out" :class="show.infoBoxes ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
         <div class="p-5">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -114,7 +115,7 @@
 <!-- Revenue and Pending Orders + Sales Trend -->
 <div class="grid grid-cols-1 gap-5 lg:grid-cols-3 mb-6">
     <!-- Revenue Overview -->
-    <div class="bg-white shadow rounded-lg lg:col-span-1">
+    <div class="bg-white shadow rounded-lg lg:col-span-1 transform transition duration-300 ease-out" :class="show.revenue ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
         <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
                 <i class="fas fa-dollar-sign mr-2"></i>
@@ -134,7 +135,7 @@
     </div>
 
     <!-- Sales Trend -->
-    <div class="bg-white shadow rounded-lg lg:col-span-2">
+    <div class="bg-white shadow rounded-lg lg:col-span-2 transform transition duration-300 ease-out" :class="show.sales ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
         <div class="px-4 py-5 sm:p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -153,40 +154,14 @@
                     <button class="px-3 py-2 bg-blue-600 text-white rounded-md">Apply</button>
                 </form>
             </div>
-            <div class="h-64 md:h-80">
-                <canvas id="salesChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Stats -->
-    <div class="bg-white shadow rounded-lg lg:col-span-1">
-        <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                <i class="fas fa-chart-pie mr-2"></i>
-                Quick Stats
-            </h3>
-            <div class="space-y-3">
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-500">Orders Today</span>
-                    <span class="text-sm font-medium text-gray-900">{{ $stats['total_orders'] ?? 0 }}</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-500">Active Customers</span>
-                    <span class="text-sm font-medium text-gray-900">{{ $stats['total_customers'] ?? 0 }}</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-500">Products in Stock</span>
-                    <span class="text-sm font-medium text-gray-900">{{ $stats['total_products'] ?? 0 }}</span>
-                </div>
-            </div>
+            <div id="vue-dashboard-root" v-pre class="h-64 md:h-80" data-labels='@json($salesChart['labels'] ?? [])' data-series='@json($salesChart['data'] ?? [])'></div>
         </div>
     </div>
 </div>
 
 <!-- Low Stock Products -->
 @if(isset($stats['low_stock_products']) && $stats['low_stock_products']->count() > 0)
-<div class="bg-white shadow rounded-lg mb-6">
+<div class="bg-white shadow rounded-lg mb-6 transform transition duration-300 ease-out" :class="show.lowStock ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
     <div class="px-4 py-5 sm:p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -249,7 +224,7 @@
 
 <!-- Recent Orders -->
 @if(isset($stats['recent_orders']) && $stats['recent_orders']->count() > 0)
-<div class="bg-white shadow rounded-lg mb-6">
+<div class="bg-white shadow rounded-lg mb-6 transform transition duration-300 ease-out" :class="show.recentOrders ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
     <div class="px-4 py-5 sm:p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -324,7 +299,7 @@
 @endif
 
 <!-- Recent Logins -->
-<div class="bg-white shadow rounded-lg mb-6">
+<div class="bg-white shadow rounded-lg mb-6 transform transition duration-300 ease-out" :class="show.recentLogins ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
     <div class="px-4 py-5 sm:p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -340,7 +315,9 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">When</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        @if(auth()->user()->is_root)
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
+                        @endif
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OS / Browser</th>
                     </tr>
@@ -357,7 +334,9 @@
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Failed</span>
                             @endif
                         </td>
+                        @if(auth()->user()->is_root)
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $log->ip_address }}</td>
+                        @endif
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $log->device }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $log->os }} / {{ $log->browser }}</td>
                     </tr>
@@ -370,117 +349,9 @@
         @endif
     </div>
 </div>
-
-<!-- Quick Actions -->
-<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                <i class="fas fa-shopping-cart text-2xl"></i>
-            </div>
-            <div class="ml-4">
-                <h3 class="text-lg font-medium">{{ $stats['total_orders'] ?? 0 }}</h3>
-                <p class="text-blue-100">Total Orders</p>
-            </div>
-        </div>
-        <div class="mt-4">
-            <a href="{{ route('orders.create') }}" class="text-blue-100 hover:text-white text-sm font-medium">
-                Create New Order <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-    </div>
-
-    <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                <i class="fas fa-users text-2xl"></i>
-            </div>
-            <div class="ml-4">
-                <h3 class="text-lg font-medium">{{ $stats['total_customers'] ?? 0 }}</h3>
-                <p class="text-green-100">Customers</p>
-            </div>
-        </div>
-        <div class="mt-4">
-            <a href="{{ route('customers.create') }}" class="text-green-100 hover:text-white text-sm font-medium">
-                Add New Customer <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-    </div>
-
-    <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg shadow-lg p-6 text-white">
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                <i class="fas fa-box text-2xl"></i>
-            </div>
-            <div class="ml-4">
-                <h3 class="text-lg font-medium">{{ $stats['total_products'] ?? 0 }}</h3>
-                <p class="text-yellow-100">Products</p>
-            </div>
-        </div>
-        <div class="mt-4">
-            <a href="{{ route('products.create') }}" class="text-yellow-100 hover:text-white text-sm font-medium">
-                Add New Product <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-    </div>
-
-    <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-lg shadow-lg p-6 text-white">
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                <i class="fas fa-clock text-2xl"></i>
-            </div>
-            <div class="ml-4">
-                <h3 class="text-lg font-medium">{{ $stats['pending_orders'] ?? 0 }}</h3>
-                <p class="text-red-100">Pending Orders</p>
-            </div>
-        </div>
-        <div class="mt-4">
-            <a href="{{ route('orders.index', ['status' => 'pending']) }}" class="text-red-100 hover:text-white text-sm font-medium">
-                View Pending <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-    </div>
+<!-- /vue-dashboard-stagger root -->
 </div>
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const ctx = document.getElementById('salesChart');
-  if (!ctx) return;
-  const labels = @json($salesChart['labels'] ?? []);
-  const data = @json($salesChart['data'] ?? []);
-
-  if (ctx._chartInstance) {
-    ctx._chartInstance.destroy();
-  }
-  ctx._chartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Sales',
-        data: data,
-        borderColor: 'rgb(59, 130, 246)',
-        backgroundColor: 'rgba(59, 130, 246, 0.15)',
-        fill: true,
-        tension: 0.3,
-        pointRadius: 2,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: { beginAtZero: true, ticks: { callback: (v) => 'Rs ' + Number(v).toLocaleString() } }
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: (ctx) => 'Rs ' + Number(ctx.parsed.y).toLocaleString() } }
-      }
-    }
-  });
-});
-</script>
 @endpush
