@@ -119,10 +119,8 @@
                                         </div>
                                     </div>
                                     @if(!$role->is_system || auth()->user()->hasRole('admin'))
-                                        <form method="POST" action="{{ route('user-management.show', ['user_management' => $user_management->id]) }}" class="inline" onsubmit="return confirm('Remove this role from user?')">
+                                        <form method="POST" action="{{ route('user-management.remove-role', ['user_management' => $user_management->id]) }}" class="inline" onsubmit="return confirm('Remove this role from user?')">
                                             @csrf
-                                            @method('PATCH')
-                                            <input type="hidden" name="action" value="remove_role">
                                             <input type="hidden" name="role_id" value="{{ $role->id }}">
                                             <button type="submit" class="text-red-600 hover:text-red-900">
                                                 <i class="fas fa-times"></i>
@@ -246,38 +244,46 @@
 </div>
 
 <!-- Role Assignment Modal -->
-<div id="roleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" x-data="{ open: false }" x-show="open" @click.away="open = false">
+<div id="roleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" onclick="if(event.target === this) closeRoleModal()">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-medium text-gray-900">Assign Role</h3>
-                <button @click="open = false" class="text-gray-400 hover:text-gray-600">
+                <button onclick="closeRoleModal()" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             
             <form id="roleForm" method="POST">
                 @csrf
-                @method('PATCH')
-                <input type="hidden" name="action" value="assign_role">
+                <input type="hidden" name="_method" value="POST">
                 
                 <div class="mb-4">
                     <label for="role_id" class="block text-sm font-medium text-gray-700 mb-2">Select Role</label>
-                    <select name="role_id" id="role_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
-                        <option value="">Choose a role</option>
-                        @foreach($allRoles as $role)
-                            @if(!$user_management->hasRole($role))
+                    @php
+                        $unassignedRoles = $allRoles->filter(function($r) use ($user_management) {
+                            return !$user_management->hasRole($r);
+                        });
+                    @endphp
+                    @if($unassignedRoles->isEmpty())
+                        <div class="px-3 py-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                            All available roles are already assigned to this user.
+                        </div>
+                    @else
+                        <select name="role_id" id="role_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                            <option value="">Choose a role</option>
+                            @foreach($unassignedRoles as $role)
                                 <option value="{{ $role->id }}">{{ $role->display_name }}</option>
-                            @endif
-                        @endforeach
-                    </select>
+                            @endforeach
+                        </select>
+                    @endif
                 </div>
                 
                 <div class="flex justify-end space-x-3">
-                    <button type="button" @click="open = false" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    <button type="button" onclick="closeRoleModal()" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
                         Cancel
                     </button>
-                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700" {{ isset($unassignedRoles) && $unassignedRoles->isEmpty() ? 'disabled' : '' }}>
                         Assign Role
                     </button>
                 </div>
@@ -288,7 +294,7 @@
 
 <script>
 function openRoleModal() {
-    document.getElementById('roleForm').action = '{{ route("user-management.show", ["user_management" => $user_management->id]) }}';
+    document.getElementById('roleForm').action = '{{ route("user-management.assign-role", ["user_management" => $user_management->id]) }}';
     document.getElementById('roleModal').classList.remove('hidden');
 }
 

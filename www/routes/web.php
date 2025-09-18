@@ -102,6 +102,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('user-management/roles/{role}', [UserManagementController::class, 'updateRole'])->name('user-management.roles.update');
     Route::delete('user-management/roles/{role}', [UserManagementController::class, 'destroyRole'])->name('user-management.roles.destroy');
     Route::patch('user-management/roles/{role}/toggle', [UserManagementController::class, 'toggleRoleStatus'])->name('user-management.roles.toggle');
+    // User role assignment actions
+    Route::post('user-management/{user_management}/assign-role', [UserManagementController::class, 'assignRoleAction'])->name('user-management.assign-role');
+    Route::post('user-management/{user_management}/remove-role', [UserManagementController::class, 'removeRoleAction'])->name('user-management.remove-role');
     Route::get('user-management/permissions', [UserManagementController::class, 'permissions'])->name('user-management.permissions');
     Route::patch('user-management/permissions/{permission}/toggle', [UserManagementController::class, 'togglePermissionStatus'])->name('user-management.permissions.toggle');
     Route::resource('user-management', UserManagementController::class)->except(['destroy']);

@@ -23,6 +23,7 @@ class UserManagementController extends Controller
         $this->middleware('permission:users.create')->only(['create', 'store', 'apiStore']);
         $this->middleware('permission:users.edit')->only(['edit', 'update', 'apiUpdate']);
         $this->middleware('permission:users.delete')->only(['destroy', 'apiDestroy']);
+        $this->middleware('permission:users.edit')->only(['assignRoleAction', 'removeRoleAction']);
         
         // Roles
         $this->middleware('permission:roles.view')->only(['roles']);
@@ -36,7 +37,7 @@ class UserManagementController extends Controller
     }
     public function index(Request $request)
     {
-        $query = User::with('roles');
+        $query = User::with(['roles', 'department']);
 
         // Search functionality
         if ($request->filled('search')) {
@@ -200,6 +201,30 @@ class UserManagementController extends Controller
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Failed to delete user. Please try again.']);
         }
+    }
+
+    public function assignRoleAction(Request $request, User $user_management)
+    {
+        $request->validate([
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
+        $user_management->assignRole((int) $request->role_id);
+
+        return redirect()->route('user-management.show', ['user_management' => $user_management->id])
+            ->with('success', 'Role assigned successfully.');
+    }
+
+    public function removeRoleAction(Request $request, User $user_management)
+    {
+        $request->validate([
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
+        $user_management->removeRole((int) $request->role_id);
+
+        return redirect()->route('user-management.show', ['user_management' => $user_management->id])
+            ->with('success', 'Role removed successfully.');
     }
 
     // Role Management Methods
