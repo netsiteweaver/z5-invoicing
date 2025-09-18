@@ -220,27 +220,7 @@
                 </div>
                 @endif
 
-                <!-- Invoices -->
-                <div x-data="{ invoicesOpen: false }">
-                    <button @click="invoicesOpen = !invoicesOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white">
-                        <div class="flex items-center">
-                            <i class="fas fa-file-invoice mr-3 h-5 w-5"></i>
-                            Invoices
-                        </div>
-                        <i class="fas fa-chevron-down transition-transform duration-200" :class="invoicesOpen ? 'rotate-180' : ''"></i>
-                    </button>
-                    <div x-show="invoicesOpen" x-transition class="ml-6 mt-1 space-y-1">
-                        <a href="#" class="block px-3 py-2 text-sm rounded-md text-gray-400 hover:bg-gray-700 hover:text-white">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Create Invoice
-                        </a>
-                        <a href="#" class="block px-3 py-2 text-sm rounded-md text-gray-400 hover:bg-gray-700 hover:text-white">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Invoice List
-                        </a>
-                    </div>
-                </div>
+                
 
                 <!-- Inventory -->
                 @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.view'))
