@@ -23,6 +23,13 @@ class ParamsSeeder extends Seeder
             Param::setValue('sales.last_number', '0');
         }
 
+        // Payments numbering params
+        Param::setValue('payments.prefix', 'PAY-');
+        Param::setValue('payments.padding', '6');
+        if (Param::getValue('payments.last_number') === null) {
+            Param::setValue('payments.last_number', '0');
+        }
+
         // Default product brand (optional). Set to an existing brand ID.
         if (Param::getValue('products.default_brand_id') === null) {
             Param::setValue('products.default_brand_id', null);

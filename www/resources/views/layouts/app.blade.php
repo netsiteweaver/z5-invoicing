@@ -219,6 +219,36 @@
                 </div>
                 @endif
 
+                <!-- Payments -->
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('payments.view') || auth()->user()->hasPermission('payments.create'))
+                <div x-data="{ paymentsOpen: {{ request()->routeIs('payments.*') ? 'true' : 'false' }} }">
+                    <button @click="paymentsOpen = !paymentsOpen" 
+                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('payments.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                        <div class="flex items-center">
+                            <i class="fas fa-money-bill-wave mr-3 h-5 w-5"></i>
+                            Payments
+                        </div>
+                        <i class="fas fa-chevron-down transition-transform duration-200" :class="paymentsOpen ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="paymentsOpen" x-transition class="ml-6 mt-1 space-y-1">
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('payments.view'))
+                        <a href="{{ route('payments.index') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('payments.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            All Payments
+                        </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('payments.create'))
+                        <a href="{{ route('payments.create') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('payments.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Record Payment
+                        </a>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
                 
 
                 <!-- Inventory -->

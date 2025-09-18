@@ -154,6 +154,11 @@
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                         @endif
+                                        @if($sale->payment_status !== 'paid')
+                                            <a href="{{ route('sales.payments.create', $sale) }}" class="text-green-600 hover:text-green-800" title="Record Payment">
+                                                <i class="fas fa-money-bill-wave"></i>
+                                            </a>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

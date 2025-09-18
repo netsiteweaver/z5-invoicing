@@ -73,10 +73,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Sales routes
     Route::resource('sales', SaleController::class);
-    // Payments routes (minimal for sale payments)
-    Route::post('sales/{sale}/payments', [PaymentController::class, 'storeForSale'])
-        ->name('sales.payments.store')
-        ->middleware('permission:sales.edit');
+    // Payments routes
+    Route::resource('payments', \App\Http\Controllers\PaymentController::class)->only(['index','create','store','show']);
+    // Convenience: preselect sale on create via query ?sale_id=ID
+    Route::get('sales/{sale}/payments/create', [\App\Http\Controllers\PaymentController::class, 'create'])->name('sales.payments.create');
+    // Invoice routes
+    Route::resource('invoices', InvoiceController::class)->except(['create', 'store', 'edit', 'update', 'destroy']);
+    
     // Supplier routes
     Route::resource('suppliers', SupplierController::class);
 
