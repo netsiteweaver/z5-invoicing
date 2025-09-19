@@ -81,6 +81,13 @@ class PaymentController extends Controller
 		$sale = Sale::with('customer', 'payments')->findOrFail($validated['sale_id']);
 		$paymentType = PaymentType::findOrFail($validated['payment_type_id']);
 
+		// Compute amount due and block overpayment
+		$totalPaid = (float) $sale->payments()->where('status', 1)->sum('amount');
+		$due = max(0.0, (float) $sale->total_amount - $totalPaid);
+		if ((float) $validated['amount'] > $due) {
+			return back()->withErrors(['amount' => 'Payment amount exceeds amount due (Rs '.number_format($due, 2).').'])->withInput();
+		}
+
 		DB::beginTransaction();
 		try {
 			$payment = Payment::create([

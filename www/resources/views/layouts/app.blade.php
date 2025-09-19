@@ -338,6 +338,34 @@
                     </div>
                 </div>
 
+                <!-- Payment Terms (CRUD) moved above System block -->
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('settings.view'))
+                <div x-data="{ termsOpen: {{ request()->routeIs('payment-terms.*') ? 'true' : 'false' }} }">
+                    <button @click="termsOpen = !termsOpen" 
+                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('payment-terms.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar-alt mr-3 h-5 w-5"></i>
+                            Payment Terms
+                        </div>
+                        <i class="fas fa-chevron-down transition-transform duration-200" :class="termsOpen ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="termsOpen" x-transition class="ml-6 mt-1 space-y-1">
+                        <a href="{{ route('payment-terms.index') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('payment-terms.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            All Payment Terms
+                        </a>
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('settings.edit'))
+                        <a href="{{ route('payment-terms.create') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('payment-terms.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Create Payment Term
+                        </a>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
                 <!-- Divider -->
                 <div class="border-t border-gray-700 my-4"></div>
                 <div class="px-3 py-2">

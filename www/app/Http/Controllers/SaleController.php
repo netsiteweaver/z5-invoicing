@@ -89,7 +89,8 @@ class SaleController extends Controller
     {
         $customers = Customer::ordered()->get();
         $products = Product::ordered()->get();
-        return view('sales.create', compact('customers', 'products'));
+        $paymentTerms = \App\Models\PaymentTerm::where('status', 1)->orderBy('is_default', 'desc')->orderBy('name')->get();
+        return view('sales.create', compact('customers', 'products', 'paymentTerms'));
     }
 
     public function store(Request $request, InventoryService $inventoryService)
@@ -98,6 +99,7 @@ class SaleController extends Controller
             'customer_id' => 'required|exists:customers,id',
             'sale_date' => 'required|date',
             'due_date' => 'nullable|date|after_or_equal:sale_date',
+            'payment_term_id' => 'nullable|exists:payment_terms,id',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -121,17 +123,31 @@ class SaleController extends Controller
 
             $totalAmount = $subtotal - $totalDiscount;
 
+            // Determine due date from payment terms if provided and not manual
+            $dueDate = $request->due_date;
+            if ($request->filled('payment_term_id')) {
+                $term = \App\Models\PaymentTerm::find($request->payment_term_id);
+                if ($term) {
+                    if ($term->type === 'days') {
+                        $dueDate = \Carbon\Carbon::parse($request->sale_date)->addDays($term->days)->toDateString();
+                    } elseif ($term->type === 'eom') {
+                        $dueDate = \Carbon\Carbon::parse($request->sale_date)->endOfMonth()->toDateString();
+                    } // manual keeps provided due_date
+                }
+            }
+
             // Create sale
             $sale = Sale::create([
                 'customer_id' => $request->customer_id,
                 'sale_date' => $request->sale_date,
-                'due_date' => $request->due_date,
+                'due_date' => $dueDate,
                 'subtotal' => $subtotal,
                 'discount_amount' => $totalDiscount,
                 'total_amount' => $totalAmount,
                 'notes' => $request->notes,
                 'status' => 'confirmed',
                 'payment_status' => 'pending',
+                'payment_term_id' => $request->payment_term_id,
                 'created_by' => auth()->id(),
             ]);
 
@@ -204,6 +220,7 @@ class SaleController extends Controller
             'customer_id' => 'required|exists:customers,id',
             'sale_date' => 'required|date',
             'due_date' => 'nullable|date|after_or_equal:sale_date',
+            'payment_term_id' => 'nullable|exists:payment_terms,id',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -250,15 +267,29 @@ class SaleController extends Controller
 
             $totalAmount = $subtotal - $totalDiscount;
 
+            // Recompute due date from terms if provided
+            $dueDate = $request->due_date;
+            if ($request->filled('payment_term_id')) {
+                $term = \App\Models\PaymentTerm::find($request->payment_term_id);
+                if ($term) {
+                    if ($term->type === 'days') {
+                        $dueDate = \Carbon\Carbon::parse($request->sale_date)->addDays($term->days)->toDateString();
+                    } elseif ($term->type === 'eom') {
+                        $dueDate = \Carbon\Carbon::parse($request->sale_date)->endOfMonth()->toDateString();
+                    }
+                }
+            }
+
             // Update sale
             $sale->update([
                 'customer_id' => $request->customer_id,
                 'sale_date' => $request->sale_date,
-                'due_date' => $request->due_date,
+                'due_date' => $dueDate,
                 'subtotal' => $subtotal,
                 'discount_amount' => $totalDiscount,
                 'total_amount' => $totalAmount,
                 'notes' => $request->notes,
+                'payment_term_id' => $request->payment_term_id,
             ]);
 
             // Create new sale items

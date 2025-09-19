@@ -123,6 +123,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('settings/current', [SettingsController::class, 'getCurrent'])->name('settings.current');
     Route::post('settings/{setting}/logo', [SettingsController::class, 'updateLogo'])->name('settings.logo');
 
+    // Payment Terms routes
+    Route::resource('payment-terms', \App\Http\Controllers\PaymentTermController::class);
+
     // (moved) changelog feed is public
 
     // User Manual (HTML) - serves file from project docs
