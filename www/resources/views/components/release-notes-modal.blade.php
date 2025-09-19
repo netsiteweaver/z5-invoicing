@@ -1,4 +1,5 @@
 <div x-data="releaseNotes()" x-init="init()">
+  <style>[x-cloak]{display:none!important}</style>
   <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center">
     <div class="absolute inset-0 bg-black/40" @click="dismiss()"></div>
     <div class="relative bg-white rounded-lg shadow-xl border border-gray-200 max-w-2xl w-full mx-4">
@@ -88,13 +89,14 @@
           }
           return this.releases;
         },
-        init() {
-          try {
-            const seen = localStorage.getItem(key);
-            this.open = !seen;
-          } catch (e) { this.open = true; }
+        async init() {
           this.lastLogin = lastLoginIso ? new Date(lastLoginIso) : null;
-          this.fetchChangelog();
+          let seen = false;
+          try { seen = !!localStorage.getItem(key); } catch (e) { seen = false; }
+          if (seen) { this.open = false; return; }
+          await this.fetchChangelog();
+          // Only open after verification & fetch
+          this.open = true;
         },
         dismiss() {
           if (this.dontShowAgain) {

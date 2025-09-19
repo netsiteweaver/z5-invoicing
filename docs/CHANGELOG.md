@@ -3,6 +3,7 @@
 - assign department to user
 - payments
 - manage payment terms (to be used for sale)
+- prevent what's new popup from flashing on page load
 
 ## 0.0.24 - 2025-09-18
 - forgot password now functional
