@@ -35,7 +35,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Domain event bindings can be added here if using custom events
     }
 
     /**

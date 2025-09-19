@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             InitialDataSeeder::class,
             CompanySettingsSeeder::class,
             ParamsSeeder::class,
+            NotificationSeeder::class,
             PostInstallFixesSeeder::class,
         ]);
     }
