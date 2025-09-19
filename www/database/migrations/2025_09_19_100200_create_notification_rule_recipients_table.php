@@ -20,7 +20,8 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
-            $table->unique(['rule_id', 'recipient_type', 'recipient_value']);
+            // Use a short custom name to avoid MySQL 64-char identifier limit
+            $table->unique(['rule_id', 'recipient_type', 'recipient_value'], 'uniq_rule_recipient');
             $table->index('rule_id');
             $table->index('recipient_type');
             $table->foreign('rule_id')->references('id')->on('notification_rules')->onDelete('cascade');
