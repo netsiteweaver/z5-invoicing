@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -21,6 +21,9 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Delegate all Blade @can checks to our role/permission system
+        Gate::before(function ($user, string $ability, ?array $arguments = null) {
+            return method_exists($user, 'hasPermission') && $user->hasPermission($ability) ? true : null;
+        });
     }
 }
