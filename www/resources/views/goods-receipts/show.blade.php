@@ -47,17 +47,51 @@
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Cost</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Line Total (incl. VAT)</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
+          @php
+            $totalQty = 0;
+            $totalNet = 0;
+            $totalVat = 0;
+            $totalGross = 0;
+          @endphp
           @foreach($receipt->items as $item)
+            @php
+              $unitCost = $item->unit_cost ?? 0;
+              $quantity = $item->quantity;
+              $grossAmount = $quantity * $unitCost;
+              $vatRate = ($item->product->tax_type ?? 'standard') === 'standard' ? 0.15 : 0;
+              $vatAmount = $grossAmount * $vatRate;
+              $lineTotal = $grossAmount + $vatAmount;
+              
+              $totalQty += $quantity;
+              $totalNet += $grossAmount;
+              $totalVat += $vatAmount;
+              $totalGross += $lineTotal;
+            @endphp
           <tr>
             <td class="px-6 py-4 whitespace-nowrap">{{ $item->product->name ?? ('#'.$item->product_id) }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">{{ $item->quantity }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">{{ $item->unit_cost ? number_format($item->unit_cost, 2) : '-' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ $quantity }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ number_format($unitCost, 2) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap font-medium">{{ number_format($lineTotal, 2) }}</td>
           </tr>
           @endforeach
         </tbody>
+        <tfoot class="bg-gray-50">
+          <tr class="font-medium">
+            <td class="px-6 py-3 text-left text-sm text-gray-900">Totals:</td>
+            <td class="px-6 py-3 text-left text-sm text-gray-900">{{ $totalQty }}</td>
+            <td class="px-6 py-3 text-left text-sm text-gray-900">Products (excl. VAT): {{ number_format($totalNet, 2) }}</td>
+            <td class="px-6 py-3 text-left text-sm text-gray-900">
+              <div class="text-sm">
+                <div>VAT (15%): {{ number_format($totalVat, 2) }}</div>
+                <div class="font-semibold">Grand Total: {{ number_format($totalGross, 2) }}</div>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   </div>

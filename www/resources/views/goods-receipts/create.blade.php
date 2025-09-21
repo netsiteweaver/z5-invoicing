@@ -144,38 +144,47 @@ document.addEventListener('change', function(e) {
   }
 });
 
-// Recalculate line total for a row
+// Recalculate line total for a row (including VAT)
 function recalcRow(row) {
   const qty = parseFloat((row.querySelector('.gr-qty')?.value || '0')) || 0;
   const cost = parseFloat((row.querySelector('.gr-unit-cost')?.value || '0')) || 0;
-  const total = (qty * cost).toFixed(2);
+  const gross = qty * cost;
+  const vatRate = getVatRateForRow(row);
+  const vatAmount = gross * vatRate;
+  const totalWithVat = gross + vatAmount;
+  
   const totalEl = row.querySelector('.gr-line-total');
-  if (totalEl) totalEl.textContent = total;
+  if (totalEl) {
+    totalEl.textContent = totalWithVat.toFixed(2);
+    totalEl.setAttribute('title', `Gross: ${gross.toFixed(2)} + VAT (${(vatRate * 100).toFixed(1)}%): ${vatAmount.toFixed(2)}`);
+  }
 }
 
 // Recalculate footer totals
 function recalcTotals() {
   let sumQty = 0;
-  let sumAmount = 0; // gross
-  let sumNet = 0;
+  let sumNet = 0; // products excluding VAT
   let sumVat = 0;
+  let sumTotal = 0; // total including VAT
   document.querySelectorAll('#items .grid').forEach(row => {
     const qty = parseFloat((row.querySelector('.gr-qty')?.value || '0')) || 0;
     const cost = parseFloat((row.querySelector('.gr-unit-cost')?.value || '0')) || 0;
     sumQty += qty;
     const gross = qty * cost;
-    sumAmount += gross;
-    const rate = getVatRateForRow(row);
-    const net = rate > 0 ? gross / (1 + rate) : gross;
-    sumNet += net;
-    sumVat += gross - net;
+    const vatRate = getVatRateForRow(row);
+    const vatAmount = gross * vatRate;
+    const netAmount = gross; // cost is already net (excluding VAT)
+    
+    sumNet += netAmount;
+    sumVat += vatAmount;
+    sumTotal += gross + vatAmount;
   });
   const qtyEl = document.getElementById('gr-total-qty');
   const amtEl = document.getElementById('gr-total-amount');
   const netEl = document.getElementById('gr-total-net');
   const vatEl = document.getElementById('gr-total-vat');
   if (qtyEl) qtyEl.textContent = sumQty.toString();
-  if (amtEl) amtEl.textContent = sumAmount.toFixed(2);
+  if (amtEl) amtEl.textContent = sumTotal.toFixed(2);
   if (netEl) netEl.textContent = sumNet.toFixed(2);
   if (vatEl) vatEl.textContent = sumVat.toFixed(2);
 }

@@ -21,20 +21,52 @@
   <table>
     <thead>
       <tr>
-        <th style="width: 60%">Product</th>
-        <th style="width: 20%">Qty</th>
+        <th style="width: 40%">Product</th>
+        <th style="width: 15%">Qty</th>
         <th style="width: 20%">Unit Cost</th>
+        <th style="width: 25%">Line Total (incl. VAT)</th>
       </tr>
     </thead>
     <tbody>
+      @php
+        $totalQty = 0;
+        $totalNet = 0;
+        $totalVat = 0;
+        $totalGross = 0;
+      @endphp
       @foreach($receipt->items as $item)
+        @php
+          $unitCost = $item->unit_cost ?? 0;
+          $quantity = $item->quantity;
+          $grossAmount = $quantity * $unitCost;
+          $vatRate = ($item->product->tax_type ?? 'standard') === 'standard' ? 0.15 : 0;
+          $vatAmount = $grossAmount * $vatRate;
+          $lineTotal = $grossAmount + $vatAmount;
+          
+          $totalQty += $quantity;
+          $totalNet += $grossAmount;
+          $totalVat += $vatAmount;
+          $totalGross += $lineTotal;
+        @endphp
       <tr>
         <td>{{ $item->product->name ?? ('#'.$item->product_id) }}</td>
-        <td>{{ $item->quantity }}</td>
-        <td>{{ $item->unit_cost ? number_format($item->unit_cost, 2) : '-' }}</td>
+        <td>{{ $quantity }}</td>
+        <td>{{ number_format($unitCost, 2) }}</td>
+        <td>{{ number_format($lineTotal, 2) }}</td>
       </tr>
       @endforeach
     </tbody>
+    <tfoot>
+      <tr style="background: #f0f0f0; font-weight: bold;">
+        <td>Totals:</td>
+        <td>{{ $totalQty }}</td>
+        <td>Products (excl. VAT): {{ number_format($totalNet, 2) }}</td>
+        <td>
+          <div>VAT (15%): {{ number_format($totalVat, 2) }}</div>
+          <div>Grand Total: {{ number_format($totalGross, 2) }}</div>
+        </td>
+      </tr>
+    </tfoot>
   </table>
 
   @if($receipt->notes)
