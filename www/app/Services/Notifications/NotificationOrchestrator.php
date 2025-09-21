@@ -51,7 +51,7 @@ class NotificationOrchestrator
                 ]);
                 $template = new \App\Models\NotificationTemplate([
                     'subject' => 'Notification: {{event}}',
-                    'body' => "Hello,\n\nAn event occurred: {{event}}\nReference: {{reference}}\n\nThanks.",
+                    'body' => "Hello,\n\nReference: {{reference}}\n\nThanks.",
                     'channel' => 'email',
                 ]);
 
@@ -179,8 +179,71 @@ class NotificationOrchestrator
         // Provide sensible defaults for common placeholders
         $vars['event_type'] = $vars['event_type'] ?? ($rule->event_type ?? '');
         $vars['event'] = $vars['event'] ?? $vars['event_type'];
-        $vars['reference'] = $vars['reference']
-            ?? ($vars['order_number'] ?? $vars['sale_number'] ?? $vars['payment_number'] ?? $vars['id'] ?? '');
+		$vars['reference'] = $vars['reference']
+			?? ($vars['reference_number'] ?? $vars['order_number'] ?? $vars['sale_number'] ?? $vars['payment_number'] ?? $vars['id'] ?? '');
+
+        // Derive entity and identifiers for convenience
+        $entity = '';
+        if (!empty($vars['event_type']) && str_contains($vars['event_type'], '.')) {
+            $entity = (string) \Illuminate\Support\Str::before($vars['event_type'], '.');
+        }
+        $entityId = null;
+        $entityName = null;
+        switch ($entity) {
+            case 'order':
+                $entityId = $payload['order_id'] ?? null;
+                $entityName = $payload['order_number'] ?? null;
+                break;
+            case 'sale':
+                $entityId = $payload['sale_id'] ?? null;
+                $entityName = $payload['sale_number'] ?? null;
+                break;
+            case 'payment':
+                $entityId = $payload['payment_id'] ?? ($payload['id'] ?? null);
+                $entityName = $payload['payment_number'] ?? null;
+                break;
+            case 'product':
+                $entityId = $payload['product_id'] ?? null;
+                $entityName = $payload['product_name'] ?? null;
+                break;
+            case 'customer':
+                $entityId = $payload['customer_id'] ?? null;
+                $entityName = $payload['customer_name'] ?? null;
+                break;
+            case 'supplier':
+                $entityId = $payload['supplier_id'] ?? null;
+                $entityName = $payload['supplier_name'] ?? null;
+                break;
+            case 'user':
+                $entityId = $payload['user_id'] ?? null;
+                $entityName = $payload['user_name'] ?? null;
+                break;
+            default:
+                // leave nulls
+                break;
+        }
+        $vars['entity'] = $vars['entity'] ?? $entity;
+        $vars['entity_id'] = $vars['entity_id'] ?? ($entityId ? (string) $entityId : '');
+        $vars['name'] = $vars['name']
+            ?? ($entityName
+                ?? ($vars['user_name'] ?? $vars['customer_name'] ?? $vars['supplier_name'] ?? $vars['product_name'] ?? ''));
+
+        // Compute a link to the entity if possible
+        $baseUrl = rtrim((string) config('app.url'), '/');
+        $path = null;
+        if ($entityId) {
+            $paths = [
+                'order' => '/orders/' . $entityId,
+                'sale' => '/sales/' . $entityId,
+                'payment' => '/payments/' . $entityId,
+                'product' => '/products/' . $entityId,
+                'customer' => '/customers/' . $entityId,
+                'supplier' => '/suppliers/' . $entityId,
+                'user' => '/user-management/' . $entityId,
+            ];
+            $path = $paths[$entity] ?? null;
+        }
+        $vars['link'] = $vars['link'] ?? ($path && $baseUrl ? $baseUrl . $path : '');
 
         // Resolve author/actor details if available
         $author = null;
@@ -213,9 +276,16 @@ class NotificationOrchestrator
             $body = str_replace('{{' . $key . '}}', (string) $value, $body);
         }
 
-        // Ensure author is visible even if template didn't include placeholders
-        if (!empty($vars['author'])) {
-            $body = rtrim($body) . "\n\nAuthor: " . $vars['author'] . "\n";
+        // Append details section to body for convenience
+        $details = [];
+        if (!empty($vars['reference'])) { $details[] = 'Reference: ' . $vars['reference']; }
+        if (!empty($vars['name'])) { $details[] = 'Name: ' . $vars['name']; }
+        if (!empty($vars['entity'])) { $details[] = 'Entity: ' . ucfirst($vars['entity']); }
+        if (!empty($vars['entity_id'])) { $details[] = 'Entity ID: ' . $vars['entity_id']; }
+        if (!empty($vars['author'])) { $details[] = 'Author: ' . $vars['author']; }
+        if (!empty($vars['link'])) { $details[] = 'Link: ' . $vars['link']; }
+        if (!empty($details)) {
+            $body = rtrim($body) . "\n\n" . "Details:" . "\n" . implode("\n", array_map(fn($l) => '- ' . $l, $details)) . "\n";
         }
 
         return [$subject, $body];

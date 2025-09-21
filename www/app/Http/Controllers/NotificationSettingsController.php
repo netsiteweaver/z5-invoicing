@@ -102,7 +102,7 @@ class NotificationSettingsController extends Controller
                 'channel' => 'email',
                 'name' => 'Default Notification',
                 'subject' => 'Notification: {{event}}',
-                'body' => "Hello,\n\nAn event occurred: {{event}}\nReference: {{reference}}\n\nThanks.",
+                'body' => "Hello,\n\nReference: {{reference}}\n\nThanks.",
                 'is_active' => true,
             ]);
         }

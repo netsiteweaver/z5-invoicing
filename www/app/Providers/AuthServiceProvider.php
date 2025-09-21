@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -21,6 +21,13 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Delegate all ability checks to our custom permission system
+        Gate::before(function ($user, string $ability) {
+            try {
+                return method_exists($user, 'hasPermission') && $user->hasPermission($ability) ? true : null;
+            } catch (\Throwable $e) {
+                return null;
+            }
+        });
     }
 }

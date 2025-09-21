@@ -63,342 +63,367 @@
 
             <!-- Navigation -->
             <nav class="mt-2 px-2">
-                <!-- Dashboard -->
-                <a href="{{ route('dashboard') }}" 
-                   class="group flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                    <i class="fas fa-tachometer-alt mr-3 h-5 w-5"></i>
-                    Dashboard
-                </a>
 
-                <!-- Customers -->
-                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.view'))
-                <div x-data="{ customersOpen: {{ request()->routeIs('customers.*') ? 'true' : 'false' }} }">
-                    <button @click="customersOpen = !customersOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('customers.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                        <div class="flex items-center">
-                            <i class="fas fa-users mr-3 h-5 w-5"></i>
-                            Customers
-                        </div>
-                        <i class="fas fa-chevron-down transition-transform duration-200" :class="customersOpen ? 'rotate-180' : ''"></i>
-                    </button>
-                    <div x-show="customersOpen" x-transition class="ml-6 mt-1 space-y-1">
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.view'))
-                        <a href="{{ route('customers.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('customers.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            All Customers
-                        </a>
-                        @endif
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.create'))
-                        <a href="{{ route('customers.create') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('customers.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Create Customer
-                        </a>
-                        @endif
+            <!-- Dashboard -->
+            <a href="{{ route('dashboard') }}" 
+               class="group flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                <i class="fas fa-tachometer-alt mr-3 h-5 w-5"></i>
+                Dashboard
+            </a>
+
+            <!-- Customers -->
+            @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.view'))
+            <div x-data="{ customersOpen: {{ request()->routeIs('customers.*') ? 'true' : 'false' }} }">
+                <button @click="customersOpen = !customersOpen" 
+                        class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('customers.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                    <div class="flex items-center">
+                        <i class="fas fa-users mr-3 h-5 w-5"></i>
+                        Customers
                     </div>
+                    <i class="fas fa-chevron-down transition-transform duration-200" :class="customersOpen ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="customersOpen" x-transition class="ml-6 mt-1 space-y-1">
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.view'))
+                    <a href="{{ route('customers.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('customers.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        All Customers
+                    </a>
+                    @endif
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.create'))
+                    <a href="{{ route('customers.create') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('customers.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Create Customer
+                    </a>
+                    @endif
                 </div>
-                @endif
+            </div>
+            @endif
 
-                <!-- Suppliers -->
-                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('suppliers.view'))
-                <div x-data="{ suppliersOpen: {{ request()->routeIs('suppliers.*') ? 'true' : 'false' }} }">
-                    <button @click="suppliersOpen = !suppliersOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('suppliers.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                        <div class="flex items-center">
-                            <i class="fas fa-truck mr-3 h-5 w-5"></i>
-                            Suppliers
-                        </div>
-                        <i class="fas fa-chevron-down transition-transform duration-200" :class="suppliersOpen ? 'rotate-180' : ''"></i>
-                    </button>
-                    <div x-show="suppliersOpen" x-transition class="ml-6 mt-1 space-y-1">
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('suppliers.view'))
-                        <a href="{{ route('suppliers.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('suppliers.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            All Suppliers
-                        </a>
-                        @endif
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('suppliers.create'))
-                        <a href="{{ route('suppliers.create') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('suppliers.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Create Supplier
-                        </a>
-                        @endif
+            <!-- Suppliers -->
+            @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('suppliers.view'))
+            <div x-data="{ suppliersOpen: {{ request()->routeIs('suppliers.*') ? 'true' : 'false' }} }">
+                <button @click="suppliersOpen = !suppliersOpen" 
+                        class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('suppliers.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                    <div class="flex items-center">
+                        <i class="fas fa-truck mr-3 h-5 w-5"></i>
+                        Suppliers
                     </div>
+                    <i class="fas fa-chevron-down transition-transform duration-200" :class="suppliersOpen ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="suppliersOpen" x-transition class="ml-6 mt-1 space-y-1">
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('suppliers.view'))
+                    <a href="{{ route('suppliers.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('suppliers.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        All Suppliers
+                    </a>
+                    @endif
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('suppliers.create'))
+                    <a href="{{ route('suppliers.create') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('suppliers.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Create Supplier
+                    </a>
+                    @endif
                 </div>
-                @endif
+            </div>
+            @endif
 
-                <!-- Products -->
-                <div x-data="{ productsOpen: {{ request()->routeIs('products.*') || request()->routeIs('product-categories.*') || request()->routeIs('product-brands.*') ? 'true' : 'false' }} }">
-                    <button @click="productsOpen = !productsOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('products.*') || request()->routeIs('product-categories.*') || request()->routeIs('product-brands.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                        <div class="flex items-center">
-                            <i class="fas fa-box mr-3 h-5 w-5"></i>
-                            Products
-                        </div>
-                        <i class="fas fa-chevron-down transition-transform duration-200" :class="productsOpen ? 'rotate-180' : ''"></i>
-                    </button>
-                    <div x-show="productsOpen" x-transition class="ml-6 mt-1 space-y-1">
-                        <a href="{{ route('products.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('products.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            All Products
-                        </a>
-                        <a href="{{ route('product-categories.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('product-categories.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Categories
-                        </a>
-                        <a href="{{ route('product-brands.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('product-brands.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Brands
-                        </a>
+            <!-- Departments -->
+            <div x-data="{ departmentsOpen: {{ request()->routeIs('departments.*') ? 'true' : 'false' }} }">
+                <button @click="departmentsOpen = !departmentsOpen" 
+                        class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('departments.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                    <div class="flex items-center">
+                        <i class="fas fa-building mr-3 h-5 w-5"></i>
+                        Departments
                     </div>
+                    <i class="fas fa-chevron-down transition-transform duration-200" :class="departmentsOpen ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="departmentsOpen" x-transition class="ml-6 mt-1 space-y-1">
+                    <a href="{{ route('departments.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('departments.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        All Departments
+                    </a>
+                    <a href="{{ route('departments.create') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('departments.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Create Department
+                    </a>
                 </div>
+            </div>
 
-                <!-- Orders -->
-                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.view'))
-                <div x-data="{ ordersOpen: {{ request()->routeIs('orders.*') ? 'true' : 'false' }} }">
-                    <button @click="ordersOpen = !ordersOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('orders.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                        <div class="flex items-center">
-                            <i class="fas fa-shopping-cart mr-3 h-5 w-5"></i>
-                            Orders
-                        </div>
-                        <i class="fas fa-chevron-down transition-transform duration-200" :class="ordersOpen ? 'rotate-180' : ''"></i>
-                    </button>
-                    <div x-show="ordersOpen" x-transition class="ml-6 mt-1 space-y-1">
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.view'))
-                        <a href="{{ route('orders.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('orders.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            All Orders
-                        </a>
-                        @endif
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.create'))
-                        <a href="{{ route('orders.create') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('orders.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Create Order
-                        </a>
-                        @endif
+            <!-- Products -->
+            <div x-data="{ productsOpen: {{ request()->routeIs('products.*') || request()->routeIs('product-categories.*') || request()->routeIs('product-brands.*') ? 'true' : 'false' }} }">
+                <button @click="productsOpen = !productsOpen" 
+                        class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('products.*') || request()->routeIs('product-categories.*') || request()->routeIs('product-brands.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                    <div class="flex items-center">
+                        <i class="fas fa-box mr-3 h-5 w-5"></i>
+                        Products
                     </div>
+                    <i class="fas fa-chevron-down transition-transform duration-200" :class="productsOpen ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="productsOpen" x-transition class="ml-6 mt-1 space-y-1">
+                    <a href="{{ route('products.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('products.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        All Products
+                    </a>
+                    <a href="{{ route('product-categories.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('product-categories.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Categories
+                    </a>
+                    <a href="{{ route('product-brands.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('product-brands.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Brands
+                    </a>
                 </div>
-                @endif
+            </div>
 
-                <!-- Sales -->
-                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('sales.view'))
-                <div x-data="{ salesOpen: {{ request()->routeIs('sales.*') ? 'true' : 'false' }} }">
-                    <button @click="salesOpen = !salesOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('sales.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                        <div class="flex items-center">
-                            <i class="fas fa-chart-line mr-3 h-5 w-5"></i>
-                            Sales
-                        </div>
-                        <i class="fas fa-chevron-down transition-transform duration-200" :class="salesOpen ? 'rotate-180' : ''"></i>
-                    </button>
-                    <div x-show="salesOpen" x-transition class="ml-6 mt-1 space-y-1">
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('sales.view'))
-                        <a href="{{ route('sales.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('sales.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            All Sales
-                        </a>
-                        @endif
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('sales.create'))
-                        <a href="{{ route('sales.create') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('sales.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Create Sale
-                        </a>
-                        @endif
+            <!-- Orders -->
+            @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.view'))
+            <div x-data="{ ordersOpen: {{ request()->routeIs('orders.*') ? 'true' : 'false' }} }">
+                <button @click="ordersOpen = !ordersOpen" 
+                        class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('orders.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                    <div class="flex items-center">
+                        <i class="fas fa-shopping-cart mr-3 h-5 w-5"></i>
+                        Orders
                     </div>
+                    <i class="fas fa-chevron-down transition-transform duration-200" :class="ordersOpen ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="ordersOpen" x-transition class="ml-6 mt-1 space-y-1">
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.view'))
+                    <a href="{{ route('orders.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('orders.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        All Orders
+                    </a>
+                    @endif
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.create'))
+                    <a href="{{ route('orders.create') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('orders.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Create Order
+                    </a>
+                    @endif
                 </div>
-                @endif
+            </div>
+            @endif
 
-                <!-- Payments -->
-                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('payments.view') || auth()->user()->hasPermission('payments.create'))
-                <div x-data="{ paymentsOpen: {{ request()->routeIs('payments.*') ? 'true' : 'false' }} }">
-                    <button @click="paymentsOpen = !paymentsOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('payments.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                        <div class="flex items-center">
-                            <i class="fas fa-money-bill-wave mr-3 h-5 w-5"></i>
-                            Payments
-                        </div>
-                        <i class="fas fa-chevron-down transition-transform duration-200" :class="paymentsOpen ? 'rotate-180' : ''"></i>
-                    </button>
-                    <div x-show="paymentsOpen" x-transition class="ml-6 mt-1 space-y-1">
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('payments.view'))
-                        <a href="{{ route('payments.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('payments.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            All Payments
-                        </a>
-                        @endif
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('payments.create'))
-                        <a href="{{ route('payments.create') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('payments.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Record Payment
-                        </a>
-                        @endif
+            <!-- Sales -->
+            @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('sales.view'))
+            <div x-data="{ salesOpen: {{ request()->routeIs('sales.*') ? 'true' : 'false' }} }">
+                <button @click="salesOpen = !salesOpen" 
+                        class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('sales.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                    <div class="flex items-center">
+                        <i class="fas fa-chart-line mr-3 h-5 w-5"></i>
+                        Sales
                     </div>
+                    <i class="fas fa-chevron-down transition-transform duration-200" :class="salesOpen ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="salesOpen" x-transition class="ml-6 mt-1 space-y-1">
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('sales.view'))
+                    <a href="{{ route('sales.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('sales.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        All Sales
+                    </a>
+                    @endif
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('sales.create'))
+                    <a href="{{ route('sales.create') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('sales.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Create Sale
+                    </a>
+                    @endif
                 </div>
-                @endif
+            </div>
+            @endif
 
-                
-
-                <!-- Inventory -->
-                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.view'))
-                <div x-data="{ inventoryOpen: {{ request()->routeIs('inventory.*') ? 'true' : 'false' }} }">
-                    <button @click="inventoryOpen = !inventoryOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('inventory.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                        <div class="flex items-center">
-                            <i class="fas fa-warehouse mr-3 h-5 w-5"></i>
-                            Inventory
-                        </div>
-                        <i class="fas fa-chevron-down transition-transform duration-200" :class="inventoryOpen ? 'rotate-180' : ''"></i>
-                    </button>
-                    <div x-show="inventoryOpen" x-transition class="ml-6 mt-1 space-y-1">
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.view'))
-                        <a href="{{ route('inventory.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('inventory.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            All Inventory
-                        </a>
-                        @endif
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.low_stock'))
-                        <a href="{{ route('inventory.low-stock') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('inventory.low-stock') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Low Stock Alert
-                        </a>
-                        @endif
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.stock_report'))
-                        <a href="{{ route('inventory.stock-report') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('inventory.stock-report') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Stock Report
-                        </a>
-                        @endif
-
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('goods_receipts.view'))
-                        <a href="{{ route('goods-receipts.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('goods-receipts.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Goods Receipts
-                        </a>
-                        @endif
-
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('stock_transfers.view'))
-                        <a href="{{ route('stock-transfers.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('stock-transfers.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Stock Transfers
-                        </a>
-                        @endif
+            <!-- Payments -->
+            @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('payments.view') || auth()->user()->hasPermission('payments.create'))
+            <div x-data="{ paymentsOpen: {{ request()->routeIs('payments.*') ? 'true' : 'false' }} }">
+                <button @click="paymentsOpen = !paymentsOpen" 
+                        class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('payments.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                    <div class="flex items-center">
+                        <i class="fas fa-money-bill-wave mr-3 h-5 w-5"></i>
+                        Payments
                     </div>
+                    <i class="fas fa-chevron-down transition-transform duration-200" :class="paymentsOpen ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="paymentsOpen" x-transition class="ml-6 mt-1 space-y-1">
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('payments.view'))
+                    <a href="{{ route('payments.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('payments.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        All Payments
+                    </a>
+                    @endif
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('payments.create'))
+                    <a href="{{ route('payments.create') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('payments.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Record Payment
+                    </a>
+                    @endif
                 </div>
-                @endif
+            </div>
+            @endif
 
-                <!-- User Management -->
-                <div x-data="{ userManagementOpen: {{ request()->routeIs('user-management.*') ? 'true' : 'false' }} }">
-                    <button @click="userManagementOpen = !userManagementOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('user-management.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                        <div class="flex items-center">
-                            <i class="fas fa-users mr-3 h-5 w-5"></i>
-                            User Management
-                        </div>
-                        <i class="fas fa-chevron-down transition-transform duration-200" :class="userManagementOpen ? 'rotate-180' : ''"></i>
-                    </button>
-                    <div x-show="userManagementOpen" x-transition class="ml-6 mt-1 space-y-1">
-                        <a href="{{ route('user-management.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('user-management.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            All Users
-                        </a>
-                        <a href="{{ route('user-management.create') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('user-management.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Add User
-                        </a>
-                        <a href="{{ route('user-management.roles') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('user-management.roles') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Manage Roles
-                        </a>
-                        <a href="{{ route('user-management.permissions') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('user-management.permissions') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Manage Permissions
-                        </a>
+            
+
+            <!-- Inventory -->
+            @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.view'))
+            <div x-data="{ inventoryOpen: {{ request()->routeIs('inventory.*') ? 'true' : 'false' }} }">
+                <button @click="inventoryOpen = !inventoryOpen" 
+                        class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('inventory.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                    <div class="flex items-center">
+                        <i class="fas fa-warehouse mr-3 h-5 w-5"></i>
+                        Inventory
                     </div>
-                </div>
+                    <i class="fas fa-chevron-down transition-transform duration-200" :class="inventoryOpen ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="inventoryOpen" x-transition class="ml-6 mt-1 space-y-1">
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.view'))
+                    <a href="{{ route('inventory.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('inventory.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        All Inventory
+                    </a>
+                    @endif
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.low_stock'))
+                    <a href="{{ route('inventory.low-stock') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('inventory.low-stock') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Low Stock Alert
+                    </a>
+                    @endif
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.stock_report'))
+                    <a href="{{ route('inventory.stock-report') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('inventory.stock-report') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Stock Report
+                    </a>
+                    @endif
 
-                <!-- Payment Terms (CRUD) moved above System block -->
-                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('settings.view'))
-                <div x-data="{ termsOpen: {{ request()->routeIs('payment-terms.*') ? 'true' : 'false' }} }">
-                    <button @click="termsOpen = !termsOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('payment-terms.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                        <div class="flex items-center">
-                            <i class="fas fa-calendar-alt mr-3 h-5 w-5"></i>
-                            Payment Terms
-                        </div>
-                        <i class="fas fa-chevron-down transition-transform duration-200" :class="termsOpen ? 'rotate-180' : ''"></i>
-                    </button>
-                    <div x-show="termsOpen" x-transition class="ml-6 mt-1 space-y-1">
-                        <a href="{{ route('payment-terms.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('payment-terms.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            All Payment Terms
-                        </a>
-                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('settings.edit'))
-                        <a href="{{ route('payment-terms.create') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('payment-terms.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Create Payment Term
-                        </a>
-                        @endif
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('goods_receipts.view'))
+                    <a href="{{ route('goods-receipts.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('goods-receipts.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Goods Receipts
+                    </a>
+                    @endif
+
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('stock_transfers.view'))
+                    <a href="{{ route('stock-transfers.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('stock-transfers.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Stock Transfers
+                    </a>
+                    @endif
+                </div>
+            </div>
+            @endif
+
+            <!-- User Management -->
+            <div x-data="{ userManagementOpen: {{ request()->routeIs('user-management.*') ? 'true' : 'false' }} }">
+                <button @click="userManagementOpen = !userManagementOpen" 
+                        class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('user-management.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                    <div class="flex items-center">
+                        <i class="fas fa-users mr-3 h-5 w-5"></i>
+                        User Management
                     </div>
+                    <i class="fas fa-chevron-down transition-transform duration-200" :class="userManagementOpen ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="userManagementOpen" x-transition class="ml-6 mt-1 space-y-1">
+                    <a href="{{ route('user-management.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('user-management.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        All Users
+                    </a>
+                    <a href="{{ route('user-management.create') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('user-management.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Add User
+                    </a>
+                    <a href="{{ route('user-management.roles') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('user-management.roles') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Manage Roles
+                    </a>
+                    <a href="{{ route('user-management.permissions') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('user-management.permissions') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Manage Permissions
+                    </a>
                 </div>
-                @endif
+            </div>
 
-                <!-- Divider -->
-                <div class="border-t border-gray-700 my-4"></div>
-                <div class="px-3 py-2">
-                    <p class="text-gray-500 text-xs font-semibold uppercase tracking-wider">System</p>
-                </div>
-
-                <!-- Settings -->
-                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('settings.view'))
-                <div x-data="{ settingsOpen: {{ request()->routeIs('settings.*') || request()->routeIs('settings.notifications') ? 'true' : 'false' }} }">
-                    <button @click="settingsOpen = !settingsOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('settings.*') || request()->routeIs('settings.notifications') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                        <div class="flex items-center">
-                            <i class="fas fa-cogs mr-3 h-5 w-5"></i>
-                            Settings
-                        </div>
-                        <i class="fas fa-chevron-down transition-transform duration-200" :class="settingsOpen ? 'rotate-180' : ''"></i>
-                    </button>
-                    <div x-show="settingsOpen" x-transition class="ml-6 mt-1 space-y-1">
-                        <a href="{{ route('settings.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('settings.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Company Settings
-                        </a>
-                        <a href="{{ route('settings.notifications') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('settings.notifications') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Notifications
-                        </a>
+            <!-- Payment Terms (CRUD) moved above System block -->
+            @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('settings.view'))
+            <div x-data="{ termsOpen: {{ request()->routeIs('payment-terms.*') ? 'true' : 'false' }} }">
+                <button @click="termsOpen = !termsOpen" 
+                        class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('payment-terms.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                    <div class="flex items-center">
+                        <i class="fas fa-calendar-alt mr-3 h-5 w-5"></i>
+                        Payment Terms
                     </div>
+                    <i class="fas fa-chevron-down transition-transform duration-200" :class="termsOpen ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="termsOpen" x-transition class="ml-6 mt-1 space-y-1">
+                    <a href="{{ route('payment-terms.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('payment-terms.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        All Payment Terms
+                    </a>
+                    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('settings.edit'))
+                    <a href="{{ route('payment-terms.create') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('payment-terms.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Create Payment Term
+                    </a>
+                    @endif
                 </div>
-                @endif
-
+            </div>
+            @endif
             </nav>
+
+            <!-- Divider -->
+            <div class="border-t border-gray-700 my-4"></div>
+            <div class="px-3 py-2">
+                <p class="text-gray-500 text-xs font-semibold uppercase tracking-wider">System</p>
+            </div>
+
+            <!-- Settings -->
+            @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('settings.view'))
+            <div x-data="{ settingsOpen: {{ request()->routeIs('settings.*') || request()->routeIs('settings.notifications') ? 'true' : 'false' }} }">
+                <button @click="settingsOpen = !settingsOpen" 
+                        class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('settings.*') || request()->routeIs('settings.notifications') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                    <div class="flex items-center">
+                        <i class="fas fa-cogs mr-3 h-5 w-5"></i>
+                        Settings
+                    </div>
+                    <i class="fas fa-chevron-down transition-transform duration-200" :class="settingsOpen ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="settingsOpen" x-transition class="ml-6 mt-1 space-y-1">
+                    <a href="{{ route('settings.index') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('settings.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Company Settings
+                    </a>
+                    <a href="{{ route('settings.notifications') }}" 
+                       class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('settings.notifications') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                        <i class="far fa-circle mr-2 text-xs"></i>
+                        Notifications
+                    </a>
+                </div>
+            </div>
+            @endif
+
         </div>
 
         <!-- Main content -->

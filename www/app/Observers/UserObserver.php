@@ -20,6 +20,20 @@ class UserObserver
 
 	public function updated(User $user): void
 	{
+		// Avoid notifying on auth-related updates (e.g., remember_token on logout/login)
+		$changedKeys = array_keys($user->getChanges());
+		$nonMeaningful = [
+			'remember_token',
+			'updated_at',
+			'last_login',
+			'ip',
+			'token',
+			'token_valid_until',
+		];
+		$meaningfulChanges = array_diff($changedKeys, $nonMeaningful);
+		if (count($meaningfulChanges) === 0) {
+			return;
+		}
 		$this->dispatch('user.updated', $user);
 	}
 

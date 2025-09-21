@@ -46,7 +46,7 @@ require __DIR__.'/auth.php';
 Route::get('/changelog', [ChangelogController::class, 'feed'])->name('changelog.feed');
 
 // Protected routes
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'check.user.status'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
