@@ -13,12 +13,20 @@ class ChangelogController extends Controller
         $docsDir = base_path('..' . DIRECTORY_SEPARATOR . 'docs');
 
         if (is_dir($docsDir)) {
+            // First, load discrete per-version files if present
+            $perVersion = $this->loadPerVersionFiles($docsDir);
+            if (!empty($perVersion)) {
+                $releases = array_merge($releases, $perVersion);
+            }
+
             // Prefer HTML changelog
-            foreach (['_CHANGELOG.html', 'CHANGELOG.html'] as $file) {
-                $path = $docsDir . DIRECTORY_SEPARATOR . $file;
-                if (is_file($path)) {
-                    $releases = $this->parseHtmlChangelog(file_get_contents($path));
-                    break;
+            if (empty($releases)) {
+                foreach (['_CHANGELOG.html', 'CHANGELOG.html'] as $file) {
+                    $path = $docsDir . DIRECTORY_SEPARATOR . $file;
+                    if (is_file($path)) {
+                        $releases = $this->parseHtmlChangelog(file_get_contents($path));
+                        break;
+                    }
                 }
             }
 
@@ -37,6 +45,68 @@ class ChangelogController extends Controller
         return response()->json([ 'releases' => $releases ]);
     }
 
+    private function loadPerVersionFiles(string $docsDir): array
+    {
+        $releases = [];
+        $candidates = [];
+        $releaseDir = $docsDir . DIRECTORY_SEPARATOR . 'releases';
+        if (is_dir($releaseDir)) {
+            $candidates = array_merge($candidates, glob($releaseDir . DIRECTORY_SEPARATOR . 'changes_*.*'));
+        }
+        $candidates = array_merge($candidates, glob($docsDir . DIRECTORY_SEPARATOR . 'changes_*.*'));
+
+        foreach ($candidates as $path) {
+            if (!is_file($path)) continue;
+            $filename = basename($path);
+            if (!preg_match('/^changes_(\d+_\d+_\d+)\.(txt|md|html)$/i', $filename, $m)) {
+                continue;
+            }
+            $version = str_replace('_', '.', $m[1]);
+            $ext = strtolower($m[2]);
+            $raw = file_get_contents($path) ?: '';
+
+            // Extract first non-empty line as date if matches YYYY-MM-DD
+            $releaseDate = null;
+            $body = $raw;
+            if ($ext !== 'html') {
+                $lines = preg_split("/\r\n|\r|\n/", $raw);
+                foreach ($lines as $idx => $line) {
+                    $trim = trim($line);
+                    if ($trim === '') continue;
+                    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $trim)) {
+                        $releaseDate = $trim;
+                        // Remove this first non-empty date line from body
+                        unset($lines[$idx]);
+                        $body = implode("\n", $lines);
+                    }
+                    break;
+                }
+            }
+
+            $notesHtml = '';
+            if ($ext === 'html') {
+                $notesHtml = $raw;
+            } elseif ($ext === 'md') {
+                $notesHtml = nl2br(e(trim($body)));
+            } else {
+                // txt
+                $notesHtml = nl2br(e(trim($body)));
+            }
+            $releases[] = [
+                'version' => $version,
+                'date' => $releaseDate ? $releaseDate : date('Y-m-d', filemtime($path) ?: time()),
+                'notesHtml' => $notesHtml,
+            ];
+        }
+
+        // Sort desc by date
+        usort($releases, function ($a, $b) {
+            return strcmp($b['date'], $a['date']);
+        });
+
+        return $releases;
+    }
+
     /**
      * Parse a HTML changelog where each release is under an <h2> heading containing version and date.
      */
@@ -53,14 +123,6 @@ class ChangelogController extends Controller
         $xpath = new \DOMXPath($doc);
         $h2Nodes = $doc->getElementsByTagName('h2');
 
-        $getInnerHtml = static function(\DOMNode $node): string {
-            $innerHTML = '';
-            foreach ($node->childNodes as $child) {
-                $innerHTML .= $node->ownerDocument->saveHTML($child);
-            }
-            return $innerHTML;
-        };
-
         $sections = [];
         foreach ($h2Nodes as $h2) {
             $sections[] = $h2;
@@ -69,7 +131,7 @@ class ChangelogController extends Controller
         if (count($sections) === 0) {
             $releases[] = [
                 'version' => config('app.version'),
-                'date' => date('c'),
+                'date' => date('Y-m-d'),
                 'notesHtml' => $html,
             ];
             return $releases;
@@ -78,7 +140,7 @@ class ChangelogController extends Controller
         foreach ($sections as $index => $h2) {
             $title = trim($h2->textContent);
             $version = $this->extractVersion($title) ?? config('app.version');
-            $date = $this->extractDate($title) ?? date('c');
+            $date = $this->extractDate($title) ?? date('Y-m-d');
 
             // Collect nodes until next <h2>
             $notesHtml = '';
@@ -101,7 +163,7 @@ class ChangelogController extends Controller
 
         // Sort by date desc
         usort($releases, function ($a, $b) {
-            return strtotime($b['date']) <=> strtotime($a['date']);
+            return strcmp($b['date'], $a['date']);
         });
 
         return $releases;
@@ -124,7 +186,7 @@ class ChangelogController extends Controller
             // No matches; return the whole file as a single release
             $releases[] = [
                 'version' => config('app.version'),
-                'date' => date('c'),
+                'date' => date('Y-m-d'),
                 'notesHtml' => nl2br(e($md)),
             ];
             return $releases;
@@ -147,7 +209,7 @@ class ChangelogController extends Controller
 
         // Sort by date desc
         usort($releases, function ($a, $b) {
-            return strtotime($b['date']) <=> strtotime($a['date']);
+            return strcmp($b['date'], $a['date']);
         });
 
         return $releases;
@@ -171,11 +233,11 @@ class ChangelogController extends Controller
 
     private function normalizeDate(string $date): string
     {
-        // If it's just YYYY-MM-DD, convert to ISO8601 midnight UTC
+        // Always return YYYY-MM-DD without timezone to avoid shifts
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            return date('c', strtotime($date . ' 00:00:00'));
+            return $date;
         }
-        return date('c', strtotime($date));
+        return date('Y-m-d', strtotime($date));
     }
 }
 
