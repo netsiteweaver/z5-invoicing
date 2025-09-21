@@ -32,6 +32,10 @@
                         {{ __('Suppliers') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('departments.index')" :active="request()->routeIs('departments.*')">
+                        {{ __('Departments') }}
+                    </x-nav-link>
+
                     @can('goods_receipts.view')
                     <x-nav-link :href="route('goods-receipts.index')" :active="request()->routeIs('goods-receipts.*')">
                         {{ __('Goods Receipts') }}
@@ -145,6 +149,10 @@
 
             <x-responsive-nav-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')">
                 {{ __('Suppliers') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('departments.index')" :active="request()->routeIs('departments.*')">
+                {{ __('Departments') }}
             </x-responsive-nav-link>
 
             @can('goods_receipts.view')
