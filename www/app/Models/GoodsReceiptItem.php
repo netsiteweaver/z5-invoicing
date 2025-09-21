@@ -19,6 +19,8 @@ class GoodsReceiptItem extends Model
         'quantity',
         'unit_cost',
         'uom',
+        'uom_id',
+        'uom_quantity',
         'batch_no',
         'expiry_date',
         'notes',
@@ -57,6 +59,11 @@ class GoodsReceiptItem extends Model
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function uom(): BelongsTo
+    {
+        return $this->belongsTo(Uom::class, 'uom_id');
     }
 }
 

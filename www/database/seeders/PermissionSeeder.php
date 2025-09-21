@@ -112,6 +112,12 @@ class PermissionSeeder extends Seeder
             // Settings
             ['name' => 'settings.view', 'display_name' => 'View Settings', 'module' => 'settings', 'action' => 'view'],
             ['name' => 'settings.update', 'display_name' => 'Update Settings', 'module' => 'settings', 'action' => 'update'],
+
+            // UOMs
+            ['name' => 'uoms.view', 'display_name' => 'View UOMs', 'module' => 'uoms', 'action' => 'view'],
+            ['name' => 'uoms.create', 'display_name' => 'Create UOMs', 'module' => 'uoms', 'action' => 'create'],
+            ['name' => 'uoms.edit', 'display_name' => 'Edit UOMs', 'module' => 'uoms', 'action' => 'edit'],
+            ['name' => 'uoms.delete', 'display_name' => 'Delete UOMs', 'module' => 'uoms', 'action' => 'delete'],
             
             // Reports
             ['name' => 'reports.view', 'display_name' => 'View Reports', 'module' => 'reports', 'action' => 'view'],
@@ -181,6 +187,7 @@ class PermissionSeeder extends Seeder
             'goods_receipts.view', 'goods_receipts.create', 'goods_receipts.edit', 'goods_receipts.approve', 'goods_receipts.print',
             'stock_transfers.view', 'stock_transfers.create', 'stock_transfers.edit', 'stock_transfers.approve', 'stock_transfers.print',
             'reports.view', 'reports.sales', 'reports.inventory',
+            'uoms.view', 'uoms.create', 'uoms.edit',
         ]);
 
         $this->assignPermissionsToRole($salesRepRole, [
@@ -202,7 +209,7 @@ class PermissionSeeder extends Seeder
             'inventory.low_stock', 'inventory.stock_report',
             'goods_receipts.view', 'goods_receipts.create', 'goods_receipts.edit', 'goods_receipts.approve', 'goods_receipts.print',
             'stock_transfers.view', 'stock_transfers.create', 'stock_transfers.edit', 'stock_transfers.approve', 'stock_transfers.print',
-            'reports.view', 'reports.inventory',
+            'reports.view', 'reports.inventory', 'uoms.view',
         ]);
 
         // Assign admin role to existing admin user

@@ -16,6 +16,7 @@ use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Inventory;
 use App\Models\PaymentType;
+use App\Models\Uom;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -26,6 +27,40 @@ class InitialDataSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create base UOMs
+        $unit = Uom::firstOrCreate(
+            ['code' => 'UNIT'],
+            [
+                'uuid' => Str::uuid(),
+                'name' => 'Unit',
+                'description' => 'Base unit',
+                'units_per_uom' => 1,
+                'created_by' => 1,
+                'status' => 1,
+            ]
+        );
+        $box10 = Uom::firstOrCreate(
+            ['code' => 'BOX10'],
+            [
+                'uuid' => Str::uuid(),
+                'name' => 'Box of 10',
+                'description' => 'Box containing 10 units',
+                'units_per_uom' => 10,
+                'created_by' => 1,
+                'status' => 1,
+            ]
+        );
+        $pack100 = Uom::firstOrCreate(
+            ['code' => 'PACK100'],
+            [
+                'uuid' => Str::uuid(),
+                'name' => 'Pack of 100',
+                'description' => 'Pack containing 100 units',
+                'units_per_uom' => 100,
+                'created_by' => 1,
+                'status' => 1,
+            ]
+        );
         // Create root user
         $rootUser = User::firstOrCreate(
             ['email' => 'admin@z5distribution.com'],
@@ -197,6 +232,7 @@ class InitialDataSeeder extends Seeder
                 'type' => $productData['type'],
                 'size' => $productData['size'],
                 'color' => $productData['color'],
+                'uom_id' => $unit->id,
                 'created_by' => $rootUser->id,
                 'status' => 1,
             ]);

@@ -87,7 +87,16 @@
     </div>
     <div>
       <label class="block text-sm font-medium text-gray-700">UOM</label>
-      <input type="text" name="items[IDX][uom]" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+      <select name="items[IDX][uom_id]" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        <option value="">Select</option>
+        @foreach(\App\Models\Uom::orderBy('name')->get() as $u)
+          <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->units_per_uom }})</option>
+        @endforeach
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700">UOM Qty</label>
+      <input type="number" name="items[IDX][uom_quantity]" value="1" min="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
     </div>
     <div>
       <label class="block text-sm font-medium text-gray-700">Line Total</label>

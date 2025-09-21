@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\UomService;
 
 class GoodsReceiptController extends Controller
 {
@@ -79,6 +80,8 @@ class GoodsReceiptController extends Controller
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
+            'items.*.uom_id' => 'nullable|exists:uoms,id',
+            'items.*.uom_quantity' => 'nullable|integer|min:1',
             'items.*.unit_cost' => 'nullable|numeric|min:0',
         ]);
 
@@ -106,6 +109,8 @@ class GoodsReceiptController extends Controller
                     'quantity' => $item['quantity'],
                     'unit_cost' => $item['unit_cost'] ?? null,
                     'uom' => $item['uom'] ?? null,
+                    'uom_id' => $item['uom_id'] ?? null,
+                    'uom_quantity' => $item['uom_quantity'] ?? 1,
                     'batch_no' => $item['batch_no'] ?? null,
                     'expiry_date' => $item['expiry_date'] ?? null,
                     'notes' => $item['notes'] ?? null,
@@ -200,13 +205,14 @@ class GoodsReceiptController extends Controller
                     'reorder_point' => 0,
                     'created_by' => auth()->id(),
                 ]);
-                $inventory->increment('current_stock', $item->quantity);
+                $baseQty = UomService::toBaseUnits((int) $item->quantity, $item->uom_id, $item->uom_quantity);
+                $inventory->increment('current_stock', $baseQty);
 
                 StockMovement::create([
                     'product_id' => $item->product_id,
                     'department_id' => $goods_receipt->department_id,
                     'movement_type' => 'in',
-                    'quantity' => $item->quantity,
+                    'quantity' => $baseQty,
                     'reference_type' => 'goods_receipt',
                     'reference_id' => $item->id,
                     'reference_number' => $goods_receipt->grn_number,

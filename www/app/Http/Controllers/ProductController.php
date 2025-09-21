@@ -94,6 +94,7 @@ class ProductController extends Controller
             'description' => ['nullable', 'string'],
             'category_id' => ['required', 'exists:product_categories,id'],
             'brand_id' => ['required', 'exists:product_brands,id'],
+            'uom_id' => ['nullable', 'exists:uoms,id'],
             // 'type' hidden and forced to 'finished'
             'cost_price' => ['required', 'numeric', 'min:0'],
             'selling_price' => ['required', 'numeric', 'min:0'],
@@ -191,6 +192,7 @@ class ProductController extends Controller
             'description' => ['nullable', 'string'],
             'category_id' => ['required', 'exists:product_categories,id'],
             'brand_id' => ['required', 'exists:product_brands,id'],
+            'uom_id' => ['nullable', 'exists:uoms,id'],
             // 'type' is hidden in the UI; keep existing value
             'cost_price' => ['required', 'numeric', 'min:0'],
             'selling_price' => ['required', 'numeric', 'min:0'],
