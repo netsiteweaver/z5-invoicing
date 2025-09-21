@@ -10,7 +10,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\Rule;
 use App\Http\Controllers\Concerns\HasBreadcrumbs;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UserAccountCreated;
+use App\Mail\UserAccountUpdated;
+use App\Mail\UserAccountDeleted;
+use Illuminate\Support\Str;
 
 class UserManagementController extends Controller
 {
@@ -60,6 +66,10 @@ class UserManagementController extends Controller
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
+        // Default to active users if no explicit status filter
+        if (!$request->filled('status')) {
+            $query->where('status', 1);
+        }
 
         $users = $query->orderBy('name')->paginate(20);
         $roles = Role::active()->orderBy('name')->get();
@@ -94,8 +104,8 @@ class UserManagementController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'username' => 'required|string|max:255|unique:users',
+            'email' => ['required','string','email','max:255', Rule::unique('users')->where(fn($q) => $q->where('status', '!=', 0))],
+            'username' => ['required','string','max:255', Rule::unique('users')->where(fn($q) => $q->where('status', '!=', 0))],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'user_level' => 'required|in:Normal,Admin,Root',
             'job_title' => 'nullable|string|max:255',
@@ -122,6 +132,9 @@ class UserManagementController extends Controller
                 $user->syncRoles($request->roles);
             }
 
+            // Notify user
+            try { Mail::to($user->email)->send(new UserAccountCreated($user)); } catch (\Throwable $e) {}
+
             DB::commit();
 
             return redirect()->route('user-management.show', $user)
@@ -147,8 +160,8 @@ class UserManagementController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user_management->id,
-            'username' => 'required|string|max:255|unique:users,username,' . $user_management->id,
+            'email' => ['required','string','email','max:255', Rule::unique('users','email')->ignore($user_management->id)->where(fn($q) => $q->where('status', '!=', 0))],
+            'username' => ['required','string','max:255', Rule::unique('users','username')->ignore($user_management->id)->where(fn($q) => $q->where('status', '!=', 0))],
             'password' => 'nullable|confirmed',
             'user_level' => 'required|in:Normal,Admin,Root',
             'job_title' => 'nullable|string|max:255',
@@ -178,6 +191,9 @@ class UserManagementController extends Controller
             $user_management->update($updateData);
             $user_management->syncRoles($request->roles ?? []);
 
+            // Notify user
+            try { Mail::to($user_management->email)->send(new UserAccountUpdated($user_management)); } catch (\Throwable $e) {}
+
             DB::commit();
 
             return redirect()->route('user-management.show', ['user_management' => $user_management->id])
@@ -195,7 +211,25 @@ class UserManagementController extends Controller
         }
 
         try {
-            $user_management->update(['status' => 0]); // Soft delete by setting status to 0
+            $originalEmail = $user_management->email;
+            // Ensure unique composite (email,status) and (username,status) when moving to status=0
+            $suffix = '.del' . time() . '.' . $user_management->id;
+            // Adjust email to a unique but valid format using plus addressing if possible
+            if (strpos((string) $user_management->email, '@') !== false) {
+                [$local, $domain] = explode('@', $user_management->email, 2);
+                $newEmail = $local . '+' . ltrim($suffix, '.') . '@' . $domain;
+            } else {
+                $newEmail = $user_management->email . $suffix;
+            }
+            $newUsername = ($user_management->username ?: 'user') . $suffix;
+
+            $user_management->update([
+                'email' => $newEmail,
+                'username' => $newUsername,
+                'status' => 0,
+            ]);
+            // Notify user
+            try { if ($originalEmail) { Mail::to($originalEmail)->send(new UserAccountDeleted($user_management)); } } catch (\Throwable $e) {}
             return redirect()->route('user-management.index')
                 ->with('success', 'User deleted successfully.');
         } catch (\Exception $e) {
@@ -433,8 +467,8 @@ class UserManagementController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'username' => 'required|string|max:255|unique:users',
+            'email' => ['required','string','email','max:255', Rule::unique('users')->where(fn($q) => $q->where('status', '!=', 0))],
+            'username' => ['required','string','max:255', Rule::unique('users')->where(fn($q) => $q->where('status', '!=', 0))],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'user_level' => 'required|in:Normal,Admin,Root',
             'job_title' => 'nullable|string|max:255',
@@ -472,8 +506,8 @@ class UserManagementController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'email' => ['required','string','email','max:255', Rule::unique('users','email')->ignore($user->id)->where(fn($q) => $q->where('status', '!=', 0))],
+            'username' => ['required','string','max:255', Rule::unique('users','username')->ignore($user->id)->where(fn($q) => $q->where('status', '!=', 0))],
             'password' => 'nullable|confirmed',
             'user_level' => 'required|in:Normal,Admin,Root',
             'job_title' => 'nullable|string|max:255',
