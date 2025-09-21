@@ -11,7 +11,7 @@ class NotificationRuleRepository
 	 */
 	public function getActiveRulesForEvent(string $eventType, ?int $tenantId = null)
 	{
-		[$prefix, $wild] = $this->computeWildcard($eventType);
+		[, $wild] = $this->computeWildcard($eventType);
 		return NotificationRule::with(['template', 'recipients'])
 			->when($tenantId, function ($q) use ($tenantId) {
 				$q->where(function ($q2) use ($tenantId) {
@@ -19,13 +19,9 @@ class NotificationRuleRepository
 				});
 			})
 			->where('is_active', true)
-			->where(function ($q) use ($eventType, $prefix, $wild) {
+			->where(function ($q) use ($eventType, $wild) {
 				$q->where('event_type', $eventType)
-					->orWhere('event_type', $wild)
-					->orWhere(function ($q2) use ($prefix) {
-						$q2->where('event_type', 'like', $prefix . '%')
-							->where('event_type', 'like', '%.%');
-					});
+					->orWhere('event_type', $wild);
 			})
 			->get();
 	}

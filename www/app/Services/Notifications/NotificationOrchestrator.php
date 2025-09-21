@@ -9,6 +9,7 @@ use App\Models\NotificationTemplate;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\GenericNotificationMail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class NotificationOrchestrator
 {
@@ -25,16 +26,81 @@ class NotificationOrchestrator
 	public function handle(string $eventType, array $payload): void
 	{
 		$tenantId = $payload['tenant_id'] ?? null;
+        Log::channel('maillog')->info('Notification event received', [
+            'event_type' => $eventType,
+            'payload_keys' => array_keys($payload),
+        ]);
 		$rules = $this->ruleRepo->getActiveRulesForEvent($eventType, $tenantId);
-		foreach ($rules as $rule) {
-			$this->dispatchForRule($rule, $eventType, $payload);
-		}
+        if ($rules->count() > 0) {
+            foreach ($rules as $rule) {
+                $this->dispatchForRule($rule, $eventType, $payload);
+            }
+            return;
+        }
+
+        // Fallback: if no rules configured, notify actor (if provided)
+        $actorId = $payload['actor_user_id'] ?? null;
+        if ($actorId) {
+            $actor = \App\Models\User::where('id', $actorId)->where('status', 1)->first();
+            if ($actor) {
+                $rule = new \App\Models\NotificationRule([
+                    'id' => 0,
+                    'name' => strtoupper(str_replace('.', ' ', $eventType)),
+                    'event_type' => $eventType,
+                    'channel' => 'email',
+                ]);
+                $template = new \App\Models\NotificationTemplate([
+                    'subject' => 'Notification: {{event}}',
+                    'body' => "Hello,\n\nAn event occurred: {{event}}\nReference: {{reference}}\n\nThanks.",
+                    'channel' => 'email',
+                ]);
+
+                $log = $this->logRepo->create([
+                    'uuid' => (string) Str::uuid(),
+                    'event_id' => $payload['event_id'] ?? (string) Str::uuid(),
+                    'rule_id' => null,
+                    'recipient_user_id' => $actor->id,
+                    'channel' => 'email',
+                    'payload' => $payload,
+                    'status' => 'queued',
+                    'tenant_id' => $payload['tenant_id'] ?? null,
+                ]);
+
+                try {
+                    [$subject, $body] = $this->renderEmail($rule, $template, $payload);
+                    Mail::to($actor->email)->send(new GenericNotificationMail($subject, $body));
+                    Log::channel('maillog')->info('Email sent (fallback)', [
+                        'to' => $actor->email,
+                        'subject' => $subject,
+                        'event_type' => $eventType,
+                        'rule_id' => null,
+                        'log_uuid' => $log->uuid,
+                    ]);
+                    $log->subject = $subject;
+                    $log->body = $body;
+                    $this->logRepo->markSent($log);
+                } catch (\Throwable $e) {
+                    Log::channel('maillog')->error('Email failed (fallback)', [
+                        'to' => $actor->email,
+                        'subject' => $subject ?? null,
+                        'event_type' => $eventType,
+                        'error' => $e->getMessage(),
+                    ]);
+                    $this->logRepo->markFailed($log, $e->getMessage());
+                }
+            }
+        }
 	}
 
 	private function dispatchForRule(NotificationRule $rule, string $eventType, array $payload): void
 	{
 		$template = $rule->template;
         $users = $this->recipientResolver->resolveUsers($rule, $payload);
+        Log::channel('maillog')->info('Dispatching notifications for rule', [
+            'event_type' => $eventType,
+            'rule_id' => $rule->id,
+            'recipients_count' => $users->count(),
+        ]);
         // Always include actor in recipients if provided
         $actorId = $payload['actor_user_id'] ?? null;
         if ($actorId) {
@@ -73,27 +139,86 @@ class NotificationOrchestrator
                 if ($rule->channel === 'email') {
                     [$subject, $body] = $this->renderEmail($rule, $template, $payload);
                     Mail::to($user->email)->send(new GenericNotificationMail($subject, $body));
+                    Log::channel('maillog')->info('Email sent', [
+                        'to' => $user->email,
+                        'subject' => $subject,
+                        'event_type' => $eventType,
+                        'rule_id' => $rule->id,
+                        'log_uuid' => $log->uuid,
+                    ]);
                     $log->subject = $subject;
                     $log->body = $body;
                     $this->logRepo->markSent($log);
                 }
             } catch (\Throwable $e) {
+                Log::channel('maillog')->error('Email failed', [
+                    'to' => $user->email ?? null,
+                    'subject' => $subject ?? null,
+                    'event_type' => $eventType,
+                    'rule_id' => $rule->id,
+                    'error' => $e->getMessage(),
+                ]);
 				$this->logRepo->markFailed($log, $e->getMessage());
 			}
 		}
 	}
 
-	private function renderEmail(NotificationRule $rule, NotificationTemplate $template, array $payload): array
-	{
-		$subject = $rule->subject_override ?: ($template->subject ?? ('Notification: ' . $rule->name));
-		$body = $template->body;
-		foreach ($payload as $key => $value) {
-			if (is_scalar($value)) {
-				$subject = str_replace('{{' . $key . '}}', (string) $value, $subject);
-				$body = str_replace('{{' . $key . '}}', (string) $value, $body);
-			}
-		}
-		return [$subject, $body];
-	}
+    private function renderEmail(NotificationRule $rule, NotificationTemplate $template, array $payload): array
+    {
+        $subject = $rule->subject_override ?: ($template->subject ?? ('Notification: ' . $rule->name));
+        $body = $template->body;
+
+        // Build replacement variables from payload (scalars only)
+        $vars = [];
+        foreach ($payload as $key => $value) {
+            if (is_scalar($value)) {
+                $vars[$key] = (string) $value;
+            }
+        }
+
+        // Provide sensible defaults for common placeholders
+        $vars['event_type'] = $vars['event_type'] ?? ($rule->event_type ?? '');
+        $vars['event'] = $vars['event'] ?? $vars['event_type'];
+        $vars['reference'] = $vars['reference']
+            ?? ($vars['order_number'] ?? $vars['sale_number'] ?? $vars['payment_number'] ?? $vars['id'] ?? '');
+
+        // Resolve author/actor details if available
+        $author = null;
+        if (!empty($payload['actor_user_id'])) {
+            $author = \App\Models\User::where('id', (int) $payload['actor_user_id'])->where('status', 1)->first();
+        }
+        if ($author) {
+            $vars['author_name'] = $vars['author_name'] ?? ($author->name ?? '');
+            $vars['author_email'] = $vars['author_email'] ?? ($author->email ?? '');
+            $vars['author'] = $vars['author'] ?? trim(($author->name ?? '') . ($author->email ? ' <' . $author->email . '>' : ''));
+            // Common aliases
+            $vars['actor_name'] = $vars['actor_name'] ?? $vars['author_name'];
+            $vars['actor_email'] = $vars['actor_email'] ?? $vars['author_email'];
+            $vars['actor'] = $vars['actor'] ?? $vars['author'];
+        } else {
+            // Fallback to provided strings if any
+            if (!empty($payload['actor_name']) || !empty($payload['actor_email'])) {
+                $vars['author_name'] = $vars['author_name'] ?? ($payload['actor_name'] ?? '');
+                $vars['author_email'] = $vars['author_email'] ?? ($payload['actor_email'] ?? '');
+                $vars['author'] = $vars['author'] ?? trim(($payload['actor_name'] ?? '') . (!empty($payload['actor_email']) ? ' <' . $payload['actor_email'] . '>' : ''));
+                $vars['actor_name'] = $vars['actor_name'] ?? $vars['author_name'];
+                $vars['actor_email'] = $vars['actor_email'] ?? $vars['author_email'];
+                $vars['actor'] = $vars['actor'] ?? $vars['author'];
+            }
+        }
+
+        // Replace placeholders
+        foreach ($vars as $key => $value) {
+            $subject = str_replace('{{' . $key . '}}', (string) $value, $subject);
+            $body = str_replace('{{' . $key . '}}', (string) $value, $body);
+        }
+
+        // Ensure author is visible even if template didn't include placeholders
+        if (!empty($vars['author'])) {
+            $body = rtrim($body) . "\n\nAuthor: " . $vars['author'] . "\n";
+        }
+
+        return [$subject, $body];
+    }
 }
 

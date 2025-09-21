@@ -129,7 +129,12 @@ class UserManagementController extends Controller
             ]);
 
             if ($request->roles) {
-                $user->syncRoles($request->roles);
+                $roles = collect($request->roles)->map(fn($r) => (int) $r)->unique();
+                if ($request->user_level === 'Normal') {
+                    $adminRoleIds = Role::whereIn('name', ['admin','administrator'])->pluck('id')->toArray();
+                    $roles = $roles->reject(fn($id) => in_array($id, $adminRoleIds));
+                }
+                $user->syncRoles($roles->all());
             }
 
             // Notify user
@@ -189,7 +194,12 @@ class UserManagementController extends Controller
             }
 
             $user_management->update($updateData);
-            $user_management->syncRoles($request->roles ?? []);
+            $roles = collect($request->roles ?? [])->map(fn($r) => (int) $r)->unique();
+            if ($request->user_level === 'Normal') {
+                $adminRoleIds = Role::whereIn('name', ['admin','administrator'])->pluck('id')->toArray();
+                $roles = $roles->reject(fn($id) => in_array($id, $adminRoleIds));
+            }
+            $user_management->syncRoles($roles->all());
 
             // Notify user
             try { Mail::to($user_management->email)->send(new UserAccountUpdated($user_management)); } catch (\Throwable $e) {}
@@ -242,6 +252,15 @@ class UserManagementController extends Controller
         $request->validate([
             'role_id' => 'required|exists:roles,id',
         ]);
+
+        // Prevent assigning admin roles to Normal users
+        if ($user_management->user_level === 'Normal') {
+            $adminRoleIds = Role::whereIn('name', ['admin','administrator'])->pluck('id')->toArray();
+            if (in_array((int) $request->role_id, $adminRoleIds)) {
+                return redirect()->route('user-management.show', ['user_management' => $user_management->id])
+                    ->withErrors(['error' => 'Administrator roles cannot be assigned to Normal users.']);
+            }
+        }
 
         $user_management->assignRole((int) $request->role_id);
 

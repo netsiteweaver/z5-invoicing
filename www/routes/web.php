@@ -122,6 +122,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('settings', SettingsController::class)->except(['show', 'destroy']);
     Route::get('settings/current', [SettingsController::class, 'getCurrent'])->name('settings.current');
     Route::post('settings/{setting}/logo', [SettingsController::class, 'updateLogo'])->name('settings.logo');
+    // Settings > Notifications
+    Route::get('settings/notifications', [\App\Http\Controllers\NotificationSettingsController::class, 'index'])->name('settings.notifications');
+    Route::post('settings/notifications', [\App\Http\Controllers\NotificationSettingsController::class, 'update'])->name('settings.notifications.update');
 
     // Payment Terms routes
     Route::resource('payment-terms', \App\Http\Controllers\PaymentTermController::class);

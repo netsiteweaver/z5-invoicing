@@ -374,11 +374,28 @@
 
                 <!-- Settings -->
                 @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('settings.view'))
-                <a href="{{ route('settings.index') }}" 
-                   class="group flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('settings.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                    <i class="fas fa-cogs mr-3 h-5 w-5"></i>
-                    Settings
-                </a>
+                <div x-data="{ settingsOpen: {{ request()->routeIs('settings.*') || request()->routeIs('settings.notifications') ? 'true' : 'false' }} }">
+                    <button @click="settingsOpen = !settingsOpen" 
+                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('settings.*') || request()->routeIs('settings.notifications') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                        <div class="flex items-center">
+                            <i class="fas fa-cogs mr-3 h-5 w-5"></i>
+                            Settings
+                        </div>
+                        <i class="fas fa-chevron-down transition-transform duration-200" :class="settingsOpen ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="settingsOpen" x-transition class="ml-6 mt-1 space-y-1">
+                        <a href="{{ route('settings.index') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('settings.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Company Settings
+                        </a>
+                        <a href="{{ route('settings.notifications') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('settings.notifications') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Notifications
+                        </a>
+                    </div>
+                </div>
                 @endif
 
             </nav>

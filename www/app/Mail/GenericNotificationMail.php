@@ -16,7 +16,11 @@ class GenericNotificationMail extends Mailable
 
 	public function build()
 	{
+		$bodyHtml = nl2br(e($this->bodyText));
 		return $this->subject($this->subjectText)
+			->view('emails.html_generic', [
+				'bodyHtml' => $bodyHtml,
+			])
 			->text('emails.plain_generic', [
 				'body' => $this->bodyText,
 			]);

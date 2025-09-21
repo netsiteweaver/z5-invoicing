@@ -133,10 +133,12 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Assign Roles</label>
                         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                             @foreach($roles as $role)
+                                @php $roleName = strtolower($role->name); $roleDisplay = strtolower($role->display_name); @endphp
                                 <label class="flex items-center">
                                     <input type="checkbox" name="roles[]" value="{{ $role->id }}" 
                                            {{ in_array($role->id, old('roles', [])) ? 'checked' : '' }}
-                                           class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                           data-role-name="{{ $roleName }}" data-role-display="{{ $roleDisplay }}"
+                                           class="role-checkbox rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
                                     <span class="ml-2 text-sm text-gray-700">{{ $role->display_name }}</span>
                                 </label>
                             @endforeach
@@ -163,4 +165,35 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+(function() {
+  function toggleAdminRole() {
+    var level = document.getElementById('user_level').value;
+    var checkboxes = document.querySelectorAll('.role-checkbox');
+    checkboxes.forEach(function(cb) {
+      var rn = (cb.dataset.roleName || '').toLowerCase();
+      var rd = (cb.dataset.roleDisplay || '').toLowerCase();
+      var isAdminRole = rn === 'admin' || rn === 'administrator' || rd.indexOf('admin') !== -1;
+      if (isAdminRole) {
+        if (level === 'Normal') {
+          cb.checked = false;
+          cb.disabled = true;
+          var label = cb.closest('label');
+          if (label) { label.classList.add('opacity-60'); label.classList.add('hidden'); }
+        } else {
+          cb.disabled = false;
+          var label = cb.closest('label');
+          if (label) { label.classList.remove('opacity-60'); label.classList.remove('hidden'); }
+        }
+      }
+    });
+  }
+  document.getElementById('user_level').addEventListener('change', toggleAdminRole);
+  document.addEventListener('DOMContentLoaded', toggleAdminRole);
+  toggleAdminRole();
+})();
+</script>
+@endpush
 @endsection

@@ -21,6 +21,12 @@ class ProductObserver
 
 	public function updated(Product $product): void
 	{
+		$oldStatus = (int) ($product->getOriginal('status') ?? 1);
+		$newStatus = (int) ($product->status ?? $oldStatus);
+		if ($oldStatus !== 0 && $newStatus === 0) {
+			$this->dispatch('product.deleted', $product);
+			return;
+		}
 		$this->dispatch('product.updated', $product);
 	}
 
