@@ -86,6 +86,25 @@ class BreadcrumbService
         $this->clear();
 
         switch ($page) {
+            case 'departments.index':
+                $this->add('Departments', null, true);
+                break;
+
+            case 'departments.create':
+                $this->add('Departments', route('departments.index'));
+                $this->add('Create Department', null, true);
+                break;
+
+            case 'departments.show':
+                $this->add('Departments', route('departments.index'));
+                $this->add($params['department']->name, null, true);
+                break;
+
+            case 'departments.edit':
+                $this->add('Departments', route('departments.index'));
+                $this->add($params['department']->name, route('departments.show', $params['department']));
+                $this->add('Edit Department', null, true);
+                break;
             case 'suppliers.index':
                 $this->add('Suppliers', null, true);
                 break;

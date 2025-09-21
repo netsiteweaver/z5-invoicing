@@ -12,6 +12,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ChangelogController;
 use Illuminate\Support\Facades\Route;
@@ -82,6 +83,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Supplier routes
     Route::resource('suppliers', SupplierController::class);
+
+    // Department routes
+    Route::resource('departments', DepartmentController::class);
 
     Route::post('sales/convert-from-order/{order}', [SaleController::class, 'convertFromOrder'])->name('sales.convert-from-order');
     
