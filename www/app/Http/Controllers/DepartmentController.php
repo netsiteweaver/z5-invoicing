@@ -18,6 +18,10 @@ class DepartmentController extends Controller
     public function __construct()
     {
         $this->middleware(['auth', 'verified']);
+        $this->middleware('permission:departments.view')->only(['index', 'show']);
+        $this->middleware('permission:departments.create')->only(['create', 'store']);
+        $this->middleware('permission:departments.edit')->only(['edit', 'update']);
+        $this->middleware('permission:departments.delete')->only(['destroy']);
     }
 
     /**

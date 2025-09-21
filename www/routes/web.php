@@ -68,6 +68,7 @@ Route::middleware(['auth', 'verified', 'check.user.status'])->group(function () 
     Route::resource('product-brands', ProductBrandController::class);
     
     // Order routes
+    Route::get('orders/price-history', [OrderController::class, 'priceHistory'])->name('orders.price-history');
     Route::resource('orders', OrderController::class);
     Route::get('orders/{order}/convert-to-sale', [OrderController::class, 'convertToSale'])->name('orders.convert-to-sale');
     Route::post('orders/{order}/convert', [OrderController::class, 'convertToSale'])->name('orders.convert');

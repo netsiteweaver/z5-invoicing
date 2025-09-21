@@ -18,7 +18,7 @@ class OrderController extends Controller
     public function __construct()
     {
         $this->middleware(['auth', 'verified']);
-        $this->middleware('permission:orders.view')->only(['index', 'show']);
+        $this->middleware('permission:orders.view')->only(['index', 'show', 'priceHistory']);
         $this->middleware('permission:orders.create')->only(['create', 'store']);
         $this->middleware('permission:orders.edit')->only(['edit', 'update']);
         $this->middleware('permission:orders.delete')->only(['destroy']);
@@ -409,5 +409,76 @@ class OrderController extends Controller
                 'created_by' => auth()->id(),
             ]);
         }
+    }
+
+    /**
+     * AJAX: Get prior order lines for a given customer and product.
+     */
+    public function priceHistory(Request $request)
+    {
+        $validated = $request->validate([
+            'customer_id' => ['required', 'integer', 'exists:customers,id'],
+            'product_id' => ['required', 'integer', 'exists:products,id'],
+            'limit' => ['nullable', 'integer', 'min:1', 'max:50'],
+        ]);
+
+        $limit = $validated['limit'] ?? 10;
+
+        $rows = OrderItem::query()
+            ->select([
+                'order_items.id as order_item_id',
+                'orders.id as order_id',
+                'orders.order_number',
+                'orders.order_date',
+                'order_items.quantity',
+                'order_items.unit_price',
+                'order_items.discount_percent',
+                'order_items.discount_amount',
+                'order_items.tax_percent',
+                'order_items.tax_amount',
+                'order_items.line_total',
+            ])
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('orders.customer_id', $validated['customer_id'])
+            ->where('order_items.product_id', $validated['product_id'])
+            ->where('orders.status', 1)
+            ->where('order_items.status', 1)
+            ->orderByDesc('orders.order_date')
+            ->orderByDesc('order_items.id')
+            ->limit($limit)
+            ->get();
+
+        $data = $rows->map(function ($row) {
+            $unitPrice = (float) ($row->unit_price ?? 0);
+            $discountPercent = (float) ($row->discount_percent ?? 0);
+            $taxPercent = (float) ($row->tax_percent ?? 0);
+            $netUnit = $unitPrice * (1 - ($discountPercent / 100));
+            $grossUnit = $netUnit * (1 + ($taxPercent / 100));
+
+            return [
+                'order_item_id' => (int) $row->order_item_id,
+                'order_id' => (int) $row->order_id,
+                'order_number' => $row->order_number,
+                'order_date' => (string) $row->order_date,
+                'quantity' => (int) $row->quantity,
+                'unit_price' => round($unitPrice, 2),
+                'discount_percent' => round($discountPercent, 2),
+                'tax_percent' => round($taxPercent, 2),
+                'net_unit_price_ex_vat' => round($netUnit, 2),
+                'gross_unit_price_inc_vat' => round($grossUnit, 2),
+                'order_url' => route('orders.show', $row->order_id),
+            ];
+        });
+
+        $last = $data->first();
+
+        return response()->json([
+            'data' => $data,
+            'last_price' => $last ? [
+                'net_unit_ex_vat' => $last['net_unit_price_ex_vat'],
+                'gross_unit_inc_vat' => $last['gross_unit_price_inc_vat'],
+            ] : null,
+            'count' => $data->count(),
+        ]);
     }
 }
