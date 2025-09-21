@@ -20,11 +20,16 @@
             <div class="absolute inset-0 pointer-events-none bg-cover bg-center bg-no-repeat filter blur-sm scale-105" style="{{ $bgStyle }}"></div>
             <div class="absolute inset-0 pointer-events-none bg-black/60"></div>
             @endif
-            <div>
-                <a href="/" class="relative z-10">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-200" />
-                </a>
+
+            @if(!empty($bgStyle))
+            <div class="relative z-10 text-2xl font-bold text-white drop-shadow-sm">
+                {{ str_replace('_',' ' ,config('app.name', 'Welcome')) }}
             </div>
+            @else
+            <div class="relative z-10 text-2xl font-bold text-gray-900">
+                {{ str_replace('_',' ' ,config('app.name', 'Welcome')) }}
+            </div>
+            @endif
 
             <div class="relative z-10 w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 {{ $slot }}
