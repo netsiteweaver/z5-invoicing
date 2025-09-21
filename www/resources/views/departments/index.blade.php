@@ -8,10 +8,12 @@
             <h1 class="text-2xl font-bold text-gray-900">Departments</h1>
             <p class="mt-1 text-sm text-gray-500">Manage your company departments</p>
         </div>
+        @can('departments.create')
         <a href="{{ route('departments.create') }}" class="btn btn-create">
             <i class="btn-icon fa-solid fa-plus"></i>
             Add Department
         </a>
+        @endcan
     </div>
 
     <div class="bg-white shadow rounded-lg p-6">
@@ -105,14 +107,19 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center space-x-2">
+                                    @can('departments.view')
                                     <a href="{{ route('departments.show', $department) }}" class="btn btn-view">
                                         <i class="btn-icon fa-regular fa-eye"></i>
                                         View
                                     </a>
+                                    @endcan
+                                    @can('departments.edit')
                                     <a href="{{ route('departments.edit', $department) }}" class="btn btn-edit">
                                         <i class="btn-icon fa-solid fa-pen"></i>
                                         Edit
                                     </a>
+                                    @endcan
+                                    @can('departments.delete')
                                     <form method="POST" action="{{ route('departments.destroy', $department) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this department?')">
                                         @csrf
                                         @method('DELETE')
@@ -121,6 +128,7 @@
                                             Delete
                                         </button>
                                     </form>
+                                    @endcan
                                 </div>
                             </div>
                         </div>
@@ -138,6 +146,7 @@
                 </svg>
                 <h3 class="mt-2 text-sm font-medium text-gray-900">No departments</h3>
                 <p class="mt-1 text-sm text-gray-500">Get started by creating a new department.</p>
+                @can('departments.create')
                 <div class="mt-6">
                     <a href="{{ route('departments.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -146,6 +155,7 @@
                         Add Department
                     </a>
                 </div>
+                @endcan
             </div>
         @endif
     </div>

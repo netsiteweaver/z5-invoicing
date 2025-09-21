@@ -19,6 +19,12 @@ class PermissionSeeder extends Seeder
             // Dashboard
             ['name' => 'dashboard.view', 'display_name' => 'View Dashboard', 'module' => 'dashboard', 'action' => 'view'],
             
+            // Departments
+            ['name' => 'departments.view', 'display_name' => 'View Departments', 'module' => 'departments', 'action' => 'view'],
+            ['name' => 'departments.create', 'display_name' => 'Create Departments', 'module' => 'departments', 'action' => 'create'],
+            ['name' => 'departments.edit', 'display_name' => 'Edit Departments', 'module' => 'departments', 'action' => 'edit'],
+            ['name' => 'departments.delete', 'display_name' => 'Delete Departments', 'module' => 'departments', 'action' => 'delete'],
+
             // Customers
             ['name' => 'customers.view', 'display_name' => 'View Customers', 'module' => 'customers', 'action' => 'view'],
             ['name' => 'customers.create', 'display_name' => 'Create Customers', 'module' => 'customers', 'action' => 'create'],
@@ -163,6 +169,7 @@ class PermissionSeeder extends Seeder
         
         $this->assignPermissionsToRole($managerRole, [
             'dashboard.view',
+            'departments.view', 'departments.create', 'departments.edit',
             'customers.view', 'customers.create', 'customers.edit',
             'products.view', 'products.create', 'products.edit',
             'product_categories.view', 'product_categories.create', 'product_categories.edit',
@@ -178,6 +185,7 @@ class PermissionSeeder extends Seeder
 
         $this->assignPermissionsToRole($salesRepRole, [
             'dashboard.view',
+            'departments.view',
             'customers.view', 'customers.create', 'customers.edit',
             'products.view',
             'orders.view', 'orders.create', 'orders.edit', 'orders.convert_to_sale',
@@ -188,6 +196,7 @@ class PermissionSeeder extends Seeder
 
         $this->assignPermissionsToRole($inventoryRole, [
             'dashboard.view',
+            'departments.view',
             'products.view',
             'inventory.view', 'inventory.create', 'inventory.edit', 'inventory.stock_movement',
             'inventory.low_stock', 'inventory.stock_report',
