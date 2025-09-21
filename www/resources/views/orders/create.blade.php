@@ -191,8 +191,10 @@
                                     <span class="text-sm font-medium text-gray-900" x-text="formatCurrency(item.line_total)"></span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button type="button" @click="removeItem(index)" 
-                                            class="text-red-600 hover:text-red-900">
+                                    <button type="button" @click="openHistory(index)" class="text-blue-600 hover:text-blue-900 mr-3">
+                                        History
+                                    </button>
+                                    <button type="button" @click="removeItem(index)" class="text-red-600 hover:text-red-900">
                                         Remove
                                     </button>
                                 </td>
@@ -251,6 +253,67 @@
             </button>
         </div>
     </form>
+
+    <!-- Price History Modal -->
+    <div x-show="historyOpen" x-cloak class="fixed inset-0 z-50">
+        <div class="absolute inset-0 bg-gray-900 bg-opacity-50" @click="closeHistory()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl">
+                <div class="px-4 py-3 border-b flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        Price History
+                        <span class="ml-2 text-sm text-gray-500" x-text="historyProductLabel"></span>
+                    </h3>
+                    <button type="button" @click="closeHistory()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="p-4">
+                    <template x-if="historyLoading">
+                        <div class="text-sm text-gray-500">Loading...</div>
+                    </template>
+                    <template x-if="historyError">
+                        <div class="text-sm text-red-600" x-text="historyError"></div>
+                    </template>
+                    <template x-if="!historyLoading && !historyError && historyRows.length === 0">
+                        <div class="text-sm text-gray-500">No previous purchases found for this customer and product.</div>
+                    </template>
+                    <div x-show="!historyLoading && !historyError && historyRows.length > 0" class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Order #</th>
+                                    <th class="px-3 py-2 text-right font-medium text-gray-500 uppercase tracking-wider">Qty</th>
+                                    <th class="px-3 py-2 text-right font-medium text-gray-500 uppercase tracking-wider">Unit</th>
+                                    <th class="px-3 py-2 text-right font-medium text-gray-500 uppercase tracking-wider">Discount %</th>
+                                    <th class="px-3 py-2 text-right font-medium text-gray-500 uppercase tracking-wider">Net/unit</th>
+                                    <th class="px-3 py-2 text-right font-medium text-gray-500 uppercase tracking-wider">VAT %</th>
+                                    <th class="px-3 py-2 text-right font-medium text-gray-500 uppercase tracking-wider">Gross/unit</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <template x-for="row in historyRows" :key="row.order_item_id">
+                                    <tr>
+                                        <td class="px-3 py-2" x-text="row.order_date"></td>
+                                        <td class="px-3 py-2">
+                                            <a :href="row.order_url" class="text-blue-600 hover:underline" x-text="row.order_number"></a>
+                                        </td>
+                                        <td class="px-3 py-2 text-right" x-text="row.quantity"></td>
+                                        <td class="px-3 py-2 text-right" x-text="formatCurrency(row.unit_price)"></td>
+                                        <td class="px-3 py-2 text-right" x-text="(row.discount_percent || 0).toFixed(2) + '%' "></td>
+                                        <td class="px-3 py-2 text-right" x-text="formatCurrency(row.net_unit_price_ex_vat)"></td>
+                                        <td class="px-3 py-2 text-right" x-text="(row.tax_percent || 0).toFixed(0) + '%' "></td>
+                                        <td class="px-3 py-2 text-right" x-text="formatCurrency(row.gross_unit_price_inc_vat)"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -264,6 +327,13 @@ function orderForm() {
             total_tax: 0,
             total_amount: 0
         },
+
+        // Price history state
+        historyOpen: false,
+        historyRows: [],
+        historyLoading: false,
+        historyError: '',
+        historyProductLabel: '',
 
         addItem() {
             this.form.items.push({
@@ -304,6 +374,51 @@ function orderForm() {
             item.line_total = lineSubtotal - discountAmount + taxAmount;
             
             this.calculateTotals();
+        },
+
+        async openHistory(index) {
+            this.historyError = '';
+            const customerId = this.form.customer_id;
+            if (!customerId) {
+                this.historyError = 'Select a customer first.';
+                this.historyOpen = true;
+                this.historyRows = [];
+                this.historyProductLabel = '';
+                return;
+            }
+
+            const productSelect = document.querySelector(`select[name="items[${index}][product_id]"]`);
+            if (!productSelect || !productSelect.value) {
+                this.historyError = 'Select a product first.';
+                this.historyOpen = true;
+                this.historyRows = [];
+                this.historyProductLabel = '';
+                return;
+            }
+
+            const productId = parseInt(productSelect.value, 10);
+            const label = productSelect.selectedOptions[0]?.text || '';
+            this.historyProductLabel = label;
+            this.historyOpen = true;
+            this.historyLoading = true;
+            this.historyRows = [];
+
+            try {
+                const resp = await window.axios.get("{{ route('orders.price-history') }}", {
+                    params: { customer_id: customerId, product_id: productId, limit: 10 }
+                });
+                this.historyRows = resp.data?.data || [];
+                this.historyError = '';
+            } catch (e) {
+                this.historyError = (e?.response?.data?.message) || 'Failed to load history.';
+                this.historyRows = [];
+            } finally {
+                this.historyLoading = false;
+            }
+        },
+
+        closeHistory() {
+            this.historyOpen = false;
         },
 
         calculateTotals() {
