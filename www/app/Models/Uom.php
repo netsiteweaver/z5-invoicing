@@ -18,6 +18,10 @@ class Uom extends Model
         'code',
         'description',
         'units_per_uom',
+        'dimension_code',
+        'factor_to_base',
+        'offset_to_base',
+        'min_increment',
         'created_by',
         'updated_by',
         'status',
@@ -27,6 +31,9 @@ class Uom extends Model
     {
         return [
             'units_per_uom' => 'integer',
+            'factor_to_base' => 'decimal:12',
+            'offset_to_base' => 'decimal:12',
+            'min_increment' => 'decimal:12',
             'status' => 'integer',
         ];
     }
