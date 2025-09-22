@@ -56,6 +56,17 @@ class NotificationSeeder extends Seeder
 			]
 		);
 
+		// Low stock template
+		$tplInventoryLowStock = NotificationTemplate::firstOrCreate(
+			['name' => 'inventory_low_stock'],
+			[
+				'channel' => 'email',
+				'subject' => 'Low stock: {{product_name}} ({{department_name}})',
+				'body' => "Low stock alert\n\nProduct: {{product_name}}\nDepartment: {{department_name}}\nCurrent stock: {{current_stock}}\nThreshold: {{threshold}}\nReorder point: {{reorder_point}}\nMin stock level: {{min_stock_level}}\n\nPlease review and reorder if necessary.",
+				'is_active' => true,
+			]
+		);
+
 		// Rules
 		$ruleUserCreatedAdmins = NotificationRule::firstOrCreate(
 			['name' => 'user-created-admins'],
@@ -135,6 +146,22 @@ class NotificationSeeder extends Seeder
 			'rule_id' => $ruleProductDeleted->id,
 			'recipient_type' => 'special',
 			'recipient_value' => 'actor',
+		]);
+
+		// Low stock rule to admins
+		$ruleInventoryLow = NotificationRule::firstOrCreate(
+			['name' => 'inventory-low-stock-admins'],
+			[
+				'event_type' => 'inventory.low_stock',
+				'channel' => 'email',
+				'template_id' => $tplInventoryLowStock->id,
+				'is_active' => true,
+			]
+		);
+		NotificationRuleRecipient::firstOrCreate([
+			'rule_id' => $ruleInventoryLow->id,
+			'recipient_type' => 'role',
+			'recipient_value' => (string) $adminRoleId,
 		]);
 	}
 }

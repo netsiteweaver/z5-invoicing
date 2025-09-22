@@ -91,11 +91,11 @@ Route::middleware(['auth', 'verified', 'check.user.status'])->group(function () 
 
     Route::post('sales/convert-from-order/{order}', [SaleController::class, 'convertFromOrder'])->name('sales.convert-from-order');
     
-    // Inventory routesiki
-    Route::resource('inventory', InventoryController::class);
-    Route::post('inventory/{inventory}/stock-movement', [InventoryController::class, 'stockMovement'])->name('inventory.stock-movement');
+    // Inventory routes - specific routes must come before resource routes to avoid conflicts
     Route::get('inventory/low-stock', [InventoryController::class, 'lowStock'])->name('inventory.low-stock');
     Route::get('inventory/stock-report', [InventoryController::class, 'stockReport'])->name('inventory.stock-report');
+    Route::post('inventory/{inventory}/stock-movement', [InventoryController::class, 'stockMovement'])->name('inventory.stock-movement');
+    Route::resource('inventory', InventoryController::class);
 
     // Goods Receipt routes
     Route::resource('goods-receipts', \App\Http\Controllers\GoodsReceiptController::class);

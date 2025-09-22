@@ -110,13 +110,13 @@
                 </div>
 
                 <!-- Stock Movement Button -->
-                <div class="mt-6">
+                <!-- <div class="mt-6">
                     <button onclick="openStockMovementModal({{ $inventory->id }}, '{{ $inventory->product->name }}', {{ $inventory->current_stock }})" 
                             class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                         <i class="fas fa-exchange-alt mr-2"></i>
                         Record Stock Movement
                     </button>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -128,7 +128,7 @@
                     Recent Stock Movements
                 </h3>
                 
-                @if($inventory->stockMovements->count() > 0)
+                @if($stockMovements->count() > 0)
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -141,7 +141,7 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($inventory->stockMovements as $movement)
+                                @foreach($stockMovements as $movement)
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{ $movement->created_at->format('M d, Y H:i') }}
@@ -249,16 +249,16 @@
                 </h3>
                 
                 <div class="space-y-3">
-                    <a href="{{ route('inventory.edit', $inventory) }}" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <!-- <a href="{{ route('inventory.edit', $inventory) }}" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                         <i class="fas fa-edit mr-2"></i>
                         Edit Inventory
-                    </a>
+                    </a> -->
                     
-                    <button onclick="openStockMovementModal({{ $inventory->id }}, '{{ $inventory->product->name }}', {{ $inventory->current_stock }})" 
+                    <!-- <button onclick="openStockMovementModal({{ $inventory->id }}, '{{ $inventory->product->name }}', {{ $inventory->current_stock }})" 
                             class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
                         <i class="fas fa-exchange-alt mr-2"></i>
                         Stock Movement
-                    </button>
+                    </button> -->
                     
                     <a href="{{ route('products.show', $inventory->product) }}" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                         <i class="fas fa-box mr-2"></i>

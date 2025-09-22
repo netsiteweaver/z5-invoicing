@@ -100,16 +100,19 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex space-x-2">
-                                        <a href="{{ route('inventory.show', $item) }}" class="text-blue-600 hover:text-blue-900">
-                                            <i class="fas fa-eye"></i>
+                                    <div class="flex items-center space-x-2">
+                                        <a href="{{ route('inventory.show', $item) }}" class="btn btn-view">
+                                            <i class="btn-icon fa-regular fa-eye"></i>
+                                            View
                                         </a>
-                                        <a href="{{ route('inventory.edit', $item) }}" class="text-yellow-600 hover:text-yellow-900">
-                                            <i class="fas fa-edit"></i>
+                                        <a href="{{ route('inventory.edit', $item) }}" class="btn btn-edit">
+                                            <i class="btn-icon fa-solid fa-pen"></i>
+                                            Edit
                                         </a>
-                                        <button onclick="openStockMovementModal({{ $item->id }}, '{{ $item->product->name }}', {{ $item->current_stock }})" class="text-green-600 hover:text-green-900">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
+                                        <!-- <button onclick="openStockMovementModal({{ $item->id }}, '{{ $item->product->name }}', {{ $item->current_stock }})" class="btn btn-create">
+                                            <i class="btn-icon fa-solid fa-plus"></i>
+                                            Add Stock
+                                        </button> -->
                                     </div>
                                 </td>
                             </tr>
@@ -121,7 +124,7 @@
     </div>
 
     <!-- Quick Actions -->
-    <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
+    <div class="hidden mt-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
         <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-lg shadow-lg p-6 text-white">
             <div class="flex items-center">
                 <div class="flex-shrink-0">

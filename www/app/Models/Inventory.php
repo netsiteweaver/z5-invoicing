@@ -68,9 +68,10 @@ class Inventory extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function stockMovements(): HasMany
+    public function stockMovements()
     {
-        return $this->hasMany(StockMovement::class);
+        return $this->hasMany(StockMovement::class, 'product_id', 'product_id')
+                    ->where('stock_movements.department_id', $this->department_id);
     }
 
     // Scopes
