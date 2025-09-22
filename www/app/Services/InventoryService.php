@@ -45,7 +45,9 @@ class InventoryService
                 throw new \RuntimeException('Insufficient stock');
             }
 
+            $stockBefore = (int) $inventory->current_stock;
             $inventory->decrement('current_stock', $quantity);
+            $stockAfter = $stockBefore - (int) $quantity;
 
             StockMovement::create([
                 'product_id' => $productId,
@@ -58,6 +60,25 @@ class InventoryService
                 'notes' => $movementMeta['notes'] ?? null,
                 'created_by' => auth()->id(),
             ]);
+
+            // Low stock alert crossing check
+            try {
+                app(\App\Services\LowStockAlertService::class)
+                    ->checkAndNotifyCrossing(
+                        $inventory->refresh(),
+                        $stockBefore,
+                        $stockAfter,
+                        auth()->id(),
+                        $movementMeta['movement_type'] ?? 'out',
+                        [
+                            'reference_type' => $movementMeta['reference_type'] ?? null,
+                            'reference_id' => $movementMeta['reference_id'] ?? null,
+                            'reference_number' => $movementMeta['reference_number'] ?? null,
+                        ]
+                    );
+            } catch (\Throwable $e) {
+                // Swallow alert failures to not block the transaction
+            }
         });
     }
 
