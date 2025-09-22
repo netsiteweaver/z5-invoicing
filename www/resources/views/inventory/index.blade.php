@@ -167,9 +167,9 @@
                                         <a href="{{ route('inventory.edit', $item) }}" class="text-yellow-600 hover:text-yellow-900">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <button onclick="openStockMovementModal({{ $item->id }}, '{{ $item->product->name }}', {{ $item->current_stock }})" class="text-green-600 hover:text-green-900">
+                                        <!-- <button onclick="openStockMovementModal({{ $item->id }}, '{{ $item->product->name }}', {{ $item->current_stock }})" class="text-green-600 hover:text-green-900">
                                             <i class="fas fa-exchange-alt"></i>
-                                        </button>
+                                        </button> -->
                                     </div>
                                 </td>
                             </tr>

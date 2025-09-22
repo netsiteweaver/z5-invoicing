@@ -48,9 +48,14 @@ class StockMovement extends Model
     }
 
     // Relationships
-    public function inventory(): BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Inventory::class);
+        return $this->belongsTo(Product::class);
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 
     public function createdBy(): BelongsTo
@@ -66,7 +71,13 @@ class StockMovement extends Model
 
     public function scopeByInventory($query, $inventoryId)
     {
-        return $query->where('inventory_id', $inventoryId);
+        // Get inventory details to filter by product_id and department_id
+        $inventory = Inventory::find($inventoryId);
+        if ($inventory) {
+            return $query->where('product_id', $inventory->product_id)
+                        ->where('department_id', $inventory->department_id);
+        }
+        return $query->whereRaw('1=0'); // Return empty result if inventory not found
     }
 
     public function scopeByDateRange($query, $startDate, $endDate)

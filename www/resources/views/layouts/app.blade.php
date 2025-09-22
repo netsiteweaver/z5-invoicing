@@ -239,11 +239,11 @@
                         </a>
                         @endif
                         @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.low_stock'))
-                        <!-- <a href="{{ route('inventory.low-stock') }}" 
+                        <a href="{{ route('inventory.low-stock') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('inventory.low-stock') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Low Stock Alert
-                        </a> -->
+                        </a>
                         @endif
                         @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.stock_report'))
                         <!-- <a href="{{ route('inventory.stock-report') }}" 
@@ -488,36 +488,17 @@
 
                     <!-- Right side -->
                     <div class="flex items-center space-x-4">
-                        <!-- Notifications -->
-                        <div class="hidden relative" x-data="{ open: false }">
-                            <button @click="open = !open" class="p-2 text-gray-400 hover:text-gray-500 relative">
-                                <i class="far fa-bell text-lg"></i>
-                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
-                            </button>
-                            <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50 border">
-                                <div class="px-4 py-2 border-b">
-                                    <h3 class="text-sm font-medium text-gray-900">Notifications</h3>
-                                </div>
-                                <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-envelope text-blue-500 mr-3"></i>
-                                        <div>
-                                            <p class="font-medium">New order received</p>
-                                            <p class="text-gray-500 text-xs">Order #ORD-12345</p>
-                                        </div>
-                                    </div>
-                                </a>
-                                <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-exclamation-triangle text-yellow-500 mr-3"></i>
-                                        <div>
-                                            <p class="font-medium">Low stock alert</p>
-                                            <p class="text-gray-500 text-xs">Product ABC-123</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
+                        <!-- Low Stock Notification -->
+                        @if($lowStockCount > 0)
+                        <div class="relative" x-data="{ open: false }">
+                            <a href="{{ route('inventory.low-stock') }}" 
+                               class="p-2 text-gray-400 hover:text-gray-500 relative group"
+                               title="{{ $lowStockCount }} {{ Str::plural('item', $lowStockCount) }} running low on stock">
+                                <i class="fas fa-exclamation-triangle text-lg text-yellow-500"></i>
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">{{ $lowStockCount }}</span>
+                            </a>
                         </div>
+                        @endif
 
                         <!-- User menu -->
                         <div class="relative" x-data="{ open: false }">

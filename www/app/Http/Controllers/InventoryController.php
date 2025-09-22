@@ -67,13 +67,14 @@ class InventoryController extends Controller
 
     public function show(Inventory $inventory)
     {
-        $inventory->load(['product', 'department', 'stockMovements' => function ($query) {
-            $query->orderBy('created_at', 'desc')->limit(10);
-        }]);
+        $inventory->load(['product', 'department']);
+        
+        // Load stock movements manually to avoid relationship issues
+        $stockMovements = $inventory->stockMovements()->orderBy('created_at', 'desc')->limit(10)->get();
 
         $breadcrumbs = $this->setBreadcrumbs('inventory.show', ['inventory' => $inventory]);
 
-        return view('inventory.show', compact('inventory') + $breadcrumbs);
+        return view('inventory.show', compact('inventory', 'stockMovements') + $breadcrumbs);
     }
 
     public function create()
