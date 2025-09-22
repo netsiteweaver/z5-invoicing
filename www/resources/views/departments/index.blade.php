@@ -6,7 +6,7 @@
     <div class="flex justify-between items-center">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Departments</h1>
-            <p class="mt-1 text-sm text-gray-500">Manage your company departments</p>
+            <p class="mt-1 text-sm text-gray-500">Manage your departments</p>
         </div>
         @can('departments.create')
         <a href="{{ route('departments.create') }}" class="btn btn-create">

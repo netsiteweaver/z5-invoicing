@@ -4,8 +4,8 @@
 @section('description', 'Manage customer orders and track their status')
 
 @section('actions')
-<a href="{{ route('orders.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-    <i class="fas fa-plus mr-2"></i>
+<a href="{{ route('orders.create') }}" class="btn btn-create">
+    <i class="btn-icon fa-solid fa-plus"></i>
     Create Order
 </a>
 @endsection
@@ -160,26 +160,30 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
-                                        <a href="{{ route('orders.show', $order) }}" class="text-blue-600 hover:text-blue-900">
-                                            <i class="fas fa-eye"></i>
+                                        <a href="{{ route('orders.show', $order) }}" class="btn btn-view">
+                                            <i class="btn-icon fa-regular fa-eye"></i>
+                                            View
                                         </a>
                                         @if($order->canBeEdited() && (auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.edit')))
-                                            <a href="{{ route('orders.edit', $order) }}" class="text-yellow-600 hover:text-yellow-900">
-                                                <i class="fas fa-edit"></i>
+                                            <a href="{{ route('orders.edit', $order) }}" class="btn btn-edit">
+                                                <i class="btn-icon fa-solid fa-pen"></i>
+                                                Edit
                                             </a>
-                                            <form method="POST" action="{{ route('orders.destroy', $order) }}" onsubmit="return confirm('Delete this order? This is a soft delete and can\'t be undone.');" style="display:inline">
+                                            <form method="POST" action="{{ route('orders.destroy', $order) }}" onsubmit="return confirm('Delete this order? This is a soft delete and can\'t be undone.');" class="inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.delete'))
-                                                <button type="submit" class="text-red-600 hover:text-red-900">
-                                                    <i class="fas fa-trash"></i>
+                                                <button type="submit" class="btn btn-delete">
+                                                    <i class="btn-icon fa-solid fa-trash"></i>
+                                                    Delete
                                                 </button>
                                                 @endif
                                             </form>
                                         @endif
                                         @if($order->order_status === 'confirmed' && ($order->sales_count ?? 0) === 0 && (auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.convert_to_sale')))
-                                            <a href="{{ route('orders.convert-to-sale', $order) }}" class="text-green-600 hover:text-green-900" title="Convert to Sale">
-                                                <i class="fas fa-check"></i>
+                                            <a href="{{ route('orders.convert-to-sale', $order) }}" class="btn btn-primary" title="Convert to Sale">
+                                                <i class="btn-icon fa-solid fa-check"></i>
+                                                Convert
                                             </a>
                                         @endif
                                     </div>
@@ -204,8 +208,8 @@
                 <h3 class="mt-2 text-sm font-medium text-gray-900">No orders</h3>
                 <p class="mt-1 text-sm text-gray-500">Get started by creating a new order.</p>
                 <div class="mt-6">
-                    <a href="{{ route('orders.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <i class="fas fa-plus mr-2"></i>
+                    <a href="{{ route('orders.create') }}" class="btn btn-create">
+                        <i class="btn-icon fa-solid fa-plus"></i>
                         Create Order
                     </a>
                 </div>

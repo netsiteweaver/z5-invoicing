@@ -1,0 +1,7 @@
+2025-09-22
+- unit of measures created
+- make ui consistent: similiar buttons in listings (customer,suppliers,departments,products,orders,sales,payments,users,payment terms, uom)
+- add breadcrumbs is all the CRUD operations
+- fixed editing goods receipt
+- removed unnecessary fields in goods receipt (container no and bill of lading)
+- can have only one department as main

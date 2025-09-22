@@ -4,8 +4,8 @@
 @section('description', 'Browse and manage payments')
 
 @section('actions')
-<a href="{{ route('payments.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-	<i class="fas fa-plus mr-2"></i>
+<a href="{{ route('payments.create') }}" class="btn btn-create">
+	<i class="btn-icon fa-solid fa-plus"></i>
 	Record Payment
 </a>
 @endsection
@@ -34,7 +34,10 @@
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $payment->payment_method }}</td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Rs {{ number_format($payment->amount, 2) }}</td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm">
-							<a href="{{ route('payments.show', $payment) }}" class="text-blue-600 hover:text-blue-800">View</a>
+							<a href="{{ route('payments.show', $payment) }}" class="btn btn-view">
+								<i class="btn-icon fa-regular fa-eye"></i>
+								View
+							</a>
 						</td>
 					</tr>
 					@empty

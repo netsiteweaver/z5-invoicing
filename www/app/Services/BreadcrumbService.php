@@ -313,6 +313,60 @@ class BreadcrumbService
                 $this->add($params['user']->name, route('user-management.show', $params['user']));
                 $this->add('Edit User', null, true);
                 break;
+
+            case 'payment-terms.index':
+                $this->add('Payment Terms', null, true);
+                break;
+
+            case 'payment-terms.show':
+                $this->add('Payment Terms', route('payment-terms.index'));
+                $this->add($params['payment_term']->name, null, true);
+                break;
+
+            case 'payment-terms.create':
+                $this->add('Payment Terms', route('payment-terms.index'));
+                $this->add('Create Payment Term', null, true);
+                break;
+
+            case 'payment-terms.edit':
+                $this->add('Payment Terms', route('payment-terms.index'));
+                $this->add($params['payment_term']->name, route('payment-terms.show', $params['payment_term']));
+                $this->add('Edit Payment Term', null, true);
+                break;
+
+            case 'uoms.index':
+                $this->add('Units of Measure', null, true);
+                break;
+
+            case 'uoms.show':
+                $this->add('Units of Measure', route('uoms.index'));
+                $this->add($params['uom']->name, null, true);
+                break;
+
+            case 'uoms.create':
+                $this->add('Units of Measure', route('uoms.index'));
+                $this->add('Create UOM', null, true);
+                break;
+
+            case 'uoms.edit':
+                $this->add('Units of Measure', route('uoms.index'));
+                $this->add($params['uom']->name, route('uoms.show', $params['uom']));
+                $this->add('Edit UOM', null, true);
+                break;
+
+            case 'payments.index':
+                $this->add('Payments', null, true);
+                break;
+
+            case 'payments.show':
+                $this->add('Payments', route('payments.index'));
+                $this->add('Payment #' . $params['payment']->payment_number, null, true);
+                break;
+
+            case 'payments.create':
+                $this->add('Payments', route('payments.index'));
+                $this->add('Record Payment', null, true);
+                break;
         }
 
         return $this;

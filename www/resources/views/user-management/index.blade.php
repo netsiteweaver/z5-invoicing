@@ -4,16 +4,16 @@
 @section('description', 'Manage users, roles, and permissions')
 
 @section('actions')
-<a href="{{ route('user-management.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-    <i class="fas fa-user-plus mr-2"></i>
+<a href="{{ route('user-management.create') }}" class="btn btn-create">
+    <i class="btn-icon fa-solid fa-user-plus"></i>
     Add User
 </a>
-<a href="{{ route('user-management.roles') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-    <i class="fas fa-user-tag mr-2"></i>
+<a href="{{ route('user-management.roles') }}" class="btn btn-secondary">
+    <i class="btn-icon fa-solid fa-user-tag"></i>
     Manage Roles
 </a>
-<a href="{{ route('user-management.permissions') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-    <i class="fas fa-key mr-2"></i>
+<a href="{{ route('user-management.permissions') }}" class="btn btn-secondary">
+    <i class="btn-icon fa-solid fa-key"></i>
     Manage Permissions
 </a>
 @endsection
@@ -22,7 +22,7 @@
 <!-- Filters -->
 <div class="bg-white shadow rounded-lg mb-6">
     <div class="px-4 py-5 sm:p-6">
-        <form method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+        <form method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
                 <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
                 <input type="text" name="search" id="search" value="{{ request('search') }}" 
@@ -39,16 +39,6 @@
                             {{ $role->display_name }}
                         </option>
                     @endforeach
-                </select>
-            </div>
-            
-            <div>
-                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                    <option value="">All Status</option>
-                    <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
-                    <option value="2" {{ request('status') === '2' ? 'selected' : '' }}>Inactive</option>
-                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Deleted</option>
                 </select>
             </div>
             
@@ -75,8 +65,6 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roles</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
@@ -121,34 +109,23 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($user->status === 1)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
-                                    @elseif($user->status === 2)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Inactive</span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Deleted</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">
-                                        {{ $user->last_login ? \Carbon\Carbon::parse($user->last_login)->format('M d, Y H:i') : 'Never' }}
-                                    </div>
-                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
-                                        <a href="{{ route('user-management.show', ['user_management' => $user->id]) }}" class="text-blue-600 hover:text-blue-900">
-                                            <i class="fas fa-eye"></i>
+                                        <a href="{{ route('user-management.show', ['user_management' => $user->id]) }}" class="btn btn-view">
+                                            <i class="btn-icon fa-regular fa-eye"></i>
+                                            View
                                         </a>
-                                        <a href="{{ route('user-management.edit', ['user_management' => $user->id]) }}" class="text-yellow-600 hover:text-yellow-900">
-                                            <i class="fas fa-edit"></i>
+                                        <a href="{{ route('user-management.edit', ['user_management' => $user->id]) }}" class="btn btn-edit">
+                                            <i class="btn-icon fa-solid fa-pen"></i>
+                                            Edit
                                         </a>
                                         @if($user->id !== auth()->id())
                                             <form method="POST" action="{{ route('user-management.destroy', ['user_management' => $user->id]) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this user?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900">
-                                                    <i class="fas fa-trash"></i>
+                                                <button type="submit" class="btn btn-delete">
+                                                    <i class="btn-icon fa-solid fa-trash"></i>
+                                                    Delete
                                                 </button>
                                             </form>
                                         @endif
@@ -174,8 +151,8 @@
                 <h3 class="mt-2 text-sm font-medium text-gray-900">No users found</h3>
                 <p class="mt-1 text-sm text-gray-500">Get started by adding a new user.</p>
                 <div class="mt-6">
-                    <a href="{{ route('user-management.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <i class="fas fa-user-plus mr-2"></i>
+                    <a href="{{ route('user-management.create') }}" class="btn btn-create">
+                        <i class="btn-icon fa-solid fa-user-plus"></i>
                         Add User
                     </a>
                 </div>

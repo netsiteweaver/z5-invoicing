@@ -42,6 +42,20 @@ class Department extends Model
             if (empty($model->uuid)) {
                 $model->uuid = Str::uuid();
             }
+            
+            // If this department is being set as main, remove main status from others
+            if ($model->is_main) {
+                static::where('is_main', true)->update(['is_main' => false]);
+            }
+        });
+        
+        static::updating(function ($model) {
+            // If this department is being set as main, remove main status from others
+            if ($model->is_main && $model->isDirty('is_main')) {
+                static::where('is_main', true)
+                    ->where('id', '!=', $model->id)
+                    ->update(['is_main' => false]);
+            }
         });
     }
 

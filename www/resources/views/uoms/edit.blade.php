@@ -15,7 +15,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700">Code <span class="text-red-500">*</span></label>
-                <input type="text" name="code" value="{{ old('code', $uom->code) }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                <input type="text" name="code" value="{{ old('code', $uom->code) }}" id="code" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required oninput="formatCode(this)">
                 @error('code')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
@@ -35,20 +35,43 @@
                 <textarea name="description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">{{ old('description', $uom->description) }}</textarea>
             </div>
         </div>
-        <div class="flex justify-between items-center pt-6 border-t border-gray-200">
-            <a href="{{ route('uoms.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50">Back</a>
-            <div class="space-x-3">
-                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('uoms.delete'))
-                <form method="POST" action="{{ route('uoms.destroy', $uom) }}" class="inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-red-300 rounded-md text-sm text-red-700 bg-white hover:bg-red-50">Deactivate</button>
-                </form>
-                @endif
-                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">Save Changes</button>
-            </div>
+        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+            <button type="submit" class="btn btn-primary">
+                <i class="btn-icon fa-solid fa-check"></i>
+                Save Changes
+            </button>
+            @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('uoms.delete'))
+            <button type="button" onclick="confirmDelete()" class="btn btn-delete">
+                <i class="btn-icon fa-solid fa-trash"></i>
+                Deactivate
+            </button>
+            @endif
         </div>
     </form>
+    
+    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('uoms.delete'))
+    <form method="POST" action="{{ route('uoms.destroy', $uom) }}" id="delete-form" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
+    
+    <script>
+    function confirmDelete() {
+        if (confirm('Are you sure you want to deactivate this UOM?')) {
+            document.getElementById('delete-form').submit();
+        }
+    }
+    </script>
+    @endif
 </div>
+
+<script>
+function formatCode(input) {
+    let value = input.value;
+    // Replace spaces with underscores and convert to uppercase
+    value = value.replace(/\s+/g, '_').toUpperCase();
+    input.value = value;
+}
+</script>
 @endsection
 

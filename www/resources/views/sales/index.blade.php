@@ -4,8 +4,8 @@
 @section('description', 'Manage sales and track revenue')
 
 @section('actions')
-<a href="{{ route('sales.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-    <i class="fas fa-plus mr-2"></i>
+<a href="{{ route('sales.create') }}" class="btn btn-create">
+    <i class="btn-icon fa-solid fa-plus"></i>
     Create Sale
 </a>
 @endsection
@@ -146,17 +146,20 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
-                                        <a href="{{ route('sales.show', $sale) }}" class="text-blue-600 hover:text-blue-900">
-                                            <i class="fas fa-eye"></i>
+                                        <a href="{{ route('sales.show', $sale) }}" class="btn btn-view">
+                                            <i class="btn-icon fa-regular fa-eye"></i>
+                                            View
                                         </a>
                                         @if($sale->canBeEdited())
-                                            <a href="{{ route('sales.edit', $sale) }}" class="text-yellow-600 hover:text-yellow-900">
-                                                <i class="fas fa-edit"></i>
+                                            <a href="{{ route('sales.edit', $sale) }}" class="btn btn-edit">
+                                                <i class="btn-icon fa-solid fa-pen"></i>
+                                                Edit
                                             </a>
                                         @endif
                                         @if($sale->payment_status !== 'paid')
-                                            <a href="{{ route('sales.payments.create', $sale) }}" class="text-green-600 hover:text-green-800" title="Record Payment">
-                                                <i class="fas fa-money-bill-wave"></i>
+                                            <a href="{{ route('sales.payments.create', $sale) }}" class="btn btn-primary" title="Record Payment">
+                                                <i class="btn-icon fa-solid fa-money-bill-wave"></i>
+                                                Payment
                                             </a>
                                         @endif
                                     </div>
@@ -181,8 +184,8 @@
                 <h3 class="mt-2 text-sm font-medium text-gray-900">No sales found</h3>
                 <p class="mt-1 text-sm text-gray-500">Get started by creating a new sale or converting an order.</p>
                 <div class="mt-6">
-                    <a href="{{ route('sales.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <i class="fas fa-plus mr-2"></i>
+                    <a href="{{ route('sales.create') }}" class="btn btn-create">
+                        <i class="btn-icon fa-solid fa-plus"></i>
                         Create Sale
                     </a>
                 </div>

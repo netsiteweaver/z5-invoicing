@@ -3,7 +3,10 @@
 @section('title', 'Payment Terms')
 
 @section('actions')
-<a href="{{ route('payment-terms.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">Add Term</a>
+<a href="{{ route('payment-terms.create') }}" class="btn btn-create">
+    <i class="btn-icon fa-solid fa-plus"></i>
+    Add Term
+</a>
 @endsection
 
 @section('content')
@@ -30,7 +33,24 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm">@if($term->is_default)<span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Default</span>@endif</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">{!! $term->status ? '<span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Active</span>' : '<span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">Inactive</span>' !!}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="{{ route('payment-terms.edit', $term) }}" class="text-blue-600 hover:text-blue-800">Edit</a>
+                                <div class="flex space-x-2">
+                                    <a href="{{ route('payment-terms.show', $term) }}" class="btn btn-view">
+                                        <i class="btn-icon fa-regular fa-eye"></i>
+                                        View
+                                    </a>
+                                    <a href="{{ route('payment-terms.edit', $term) }}" class="btn btn-edit">
+                                        <i class="btn-icon fa-solid fa-pen"></i>
+                                        Edit
+                                    </a>
+                                    <form method="POST" action="{{ route('payment-terms.destroy', $term) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this payment term?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-delete">
+                                            <i class="btn-icon fa-solid fa-trash"></i>
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach

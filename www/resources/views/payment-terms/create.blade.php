@@ -32,8 +32,15 @@
                 <input type="text" name="description" value="{{ old('description') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
             </div>
         </div>
-        <div class="pt-2">
-            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">Save</button>
+        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+            <a href="{{ route('payment-terms.index') }}" class="btn btn-secondary">
+                <i class="btn-icon fa-solid fa-times"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="btn-icon fa-solid fa-check"></i>
+                Save
+            </button>
         </div>
     </form>
 </div>

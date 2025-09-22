@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\PaymentTerm;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Concerns\HasBreadcrumbs;
 
 class PaymentTermController extends Controller
 {
+    use HasBreadcrumbs;
+
     public function __construct()
     {
         $this->middleware(['auth', 'verified']);
@@ -17,12 +20,24 @@ class PaymentTermController extends Controller
     public function index()
     {
         $terms = PaymentTerm::orderBy('is_default', 'desc')->orderBy('name')->paginate(20);
-        return view('payment-terms.index', compact('terms'));
+        
+        $breadcrumbs = $this->setBreadcrumbs('payment-terms.index');
+        
+        return view('payment-terms.index', compact('terms') + $breadcrumbs);
+    }
+
+    public function show(PaymentTerm $payment_term)
+    {
+        $breadcrumbs = $this->setBreadcrumbs('payment-terms.show', ['payment_term' => $payment_term]);
+        
+        return view('payment-terms.show', compact('payment_term') + $breadcrumbs);
     }
 
     public function create()
     {
-        return view('payment-terms.create');
+        $breadcrumbs = $this->setBreadcrumbs('payment-terms.create');
+        
+        return view('payment-terms.create', $breadcrumbs);
     }
 
     public function store(Request $request)
@@ -46,7 +61,9 @@ class PaymentTermController extends Controller
 
     public function edit(PaymentTerm $payment_term)
     {
-        return view('payment-terms.edit', compact('payment_term'));
+        $breadcrumbs = $this->setBreadcrumbs('payment-terms.edit', ['payment_term' => $payment_term]);
+        
+        return view('payment-terms.edit', compact('payment_term') + $breadcrumbs);
     }
 
     public function update(Request $request, PaymentTerm $payment_term)

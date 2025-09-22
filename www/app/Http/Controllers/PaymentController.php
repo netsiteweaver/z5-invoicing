@@ -7,9 +7,11 @@ use App\Models\PaymentType;
 use App\Models\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Concerns\HasBreadcrumbs;
 
 class PaymentController extends Controller
 {
+	use HasBreadcrumbs;
 	public function __construct()
 	{
 		$this->middleware(['auth', 'verified']);
@@ -39,7 +41,9 @@ class PaymentController extends Controller
 
 		$payments = $query->orderByDesc('payment_date')->paginate(20);
 
-		return view('payments.index', compact('payments'));
+		$breadcrumbs = $this->setBreadcrumbs('payments.index');
+
+		return view('payments.index', compact('payments') + $breadcrumbs);
 	}
 
 	public function create(Request $request, Sale $sale = null)
@@ -59,17 +63,19 @@ class PaymentController extends Controller
 
 		$paymentTypes = PaymentType::orderBy('display_order')->orderBy('name')->get();
 
+		$breadcrumbs = $this->setBreadcrumbs('payments.create');
+
 		return view('payments.create', [
 			'sales' => $sales,
 			'paymentTypes' => $paymentTypes,
 			'preselectedSale' => $preselectedSale,
-		]);
+		] + $breadcrumbs);
 	}
 
-	public function store(Request $request)
+	public function store(Request $request, Sale $sale = null)
 	{
 		$validated = $request->validate([
-			'sale_id' => ['required', 'exists:sales,id'],
+			'sale_id' => ['nullable', 'exists:sales,id'],
 			'payment_date' => ['required', 'date'],
 			'amount' => ['required', 'numeric', 'min:0.01'],
 			'payment_type_id' => ['required', 'exists:payment_types,id'],
@@ -77,6 +83,13 @@ class PaymentController extends Controller
 			'reference_number' => ['nullable', 'string', 'max:100'],
 			'notes' => ['nullable', 'string', 'max:1000'],
 		]);
+
+		// If sale is provided via route parameter, use it; otherwise use sale_id from request
+		if ($sale) {
+			$validated['sale_id'] = $sale->id;
+		} elseif (!$validated['sale_id']) {
+			return back()->withErrors(['sale_id' => 'Sale is required.'])->withInput();
+		}
 
 		$sale = Sale::with('customer', 'payments')->findOrFail($validated['sale_id']);
 		$paymentType = PaymentType::findOrFail($validated['payment_type_id']);
@@ -121,7 +134,10 @@ class PaymentController extends Controller
 	public function show(Payment $payment)
 	{
 		$payment->load(['sale.customer', 'paymentType', 'createdBy']);
-		return view('payments.show', compact('payment'));
+		
+		$breadcrumbs = $this->setBreadcrumbs('payments.show', ['payment' => $payment]);
+		
+		return view('payments.show', compact('payment') + $breadcrumbs);
 	}
 
 	private function updateSalePaymentStatus(int $saleId): void

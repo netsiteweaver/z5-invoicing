@@ -83,7 +83,9 @@ class OrderController extends Controller
         $customers = Customer::active()->ordered()->get();
         $products = Product::active()->with(['category', 'brand', 'inventory'])->get();
         
-        return view('orders.create', compact('customers', 'products'));
+        $breadcrumbs = $this->setBreadcrumbs('orders.create');
+        
+        return view('orders.create', compact('customers', 'products') + $breadcrumbs);
     }
 
     /**
@@ -202,7 +204,9 @@ class OrderController extends Controller
         $customers = Customer::active()->ordered()->get();
         $products = Product::active()->with(['category', 'brand', 'inventory'])->get();
         
-        return view('orders.edit', compact('order', 'customers', 'products'));
+        $breadcrumbs = $this->setBreadcrumbs('orders.edit', ['order' => $order]);
+        
+        return view('orders.edit', compact('order', 'customers', 'products') + $breadcrumbs);
     }
 
     /**

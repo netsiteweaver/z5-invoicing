@@ -14,7 +14,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700">Code <span class="text-red-500">*</span></label>
-                <input type="text" name="code" value="{{ old('code') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                <input type="text" name="code" value="{{ old('code') }}" id="code" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required oninput="formatCode(this)">
                 @error('code')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
@@ -35,10 +35,21 @@
             </div>
         </div>
         <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-            <a href="{{ route('uoms.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50">Cancel</a>
-            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">Create UOM</button>
+            <button type="submit" class="btn btn-primary">
+                <i class="btn-icon fa-solid fa-check"></i>
+                Create UOM
+            </button>
         </div>
     </form>
 </div>
+
+<script>
+function formatCode(input) {
+    let value = input.value;
+    // Replace spaces with underscores and convert to uppercase
+    value = value.replace(/\s+/g, '_').toUpperCase();
+    input.value = value;
+}
+</script>
 @endsection
 

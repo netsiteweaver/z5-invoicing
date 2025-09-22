@@ -4,7 +4,7 @@
     <div class="absolute inset-0 bg-black/40" @click="dismiss()"></div>
     <div class="relative bg-white rounded-lg shadow-xl border border-gray-200 max-w-2xl w-full mx-4">
       <div class="px-5 py-4 bg-blue-50 border-b border-blue-100 flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-gray-900" x-text="`What's new in ${version || appVersion}${releaseDate ? ' (' + formatDate(releaseDate) + ')' : ''}`"></h3>
+        <h3 class="text-lg font-semibold text-gray-900" x-text="`What's new in v${version || appVersion}${releaseDate ? ' (' + formatDate(releaseDate) + ')' : ''}`"></h3>
         <button class="text-gray-400 hover:text-gray-600" @click="dismiss()"><i class="fas fa-times"></i></button>
       </div>
       <div class="px-5 py-4 text-sm text-gray-700 max-h-[60vh] overflow-y-auto">

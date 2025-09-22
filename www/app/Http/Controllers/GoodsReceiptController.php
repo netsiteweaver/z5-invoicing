@@ -60,6 +60,12 @@ class GoodsReceiptController extends Controller
 
     public function create()
     {
+        $defaultDepartment = Department::main()->first();
+        if (!$defaultDepartment) {
+            // If no main department exists, get the first active department
+            $defaultDepartment = Department::active()->first();
+        }
+        
         $departments = Department::ordered()->get();
         $products = Product::ordered()->get();
         $suppliers = Supplier::active()->ordered()->get();
@@ -68,7 +74,7 @@ class GoodsReceiptController extends Controller
             ['title' => 'Goods Receipts', 'url' => route('goods-receipts.index'), 'current' => false],
             ['title' => 'Create Receipt', 'url' => null, 'current' => true],
         ];
-        return view('goods-receipts.create', compact('departments', 'products', 'suppliers', 'breadcrumbs'));
+        return view('goods-receipts.create', compact('departments', 'products', 'suppliers', 'defaultDepartment', 'breadcrumbs'));
     }
 
     public function store(Request $request)
@@ -94,8 +100,8 @@ class GoodsReceiptController extends Controller
                 'receipt_date' => $request->receipt_date,
                 'supplier_id' => $request->supplier_id,
                 'supplier_ref' => $request->supplier_ref,
-                'container_no' => $request->container_no,
-                'bill_of_lading' => $request->bill_of_lading,
+                'container_no' => null, // Not used in UI but kept in schema
+                'bill_of_lading' => null, // Not used in UI but kept in schema
                 'notes' => $request->notes,
                 'created_by' => auth()->id(),
                 'approval_status' => 'submitted',
@@ -162,10 +168,74 @@ class GoodsReceiptController extends Controller
             'container_no' => 'nullable|string',
             'bill_of_lading' => 'nullable|string',
             'notes' => 'nullable|string',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.uom_id' => 'nullable|exists:uoms,id',
+            'items.*.uom_quantity' => 'nullable|integer|min:1',
+            'items.*.unit_cost' => 'nullable|numeric|min:0',
         ]);
 
-        $goods_receipt->update($request->only(['receipt_date', 'supplier_id', 'supplier_ref', 'container_no', 'bill_of_lading', 'notes']));
-        return redirect()->route('goods-receipts.show', $goods_receipt)->with('success', 'Goods receipt updated.');
+        DB::beginTransaction();
+        try {
+            // Update header information
+            $goods_receipt->update($request->only(['receipt_date', 'supplier_id', 'supplier_ref', 'notes']));
+
+            // Delete existing items
+            $goods_receipt->items()->delete();
+
+            // Calculate totals
+            $subtotal = 0;
+            $totalTax = 0;
+            
+            // Create new items
+            foreach ($request->items as $itemData) {
+                $product = Product::find($itemData['product_id']);
+                $quantity = (int) $itemData['quantity'];
+                $unitCost = (float) ($itemData['unit_cost'] ?? 0);
+                $lineTotal = $quantity * $unitCost;
+                
+                // Calculate tax
+                $taxType = $product?->tax_type ?? 'standard';
+                $taxPercent = match ($taxType) {
+                    'standard' => 15,
+                    'zero' => 0,
+                    'exempt' => 0,
+                    default => 0,
+                };
+                $taxAmount = $lineTotal * ($taxPercent / 100);
+                
+                $subtotal += $lineTotal;
+                $totalTax += $taxAmount;
+                
+                $goods_receipt->items()->create([
+                    'product_id' => $itemData['product_id'],
+                    'quantity' => $quantity,
+                    'uom_id' => $itemData['uom_id'] ?? null,
+                    'uom_quantity' => $itemData['uom_quantity'] ?? 1,
+                    'unit_cost' => $unitCost,
+                    'tax_type' => $taxType,
+                    'tax_percent' => $taxPercent,
+                    'tax_amount' => $taxAmount,
+                    'line_total' => $lineTotal + $taxAmount,
+                    'created_by' => auth()->id(),
+                    'status' => 1,
+                ]);
+            }
+
+            // Update totals
+            $goods_receipt->update([
+                'subtotal' => $subtotal,
+                'tax_amount' => $totalTax,
+                'total_amount' => $subtotal + $totalTax,
+            ]);
+
+            DB::commit();
+            return redirect()->route('goods-receipts.show', $goods_receipt)->with('success', 'Goods receipt updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to update goods receipt: ' . $e->getMessage()])->withInput();
+        }
     }
 
     public function destroy(GoodsReceipt $goods_receipt)

@@ -10,12 +10,9 @@
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <div>
         <label class="block text-sm font-medium text-gray-700">Location</label>
-        <select name="department_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-          <option value="">Select location</option>
-          @foreach($departments as $dept)
-            <option value="{{ $dept->id }}">{{ $dept->name }}</option>
-          @endforeach
-        </select>
+        <input type="hidden" name="department_id" value="{{ $defaultDepartment->id }}">
+        <input type="text" value="{{ $defaultDepartment->name }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-50" readonly>
+        <p class="mt-1 text-sm text-gray-500">Location is set to the main department and cannot be changed</p>
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700">Receipt Date</label>
@@ -36,14 +33,6 @@
       <div>
         <label class="block text-sm font-medium text-gray-700">Supplier Ref</label>
         <input type="text" name="supplier_ref" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Container No</label>
-        <input type="text" name="container_no" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Bill of Lading</label>
-        <input type="text" name="bill_of_lading" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
       </div>
     </div>
 
