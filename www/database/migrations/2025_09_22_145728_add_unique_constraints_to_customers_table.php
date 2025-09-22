@@ -12,125 +12,135 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // First, clean up any duplicate values by keeping only the most recent active record
-        $this->cleanupDuplicates();
+        // Clean up any duplicate active customers only
+        $this->cleanupActiveDuplicates();
         
-        // Then add unique constraints
+        // Add indexes for better performance (not unique constraints)
         Schema::table('customers', function (Blueprint $table) {
-            // Check if constraints don't already exist before adding them
-            if (!$this->constraintExists('customers', 'customers_company_name_unique')) {
-                $table->unique('company_name', 'customers_company_name_unique');
+            // Add indexes for better query performance
+            if (!$this->indexExists('customers', 'customers_company_name_index')) {
+                $table->index('company_name', 'customers_company_name_index');
             }
-            if (!$this->constraintExists('customers', 'customers_brn_unique')) {
-                $table->unique('brn', 'customers_brn_unique');
+            if (!$this->indexExists('customers', 'customers_brn_index')) {
+                $table->index('brn', 'customers_brn_index');
             }
-            if (!$this->constraintExists('customers', 'customers_vat_unique')) {
-                $table->unique('vat', 'customers_vat_unique');
+            if (!$this->indexExists('customers', 'customers_vat_index')) {
+                $table->index('vat', 'customers_vat_index');
             }
         });
     }
     
     /**
-     * Clean up duplicate values by keeping only the most recent active record
+     * Clean up duplicate active customers only
      */
-    private function cleanupDuplicates(): void
+    private function cleanupActiveDuplicates(): void
     {
-        // Handle duplicate company names
+        // Handle duplicate ACTIVE company names only
         $duplicates = DB::select("
             SELECT company_name, COUNT(*) as count 
             FROM customers 
-            WHERE company_name IS NOT NULL AND company_name != '' 
+            WHERE company_name IS NOT NULL AND company_name != '' AND status = 1
             GROUP BY company_name 
             HAVING count > 1
         ");
         
         foreach ($duplicates as $duplicate) {
-            // Keep the most recent active record, delete others
-            $keepRecord = DB::select("
-                SELECT id FROM customers 
-                WHERE company_name = ? AND status = 1 
-                ORDER BY created_at DESC 
-                LIMIT 1
+            // Get all ACTIVE records with this company name
+            $records = DB::select("
+                SELECT id, created_at 
+                FROM customers 
+                WHERE company_name = ? AND status = 1
+                ORDER BY created_at DESC
             ", [$duplicate->company_name]);
             
-            if (!empty($keepRecord)) {
-                $keepId = $keepRecord[0]->id;
-                DB::delete("
-                    DELETE FROM customers 
-                    WHERE company_name = ? AND id != ? AND status = 1
-                ", [$duplicate->company_name, $keepId]);
+            if (count($records) > 1) {
+                // Keep the most recent active record
+                $keepId = $records[0]->id;
+                
+                // Delete all other active records
+                $deleteIds = array_slice(array_column($records, 'id'), 1);
+                if (!empty($deleteIds)) {
+                    DB::delete("
+                        DELETE FROM customers 
+                        WHERE id IN (" . implode(',', array_fill(0, count($deleteIds), '?')) . ")
+                    ", $deleteIds);
+                }
             }
         }
         
-        // Handle duplicate BRNs
+        // Handle duplicate ACTIVE BRNs only
         $duplicates = DB::select("
             SELECT brn, COUNT(*) as count 
             FROM customers 
-            WHERE brn IS NOT NULL AND brn != '' 
+            WHERE brn IS NOT NULL AND brn != '' AND status = 1
             GROUP BY brn 
             HAVING count > 1
         ");
         
         foreach ($duplicates as $duplicate) {
-            // Keep the most recent active record, delete others
-            $keepRecord = DB::select("
-                SELECT id FROM customers 
-                WHERE brn = ? AND status = 1 
-                ORDER BY created_at DESC 
-                LIMIT 1
+            $records = DB::select("
+                SELECT id, created_at 
+                FROM customers 
+                WHERE brn = ? AND status = 1
+                ORDER BY created_at DESC
             ", [$duplicate->brn]);
             
-            if (!empty($keepRecord)) {
-                $keepId = $keepRecord[0]->id;
-                DB::delete("
-                    DELETE FROM customers 
-                    WHERE brn = ? AND id != ? AND status = 1
-                ", [$duplicate->brn, $keepId]);
+            if (count($records) > 1) {
+                $keepId = $records[0]->id;
+                $deleteIds = array_slice(array_column($records, 'id'), 1);
+                if (!empty($deleteIds)) {
+                    DB::delete("
+                        DELETE FROM customers 
+                        WHERE id IN (" . implode(',', array_fill(0, count($deleteIds), '?')) . ")
+                    ", $deleteIds);
+                }
             }
         }
         
-        // Handle duplicate VATs
+        // Handle duplicate ACTIVE VATs only
         $duplicates = DB::select("
             SELECT vat, COUNT(*) as count 
             FROM customers 
-            WHERE vat IS NOT NULL AND vat != '' 
+            WHERE vat IS NOT NULL AND vat != '' AND status = 1
             GROUP BY vat 
             HAVING count > 1
         ");
         
         foreach ($duplicates as $duplicate) {
-            // Keep the most recent active record, delete others
-            $keepRecord = DB::select("
-                SELECT id FROM customers 
-                WHERE vat = ? AND status = 1 
-                ORDER BY created_at DESC 
-                LIMIT 1
+            $records = DB::select("
+                SELECT id, created_at 
+                FROM customers 
+                WHERE vat = ? AND status = 1
+                ORDER BY created_at DESC
             ", [$duplicate->vat]);
             
-            if (!empty($keepRecord)) {
-                $keepId = $keepRecord[0]->id;
-                DB::delete("
-                    DELETE FROM customers 
-                    WHERE vat = ? AND id != ? AND status = 1
-                ", [$duplicate->vat, $keepId]);
+            if (count($records) > 1) {
+                $keepId = $records[0]->id;
+                $deleteIds = array_slice(array_column($records, 'id'), 1);
+                if (!empty($deleteIds)) {
+                    DB::delete("
+                        DELETE FROM customers 
+                        WHERE id IN (" . implode(',', array_fill(0, count($deleteIds), '?')) . ")
+                    ", $deleteIds);
+                }
             }
         }
     }
     
     /**
-     * Check if a constraint exists
+     * Check if an index exists
      */
-    private function constraintExists(string $table, string $constraintName): bool
+    private function indexExists(string $table, string $indexName): bool
     {
-        $constraints = DB::select("
-            SELECT CONSTRAINT_NAME 
-            FROM information_schema.TABLE_CONSTRAINTS 
+        $indexes = DB::select("
+            SELECT INDEX_NAME 
+            FROM information_schema.STATISTICS 
             WHERE TABLE_SCHEMA = DATABASE() 
             AND TABLE_NAME = ? 
-            AND CONSTRAINT_NAME = ?
-        ", [$table, $constraintName]);
+            AND INDEX_NAME = ?
+        ", [$table, $indexName]);
         
-        return !empty($constraints);
+        return !empty($indexes);
     }
 
     /**
@@ -139,9 +149,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('customers', function (Blueprint $table) {
-            $table->dropUnique('customers_company_name_unique');
-            $table->dropUnique('customers_brn_unique');
-            $table->dropUnique('customers_vat_unique');
+            $table->dropIndex('customers_company_name_index');
+            $table->dropIndex('customers_brn_index');
+            $table->dropIndex('customers_vat_index');
         });
     }
 };
