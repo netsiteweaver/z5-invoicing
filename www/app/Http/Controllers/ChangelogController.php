@@ -65,7 +65,7 @@ class ChangelogController extends Controller
             $ext = strtolower($m[2]);
             $raw = file_get_contents($path) ?: '';
 
-            // Extract first non-empty line as date if matches YYYY-MM-DD
+            // Extract first non-empty line as date if matches YYYY-MM-DD or YYYY-MM-DD HH:MM:SS
             $releaseDate = null;
             $body = $raw;
             if ($ext !== 'html') {
@@ -73,7 +73,8 @@ class ChangelogController extends Controller
                 foreach ($lines as $idx => $line) {
                     $trim = trim($line);
                     if ($trim === '') continue;
-                    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $trim)) {
+                    // Support both YYYY-MM-DD and YYYY-MM-DD HH:MM:SS formats
+                    if (preg_match('/^\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2}:\d{2})?$/', $trim)) {
                         $releaseDate = $trim;
                         // Remove this first non-empty date line from body
                         unset($lines[$idx]);
@@ -93,15 +94,23 @@ class ChangelogController extends Controller
                 $notesHtml = nl2br(e(trim($body)));
             }
             $releases[] = [
-                'version' => $version,
+                'version' => 'v' . $version, // Ensure version has 'v' prefix to match app version
                 'date' => $releaseDate ? $releaseDate : date('Y-m-d', filemtime($path) ?: time()),
                 'notesHtml' => $notesHtml,
             ];
         }
 
-        // Sort desc by date
+        // Sort desc by date/time, then by version (newer versions first)
         usort($releases, function ($a, $b) {
-            return strcmp($b['date'], $a['date']);
+            // Convert dates to timestamps for proper comparison
+            $timeA = strtotime($a['date']);
+            $timeB = strtotime($b['date']);
+            $timeCompare = $timeB - $timeA;
+            if ($timeCompare !== 0) {
+                return $timeCompare;
+            }
+            // If dates/times are equal, sort by version (newer first)
+            return version_compare($b['version'], $a['version']);
         });
 
         return $releases;
@@ -155,15 +164,23 @@ class ChangelogController extends Controller
             }
 
             $releases[] = [
-                'version' => $version,
+                'version' => 'v' . $version, // Ensure version has 'v' prefix
                 'date' => $this->normalizeDate($date),
                 'notesHtml' => $notesHtml,
             ];
         }
 
-        // Sort by date desc
+        // Sort by date/time desc, then by version (newer versions first)
         usort($releases, function ($a, $b) {
-            return strcmp($b['date'], $a['date']);
+            // Convert dates to timestamps for proper comparison
+            $timeA = strtotime($a['date']);
+            $timeB = strtotime($b['date']);
+            $timeCompare = $timeB - $timeA;
+            if ($timeCompare !== 0) {
+                return $timeCompare;
+            }
+            // If dates/times are equal, sort by version (newer first)
+            return version_compare($b['version'], $a['version']);
         });
 
         return $releases;
@@ -201,15 +218,23 @@ class ChangelogController extends Controller
             $section = substr($md, $start, $end - $start);
 
             $releases[] = [
-                'version' => $version,
+                'version' => 'v' . $version, // Ensure version has 'v' prefix
                 'date' => $this->normalizeDate($date),
                 'notesHtml' => nl2br(e(trim($section))),
             ];
         }
 
-        // Sort by date desc
+        // Sort by date/time desc, then by version (newer versions first)
         usort($releases, function ($a, $b) {
-            return strcmp($b['date'], $a['date']);
+            // Convert dates to timestamps for proper comparison
+            $timeA = strtotime($a['date']);
+            $timeB = strtotime($b['date']);
+            $timeCompare = $timeB - $timeA;
+            if ($timeCompare !== 0) {
+                return $timeCompare;
+            }
+            // If dates/times are equal, sort by version (newer first)
+            return version_compare($b['version'], $a['version']);
         });
 
         return $releases;
