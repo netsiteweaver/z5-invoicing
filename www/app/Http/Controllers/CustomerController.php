@@ -83,6 +83,9 @@ class CustomerController extends Controller
             $request->validate(['full_name' => ['required', 'string', 'max:255']]);
         }
 
+        // Check for unique constraints - allow recreation of deleted customers
+        $this->validateUniqueFields($request, null);
+
         $validated['created_by'] = auth()->id();
         $validated['status'] = 1;
 
@@ -140,6 +143,9 @@ class CustomerController extends Controller
             $request->validate(['full_name' => ['required', 'string', 'max:255']]);
         }
 
+        // Check for unique constraints - allow recreation of deleted customers
+        $this->validateUniqueFields($request, $customer);
+
         $validated['updated_by'] = auth()->id();
 
         $customer->update($validated);
@@ -159,4 +165,57 @@ class CustomerController extends Controller
             ->with('success', 'Customer deleted successfully.');
     }
 
+    /**
+     * Validate unique fields - allow recreation of deleted customers
+     */
+    private function validateUniqueFields(Request $request, ?Customer $customer = null)
+    {
+        $errors = [];
+
+        // Check company name uniqueness (only among active customers)
+        if ($request->filled('company_name')) {
+            $query = Customer::where('company_name', $request->company_name)
+                            ->where('status', 1); // Only check active customers
+            if ($customer) {
+                $query->where('id', '!=', $customer->id);
+            }
+            $existing = $query->first();
+            
+            if ($existing) {
+                $errors['company_name'] = 'A customer with this company name already exists.';
+            }
+        }
+
+        // Check BRN uniqueness (only among active customers)
+        if ($request->filled('brn')) {
+            $query = Customer::where('brn', $request->brn)
+                            ->where('status', 1); // Only check active customers
+            if ($customer) {
+                $query->where('id', '!=', $customer->id);
+            }
+            $existing = $query->first();
+            
+            if ($existing) {
+                $errors['brn'] = 'A customer with this BRN already exists.';
+            }
+        }
+
+        // Check VAT uniqueness (only among active customers)
+        if ($request->filled('vat')) {
+            $query = Customer::where('vat', $request->vat)
+                            ->where('status', 1); // Only check active customers
+            if ($customer) {
+                $query->where('id', '!=', $customer->id);
+            }
+            $existing = $query->first();
+            
+            if ($existing) {
+                $errors['vat'] = 'A customer with this VAT number already exists.';
+            }
+        }
+
+        if (!empty($errors)) {
+            throw \Illuminate\Validation\ValidationException::withMessages($errors);
+        }
+    }
 }

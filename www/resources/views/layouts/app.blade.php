@@ -239,18 +239,18 @@
                         </a>
                         @endif
                         @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.low_stock'))
-                        <a href="{{ route('inventory.low-stock') }}" 
+                        <!-- <a href="{{ route('inventory.low-stock') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('inventory.low-stock') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Low Stock Alert
-                        </a>
+                        </a> -->
                         @endif
                         @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('inventory.stock_report'))
-                        <a href="{{ route('inventory.stock-report') }}" 
+                        <!-- <a href="{{ route('inventory.stock-report') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('inventory.stock-report') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Stock Report
-                        </a>
+                        </a> -->
                         @endif
 
                         @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('goods_receipts.view'))
@@ -648,5 +648,67 @@
         </div>
     </div>
 @stack('scripts')
+
+<script>
+// Prevent form double submission
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle all forms on the page
+    document.querySelectorAll('form').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            const submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+            
+            if (submitButton && !submitButton.disabled) {
+                // Disable the submit button
+                submitButton.disabled = true;
+                
+                // Add loading state
+                const originalText = submitButton.textContent || submitButton.value;
+                if (submitButton.tagName === 'BUTTON') {
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+                } else {
+                    submitButton.value = 'Processing...';
+                }
+                
+                // Re-enable after 10 seconds as a safety measure
+                setTimeout(function() {
+                    submitButton.disabled = false;
+                    if (submitButton.tagName === 'BUTTON') {
+                        submitButton.innerHTML = originalText;
+                    } else {
+                        submitButton.value = originalText;
+                    }
+                }, 10000);
+            }
+        });
+    });
+    
+    // Handle specific buttons with onclick handlers that submit forms
+    document.querySelectorAll('button[onclick*="submit"], input[onclick*="submit"]').forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            if (!button.disabled) {
+                button.disabled = true;
+                const originalText = button.textContent || button.value;
+                
+                if (button.tagName === 'BUTTON') {
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+                } else {
+                    button.value = 'Processing...';
+                }
+                
+                // Re-enable after 10 seconds
+                setTimeout(function() {
+                    button.disabled = false;
+                    if (button.tagName === 'BUTTON') {
+                        button.innerHTML = originalText;
+                    } else {
+                        button.value = originalText;
+                    }
+                }, 10000);
+            }
+        });
+    });
+});
+</script>
+
 </body>
 </html>
