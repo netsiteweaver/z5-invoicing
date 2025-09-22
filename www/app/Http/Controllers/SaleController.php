@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Inventory;
 use App\Models\StockMovement;
 use App\Services\InventoryService;
+use App\Services\UomService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -175,13 +176,8 @@ class SaleController extends Controller
                 if (!$departmentId) {
                     throw new \Exception('User is not assigned to any department.');
                 }
-                // Convert to base units if UOM provided
-                $baseQty = (int) $item['quantity'];
-                if (!empty($item['uom_id'])) {
-                    $uom = \App\Models\Uom::find($item['uom_id']);
-                    $uomQty = (int) ($item['uom_quantity'] ?? 1);
-                    if ($uom) { $baseQty = $uomQty * max(1, (int) $uom->units_per_uom); }
-                }
+                // Convert to base units using UomService (packs semantics)
+                $baseQty = UomService::toBaseUnits((int) $item['quantity'], $item['uom_id'] ?? null);
                 $inventoryService->adjustStockOut(
                     (int) $item['product_id'],
                     (int) $departmentId,
@@ -320,13 +316,8 @@ class SaleController extends Controller
                     'total_amount' => $itemTotal - $discountAmount,
                 ]);
 
-                // Update inventory for new items
-                $baseQty = (int) $item['quantity'];
-                if (!empty($item['uom_id'])) {
-                    $uom = \App\Models\Uom::find($item['uom_id']);
-                    $uomQty = (int) ($item['uom_quantity'] ?? 1);
-                    if ($uom) { $baseQty = $uomQty * max(1, (int) $uom->units_per_uom); }
-                }
+                // Update inventory for new items using UomService
+                $baseQty = UomService::toBaseUnits((int) $item['quantity'], $item['uom_id'] ?? null);
                 $inventoryService->adjustStockOut(
                     (int) $item['product_id'],
                     (int) $departmentId,
