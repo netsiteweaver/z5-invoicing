@@ -4,14 +4,20 @@
 
 @section('actions')
 <div class="flex space-x-2">
-  <a href="{{ route('stock-transfers.print', $transfer) }}" class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50">
-    <i class="fas fa-print mr-2"></i> Print
+  <a href="{{ route('stock-transfers.edit', $transfer) }}" class="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-amber-600 hover:bg-amber-700">
+    <i class="fas fa-pen mr-2"></i>
+    Edit
+  </a>
+  <a href="{{ route('stock-transfers.print', $transfer) }}" class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+    <i class="fas fa-print mr-2"></i>
+    Print
   </a>
   @if($transfer->status !== 'received')
-  <form method="POST" action="{{ route('stock-transfers.receive', $transfer) }}">
+  <form method="POST" action="{{ route('stock-transfers.receive', $transfer) }}" class="inline">
     @csrf
-    <button type="submit" class="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm text-white bg-green-600 hover:bg-green-700">
-      <i class="fas fa-box-open mr-2"></i> Mark as Received
+    <button type="submit" class="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+      <i class="fas fa-box-open mr-2"></i>
+      Mark as Received
     </button>
   </form>
   @endif
@@ -28,7 +34,8 @@
       </div>
       <div>
         <div class="text-xs text-gray-500">Date</div>
-        <div class="text-sm font-medium text-gray-900">{{ $transfer->transfer_date->format('Y-m-d') }}</div>
+        <div class="text-sm font-medium text-gray-900">{{ optional($transfer->transfer_date instanceof \Carbon\Carbon ? $transfer->transfer_date : \Carbon\Carbon::parse($transfer->transfer_date))->format('Y-m-d') }}</div>
+
       </div>
       <div>
         <div class="text-xs text-gray-500">From</div>

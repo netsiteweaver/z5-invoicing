@@ -4,8 +4,9 @@
 @section('description', 'List of received goods (GRN)')
 
 @section('actions')
-<a href="{{ route('goods-receipts.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-    <i class="fas fa-plus mr-2"></i> New Receipt
+<a href="{{ route('goods-receipts.create') }}" class="btn btn-create">
+    <i class="btn-icon fa-solid fa-plus"></i>
+    New Receipt
 </a>
 @endsection
 
@@ -31,13 +32,29 @@
             <td class="px-6 py-4 whitespace-nowrap">{{ $receipt->department->name ?? '-' }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ $receipt->supplier->name ?? ($receipt->supplier_name ?? '-') }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <a href="{{ route('goods-receipts.show', $receipt) }}" class="text-blue-600 hover:text-blue-900"><i class="fas fa-eye"></i></a>
-              <a href="{{ route('goods-receipts.edit', $receipt) }}" class="text-yellow-600 hover:text-yellow-900 ml-3"><i class="fas fa-edit"></i></a>
+              <div class="flex space-x-2">
+                <a href="{{ route('goods-receipts.show', $receipt) }}" class="btn btn-view">
+                  <i class="btn-icon fa-regular fa-eye"></i>
+                  View
+                </a>
+                <a href="{{ route('goods-receipts.edit', $receipt) }}" class="btn btn-edit">
+                  <i class="btn-icon fa-solid fa-pen"></i>
+                  Edit
+                </a>
+              </div>
             </td>
           </tr>
           @empty
           <tr>
-            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">No receipts found.</td>
+            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+              <div class="flex flex-col items-center space-y-4">
+                <p>No receipts found.</p>
+                <a href="{{ route('goods-receipts.create') }}" class="btn btn-create">
+                  <i class="btn-icon fa-solid fa-plus"></i>
+                  Create Receipt
+                </a>
+              </div>
+            </td>
           </tr>
           @endforelse
         </tbody>

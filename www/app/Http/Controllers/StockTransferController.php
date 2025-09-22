@@ -11,9 +11,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Http\Controllers\Concerns\HasBreadcrumbs;
 
 class StockTransferController extends Controller
 {
+    use HasBreadcrumbs;
     public function __construct()
     {
         $this->middleware(['auth', 'verified']);
@@ -34,23 +36,17 @@ class StockTransferController extends Controller
         $transfers = $query->paginate(20);
         $departments = Department::ordered()->get();
 
-        $breadcrumbs = [
-            ['title' => 'Inventory', 'url' => route('inventory.index'), 'current' => false],
-            ['title' => 'Stock Transfers', 'url' => null, 'current' => true],
-        ];
-        return view('stock-transfers.index', compact('transfers', 'departments', 'breadcrumbs'));
+        $breadcrumbs = $this->setBreadcrumbs('stock-transfers.index');
+        return view('stock-transfers.index', compact('transfers', 'departments') + $breadcrumbs);
     }
 
     public function create()
     {
         $departments = Department::ordered()->get();
         $products = Product::ordered()->get();
-        $breadcrumbs = [
-            ['title' => 'Inventory', 'url' => route('inventory.index'), 'current' => false],
-            ['title' => 'Stock Transfers', 'url' => route('stock-transfers.index'), 'current' => false],
-            ['title' => 'Create Transfer', 'url' => null, 'current' => true],
-        ];
-        return view('stock-transfers.create', compact('departments', 'products', 'breadcrumbs'));
+        
+        $breadcrumbs = $this->setBreadcrumbs('stock-transfers.create');
+        return view('stock-transfers.create', compact('departments', 'products') + $breadcrumbs);
     }
 
     public function store(Request $request)
@@ -100,12 +96,9 @@ class StockTransferController extends Controller
     public function show(StockTransfer $stock_transfer)
     {
         $stock_transfer->load(['items.product', 'fromDepartment', 'toDepartment']);
-        $breadcrumbs = [
-            ['title' => 'Inventory', 'url' => route('inventory.index'), 'current' => false],
-            ['title' => 'Stock Transfers', 'url' => route('stock-transfers.index'), 'current' => false],
-            ['title' => $stock_transfer->transfer_number, 'url' => null, 'current' => true],
-        ];
-        return view('stock-transfers.show', ['transfer' => $stock_transfer, 'breadcrumbs' => $breadcrumbs]);
+        
+        $breadcrumbs = $this->setBreadcrumbs('stock-transfers.show', ['transfer' => $stock_transfer]);
+        return view('stock-transfers.show', ['transfer' => $stock_transfer] + $breadcrumbs);
     }
 
     public function edit(StockTransfer $stock_transfer)
@@ -113,22 +106,52 @@ class StockTransferController extends Controller
         $stock_transfer->load('items');
         $departments = Department::ordered()->get();
         $products = Product::ordered()->get();
-        $breadcrumbs = [
-            ['title' => 'Inventory', 'url' => route('inventory.index'), 'current' => false],
-            ['title' => 'Stock Transfers', 'url' => route('stock-transfers.index'), 'current' => false],
-            ['title' => $stock_transfer->transfer_number, 'url' => route('stock-transfers.show', $stock_transfer), 'current' => false],
-            ['title' => 'Edit Transfer', 'url' => null, 'current' => true],
-        ];
-        return view('stock-transfers.edit', ['transfer' => $stock_transfer, 'departments' => $departments, 'products' => $products, 'breadcrumbs' => $breadcrumbs]);
+        
+        $breadcrumbs = $this->setBreadcrumbs('stock-transfers.edit', ['transfer' => $stock_transfer]);
+        return view('stock-transfers.edit', ['transfer' => $stock_transfer, 'departments' => $departments, 'products' => $products] + $breadcrumbs);
     }
 
     public function update(Request $request, StockTransfer $stock_transfer)
     {
         $request->validate([
+            'from_department_id' => 'required|exists:departments,id',
+            'to_department_id' => 'required|exists:departments,id',
+            'transfer_date' => 'required|date',
             'status' => 'required|in:draft,requested,approved,in_transit,received,cancelled',
+            'notes' => 'nullable|string|max:1000',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
         ]);
-        $stock_transfer->update($request->only(['status', 'notes']));
-        return redirect()->route('stock-transfers.show', $stock_transfer)->with('success', 'Transfer updated.');
+
+        DB::beginTransaction();
+        try {
+            // Update the transfer basic info
+            $stock_transfer->update($request->only([
+                'from_department_id', 
+                'to_department_id', 
+                'transfer_date', 
+                'status', 
+                'notes'
+            ]));
+
+            // Handle items - delete existing and create new ones
+            $stock_transfer->items()->delete();
+            
+            foreach ($request->items as $itemData) {
+                StockTransferItem::create([
+                    'stock_transfer_id' => $stock_transfer->id,
+                    'product_id' => $itemData['product_id'],
+                    'quantity' => $itemData['quantity'],
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('stock-transfers.show', $stock_transfer)->with('success', 'Transfer updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to update transfer: ' . $e->getMessage()])->withInput();
+        }
     }
 
     public function destroy(StockTransfer $stock_transfer)

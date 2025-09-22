@@ -48,6 +48,16 @@ class StockMovement extends Model
     }
 
     // Relationships
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
+
     public function inventory(): BelongsTo
     {
         return $this->belongsTo(Inventory::class);

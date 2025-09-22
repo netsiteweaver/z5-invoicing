@@ -4,14 +4,20 @@
 
 @section('actions')
 <div class="flex space-x-2">
-  <a href="{{ route('goods-receipts.print', $receipt) }}" class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50">
-    <i class="fas fa-print mr-2"></i> Print
+  <a href="{{ route('goods-receipts.edit', $receipt) }}" class="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-amber-600 hover:bg-amber-700">
+    <i class="fas fa-pen mr-2"></i>
+    Edit
+  </a>
+  <a href="{{ route('goods-receipts.print', $receipt) }}" class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+    <i class="fas fa-print mr-2"></i>
+    Print
   </a>
   @if(($receipt->approval_status ?? 'approved') !== 'approved')
-  <form method="POST" action="{{ route('goods-receipts.approve', $receipt) }}">
+  <form method="POST" action="{{ route('goods-receipts.approve', $receipt) }}" class="inline">
     @csrf
-    <button type="submit" class="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm text-white bg-green-600 hover:bg-green-700">
-      <i class="fas fa-check mr-2"></i> Approve
+    <button type="submit" class="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+      <i class="fas fa-check mr-2"></i>
+      Approve
     </button>
   </form>
   @endif
@@ -19,6 +25,39 @@
 @endsection
 
 @section('content')
+@if ($errors->any())
+<div class="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+  <div class="flex">
+    <div class="flex-shrink-0">
+      <i class="fas fa-exclamation-circle text-red-400"></i>
+    </div>
+    <div class="ml-3">
+      <h3 class="text-sm font-medium text-red-800">Error</h3>
+      <div class="mt-2 text-sm text-red-700">
+        <ul class="list-disc list-inside space-y-1">
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+@endif
+
+@if (session('success'))
+<div class="mb-4 bg-green-50 border border-green-200 rounded-md p-4">
+  <div class="flex">
+    <div class="flex-shrink-0">
+      <i class="fas fa-check-circle text-green-400"></i>
+    </div>
+    <div class="ml-3">
+      <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
+    </div>
+  </div>
+</div>
+@endif
+
 <div class="bg-white shadow rounded-lg">
   <div class="px-4 py-5 sm:p-6">
     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">

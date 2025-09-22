@@ -3,8 +3,9 @@
 @section('title', 'Stock Transfers')
 
 @section('actions')
-<a href="{{ route('stock-transfers.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-    <i class="fas fa-plus mr-2"></i> New Transfer
+<a href="{{ route('stock-transfers.create') }}" class="btn btn-create">
+    <i class="btn-icon fa-solid fa-plus"></i>
+    New Transfer
 </a>
 @endsection
 
@@ -27,18 +28,34 @@
           @forelse($transfers as $transfer)
           <tr class="hover:bg-gray-50">
             <td class="px-6 py-4 whitespace-nowrap">{{ $transfer->transfer_number }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">{{ $transfer->transfer_date->format('Y-m-d') }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ optional($transfer->transfer_date instanceof \Carbon\Carbon ? $transfer->transfer_date : \Carbon\Carbon::parse($transfer->transfer_date))->format('Y-m-d') }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ $transfer->fromDepartment->name ?? '-' }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ $transfer->toDepartment->name ?? '-' }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ ucfirst(str_replace('_', ' ', $transfer->status)) }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <a href="{{ route('stock-transfers.show', $transfer) }}" class="text-blue-600 hover:text-blue-900"><i class="fas fa-eye"></i></a>
-              <a href="{{ route('stock-transfers.edit', $transfer) }}" class="text-yellow-600 hover:text-yellow-900 ml-3"><i class="fas fa-edit"></i></a>
+              <div class="flex space-x-2">
+                <a href="{{ route('stock-transfers.show', $transfer) }}" class="btn btn-view">
+                  <i class="btn-icon fa-regular fa-eye"></i>
+                  View
+                </a>
+                <a href="{{ route('stock-transfers.edit', $transfer) }}" class="btn btn-edit">
+                  <i class="btn-icon fa-solid fa-pen"></i>
+                  Edit
+                </a>
+              </div>
             </td>
           </tr>
           @empty
           <tr>
-            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">No transfers found.</td>
+            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+              <div class="flex flex-col items-center space-y-4">
+                <p>No transfers found.</p>
+                <a href="{{ route('stock-transfers.create') }}" class="btn btn-create">
+                  <i class="btn-icon fa-solid fa-plus"></i>
+                  Create Transfer
+                </a>
+              </div>
+            </td>
           </tr>
           @endforelse
         </tbody>

@@ -13,9 +13,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\UomService;
+use App\Http\Controllers\Concerns\HasBreadcrumbs;
 
 class GoodsReceiptController extends Controller
 {
+    use HasBreadcrumbs;
     public function __construct()
     {
         $this->middleware(['auth', 'verified']);
@@ -51,11 +53,8 @@ class GoodsReceiptController extends Controller
         $departments = Department::ordered()->get();
         $suppliers = Supplier::active()->ordered()->get();
 
-        $breadcrumbs = [
-            ['title' => 'Inventory', 'url' => route('inventory.index'), 'current' => false],
-            ['title' => 'Goods Receipts', 'url' => null, 'current' => true],
-        ];
-        return view('goods-receipts.index', compact('receipts', 'departments', 'breadcrumbs'));
+        $breadcrumbs = $this->setBreadcrumbs('goods-receipts.index');
+        return view('goods-receipts.index', compact('receipts', 'departments', 'suppliers') + $breadcrumbs);
     }
 
     public function create()
@@ -69,12 +68,9 @@ class GoodsReceiptController extends Controller
         $departments = Department::ordered()->get();
         $products = Product::ordered()->get();
         $suppliers = Supplier::active()->ordered()->get();
-        $breadcrumbs = [
-            ['title' => 'Inventory', 'url' => route('inventory.index'), 'current' => false],
-            ['title' => 'Goods Receipts', 'url' => route('goods-receipts.index'), 'current' => false],
-            ['title' => 'Create Receipt', 'url' => null, 'current' => true],
-        ];
-        return view('goods-receipts.create', compact('departments', 'products', 'suppliers', 'defaultDepartment', 'breadcrumbs'));
+        
+        $breadcrumbs = $this->setBreadcrumbs('goods-receipts.create');
+        return view('goods-receipts.create', compact('departments', 'products', 'suppliers', 'defaultDepartment') + $breadcrumbs);
     }
 
     public function store(Request $request)
@@ -136,12 +132,9 @@ class GoodsReceiptController extends Controller
     public function show(GoodsReceipt $goods_receipt)
     {
         $goods_receipt->load(['items.product', 'department', 'supplier']);
-        $breadcrumbs = [
-            ['title' => 'Inventory', 'url' => route('inventory.index'), 'current' => false],
-            ['title' => 'Goods Receipts', 'url' => route('goods-receipts.index'), 'current' => false],
-            ['title' => $goods_receipt->grn_number, 'url' => null, 'current' => true],
-        ];
-        return view('goods-receipts.show', ['receipt' => $goods_receipt, 'breadcrumbs' => $breadcrumbs]);
+        
+        $breadcrumbs = $this->setBreadcrumbs('goods-receipts.show', ['receipt' => $goods_receipt]);
+        return view('goods-receipts.show', ['receipt' => $goods_receipt] + $breadcrumbs);
     }
 
     public function edit(GoodsReceipt $goods_receipt)
@@ -150,13 +143,9 @@ class GoodsReceiptController extends Controller
         $departments = Department::ordered()->get();
         $products = Product::ordered()->get();
         $suppliers = Supplier::active()->ordered()->get();
-        $breadcrumbs = [
-            ['title' => 'Inventory', 'url' => route('inventory.index'), 'current' => false],
-            ['title' => 'Goods Receipts', 'url' => route('goods-receipts.index'), 'current' => false],
-            ['title' => $goods_receipt->grn_number, 'url' => route('goods-receipts.show', $goods_receipt), 'current' => false],
-            ['title' => 'Edit Receipt', 'url' => null, 'current' => true],
-        ];
-        return view('goods-receipts.edit', ['receipt' => $goods_receipt, 'departments' => $departments, 'products' => $products, 'suppliers' => $suppliers, 'breadcrumbs' => $breadcrumbs]);
+        
+        $breadcrumbs = $this->setBreadcrumbs('goods-receipts.edit', ['receipt' => $goods_receipt]);
+        return view('goods-receipts.edit', ['receipt' => $goods_receipt, 'departments' => $departments, 'products' => $products, 'suppliers' => $suppliers] + $breadcrumbs);
     }
 
     public function update(Request $request, GoodsReceipt $goods_receipt)
