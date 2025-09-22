@@ -16,6 +16,8 @@ class SaleItem extends Model
         'sale_id',
         'order_item_id',
         'product_id',
+        'uom_id',
+        'uom_quantity',
         'quantity',
         'unit_price',
         'discount_percent',
@@ -66,6 +68,11 @@ class SaleItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function uom(): BelongsTo
+    {
+        return $this->belongsTo(Uom::class, 'uom_id');
     }
 
     // Scopes

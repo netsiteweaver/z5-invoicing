@@ -66,6 +66,11 @@ class Product extends Model
         return $this->belongsTo(ProductBrand::class, 'brand_id');
     }
 
+    public function uom(): BelongsTo
+    {
+        return $this->belongsTo(Uom::class, 'uom_id');
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

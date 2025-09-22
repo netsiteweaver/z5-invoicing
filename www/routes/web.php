@@ -133,6 +133,7 @@ Route::middleware(['auth', 'verified', 'check.user.status'])->group(function () 
 
     // Payment Terms routes
     Route::resource('payment-terms', \App\Http\Controllers\PaymentTermController::class);
+    Route::resource('uoms', \App\Http\Controllers\UomController::class)->parameters(['uoms' => 'uom']);
 
     // (moved) changelog feed is public
 
