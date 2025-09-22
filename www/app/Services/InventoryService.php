@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Inventory;
 use App\Models\StockMovement;
+use App\Models\Uom;
 use Illuminate\Support\Facades\DB;
 
 class InventoryService

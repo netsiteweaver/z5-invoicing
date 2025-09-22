@@ -87,7 +87,9 @@
 					<thead class="bg-gray-50">
 						<tr>
 							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UOM</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UOM Qty</th>
 							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
 							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount %</th>
 							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VAT</th>
@@ -113,9 +115,20 @@
 										@endforeach
 									</select>
 								</td>
-								<td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-6 py-4 whitespace-nowrap">
 									<input type="number" :name="`items[${index}][quantity]`" x-model="item.quantity" @input="updateItem(index)" min="1" class="block w-20 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
 								</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <select :name="`items[${index}][uom_id]`" x-model="item.uom_id" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                        <option value="">Unit</option>
+                                        @foreach(\App\Models\Uom::orderBy('name')->get() as $u)
+                                            <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->units_per_uom }})</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="number" :name="`items[${index}][uom_quantity]`" x-model="item.uom_quantity" min="1" class="block w-20 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                </td>
 								<td class="px-6 py-4 whitespace-nowrap">
 									<input type="number" :name="`items[${index}][unit_price]`" x-model="item.unit_price" @input="updateItem(index)" step="0.01" min="0" class="block w-24 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
 								</td>

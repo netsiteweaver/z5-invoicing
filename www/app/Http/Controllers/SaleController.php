@@ -103,6 +103,8 @@ class SaleController extends Controller
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
+            'items.*.uom_id' => 'nullable|exists:uoms,id',
+            'items.*.uom_quantity' => 'nullable|integer|min:1',
             'items.*.unit_price' => 'required|numeric|min:0',
             'items.*.discount_percentage' => 'nullable|numeric|min:0|max:100',
             'notes' => 'nullable|string|max:1000',
@@ -159,6 +161,8 @@ class SaleController extends Controller
                 SaleItem::create([
                     'sale_id' => $sale->id,
                     'product_id' => $item['product_id'],
+                    'uom_id' => $item['uom_id'] ?? null,
+                    'uom_quantity' => $item['uom_quantity'] ?? 1,
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
                     'discount_percentage' => $item['discount_percentage'] ?? 0,
@@ -171,10 +175,17 @@ class SaleController extends Controller
                 if (!$departmentId) {
                     throw new \Exception('User is not assigned to any department.');
                 }
+                // Convert to base units if UOM provided
+                $baseQty = (int) $item['quantity'];
+                if (!empty($item['uom_id'])) {
+                    $uom = \App\Models\Uom::find($item['uom_id']);
+                    $uomQty = (int) ($item['uom_quantity'] ?? 1);
+                    if ($uom) { $baseQty = $uomQty * max(1, (int) $uom->units_per_uom); }
+                }
                 $inventoryService->adjustStockOut(
                     (int) $item['product_id'],
                     (int) $departmentId,
-                    (int) $item['quantity'],
+                    (int) $baseQty,
                     [
                         'movement_type' => 'out',
                         'reference_type' => 'sale',
@@ -300,6 +311,8 @@ class SaleController extends Controller
                 SaleItem::create([
                     'sale_id' => $sale->id,
                     'product_id' => $item['product_id'],
+                    'uom_id' => $item['uom_id'] ?? null,
+                    'uom_quantity' => $item['uom_quantity'] ?? 1,
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
                     'discount_percentage' => $item['discount_percentage'] ?? 0,
@@ -308,10 +321,16 @@ class SaleController extends Controller
                 ]);
 
                 // Update inventory for new items
+                $baseQty = (int) $item['quantity'];
+                if (!empty($item['uom_id'])) {
+                    $uom = \App\Models\Uom::find($item['uom_id']);
+                    $uomQty = (int) ($item['uom_quantity'] ?? 1);
+                    if ($uom) { $baseQty = $uomQty * max(1, (int) $uom->units_per_uom); }
+                }
                 $inventoryService->adjustStockOut(
                     (int) $item['product_id'],
                     (int) $departmentId,
-                    (int) $item['quantity'],
+                    (int) $baseQty,
                     [
                         'movement_type' => 'out',
                         'reference_type' => 'sale',

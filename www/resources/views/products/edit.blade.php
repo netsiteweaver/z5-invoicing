@@ -84,6 +84,16 @@
                         @enderror
                     </div>
 
+                    <!-- Default UOM -->
+                    <div>
+                        <label for="uom_id" class="block text-sm font-medium text-gray-700">Default UOM</label>
+                        <select name="uom_id" id="uom_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            @foreach(\App\Models\Uom::orderBy('name')->get() as $u)
+                                <option value="{{ $u->id }}" {{ old('uom_id', $product->uom_id) == $u->id ? 'selected' : '' }}>{{ $u->name }} ({{ $u->units_per_uom }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <!-- Description -->
                     <div class="sm:col-span-2">
                         <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
