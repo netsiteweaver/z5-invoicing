@@ -27,6 +27,20 @@ class Uom extends Model
         'status',
     ];
 
+    // Dimension constants for better type safety
+    const DIMENSION_COUNT = 'count';
+    const DIMENSION_WEIGHT = 'weight';
+    const DIMENSION_VOLUME = 'volume';
+    const DIMENSION_LENGTH = 'length';
+
+    // Base units for each dimension
+    const BASE_UNITS = [
+        self::DIMENSION_COUNT => 'unit',
+        self::DIMENSION_WEIGHT => 'gram',
+        self::DIMENSION_VOLUME => 'milliliter',
+        self::DIMENSION_LENGTH => 'millimeter',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -84,6 +98,52 @@ class Uom extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('name');
+    }
+
+    public function scopeByDimension($query, string $dimension)
+    {
+        return $query->where('dimension_code', $dimension);
+    }
+
+    // Helper methods
+    public function getDimensionNameAttribute(): string
+    {
+        return match($this->dimension_code) {
+            self::DIMENSION_COUNT => 'Count',
+            self::DIMENSION_WEIGHT => 'Weight',
+            self::DIMENSION_VOLUME => 'Volume',
+            self::DIMENSION_LENGTH => 'Length',
+            default => 'Unknown'
+        };
+    }
+
+    public function getBaseUnitAttribute(): string
+    {
+        return self::BASE_UNITS[$this->dimension_code] ?? 'unit';
+    }
+
+    public function isCompatibleWith(Uom $other): bool
+    {
+        return $this->dimension_code === $other->dimension_code;
+    }
+
+    public function convertTo(float $value, Uom $targetUom): float
+    {
+        if (!$this->isCompatibleWith($targetUom)) {
+            throw new \InvalidArgumentException("Cannot convert between different dimensions: {$this->dimension_code} and {$targetUom->dimension_code}");
+        }
+
+        return \App\Services\UomService::convert($value, $this->id, $targetUom->id);
+    }
+
+    public function toBaseValue(float $value): float
+    {
+        return \App\Services\UomService::toBaseValue($value, $this->id);
+    }
+
+    public function fromBaseValue(float $baseValue): float
+    {
+        return \App\Services\UomService::fromBaseValue($baseValue, $this->id);
     }
 }
 

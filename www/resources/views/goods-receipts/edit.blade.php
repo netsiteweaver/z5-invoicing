@@ -176,18 +176,40 @@ document.addEventListener('change', function(e) {
 });
 
 // Recalculate line total for a row (including VAT)
-function recalcRow(row) {
+async function recalcRow(row) {
   const qty = parseFloat((row.querySelector('.gr-qty')?.value || '0')) || 0;
   const cost = parseFloat((row.querySelector('.gr-unit-cost')?.value || '0')) || 0;
   const gross = qty * cost;
-  const vatRate = getVatRateForRow(row);
-  const vatAmount = gross * vatRate;
-  const totalWithVat = gross + vatAmount;
+  const taxType = getTaxTypeForRow(row);
   
   const totalEl = row.querySelector('.gr-line-total');
   if (totalEl) {
-    totalEl.textContent = totalWithVat.toFixed(2);
-    totalEl.setAttribute('title', `Gross: ${gross.toFixed(2)} + VAT (${(vatRate * 100).toFixed(1)}%): ${vatAmount.toFixed(2)}`);
+    // Use VAT API for accurate calculations
+    try {
+      const response = await fetch('{{ url("/api/vat/calculate") }}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          amount: gross,
+          tax_type: taxType,
+          calculation_type: 'exclusive'
+        })
+      });
+      const vatData = await response.json();
+      totalEl.textContent = vatData.inclusive_price.toFixed(2);
+      totalEl.setAttribute('title', `Gross: ${gross.toFixed(2)} + VAT (${vatData.vat_rate_percent}%): ${vatData.vat_amount.toFixed(2)}`);
+    } catch (error) {
+      console.error('VAT calculation error:', error);
+      // Fallback to manual calculation
+      const vatRate = getVatRateForRow(row);
+      const vatAmount = gross * vatRate;
+      const totalWithVat = gross + vatAmount;
+      totalEl.textContent = totalWithVat.toFixed(2);
+      totalEl.setAttribute('title', `Gross: ${gross.toFixed(2)} + VAT (${(vatRate * 100).toFixed(1)}%): ${vatAmount.toFixed(2)}`);
+    }
   }
 }
 
@@ -237,6 +259,10 @@ function getVatRateForRow(row) {
   const taxType = row?.getAttribute('data-tax-type') || row?.querySelector('.gr-product-select')?.selectedOptions[0]?.getAttribute('data-tax') || 'standard';
   if (taxType === 'standard') return DEFAULT_VAT_RATE;
   return 0;
+}
+
+function getTaxTypeForRow(row) {
+  return row?.getAttribute('data-tax-type') || row?.querySelector('.gr-product-select')?.selectedOptions[0]?.getAttribute('data-tax') || 'standard';
 }
 
 // Initialize totals on page load

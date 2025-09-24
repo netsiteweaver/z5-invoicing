@@ -20,6 +20,16 @@
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search UOMs..." class="mt-1 block w-64 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                     <button class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50">Search</button>
                 </div>
+                <div class="flex items-center space-x-2">
+                    <select name="dimension" class="mt-1 block w-48 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">All Dimensions</option>
+                        @foreach($dimensions as $dimension)
+                            <option value="{{ $dimension }}" {{ request('dimension') == $dimension ? 'selected' : '' }}>
+                                {{ ucfirst($dimension) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="flex items-center">
                     <input type="checkbox" name="show_inactive" value="1" {{ request('show_inactive') == '1' ? 'checked' : '' }} id="show_inactive" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" onchange="this.form.submit()">
                     <label for="show_inactive" class="ml-2 text-sm text-gray-700">Show inactive UOMs</label>
@@ -32,6 +42,8 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dimension</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factor to Base</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Units/UOM</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -41,7 +53,17 @@
                     @foreach($uoms as $uom)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $uom->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $uom->code }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    {{ $uom->code }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    {{ $uom->dimension_name }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ number_format($uom->factor_to_base, 6) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $uom->units_per_uom }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">{!! $uom->status ? '<span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Active</span>' : '<span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">Inactive</span>' !!}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">

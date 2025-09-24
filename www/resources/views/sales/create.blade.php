@@ -200,7 +200,7 @@ function saleForm() {
 		form: { customer_id: '', sale_date: '{{ date('Y-m-d') }}', payment_term_id: '{{ optional($paymentTerms->firstWhere('is_default', true))->id }}', due_date: '', items: [], subtotal: 0, total_discount: 0, total_tax: 0, total_amount: 0 },
 		addItem() { this.form.items.push({ product_id: '', quantity: 1, unit_price: 0, discount_percentage: 0, tax_type: 'standard', line_total: 0 }); },
 		removeItem(index) { this.form.items.splice(index, 1); this.calculateTotals(); },
-		updateItem(index) {
+		async updateItem(index) {
 			const item = this.form.items[index];
 			const sel = document.querySelector(`select[name="items[${index}][product_id]"]`);
 			if (sel && sel.selectedOptions[0]) {
@@ -211,11 +211,33 @@ function saleForm() {
 			const qty = parseFloat(item.quantity) || 0;
 			const price = parseFloat(item.unit_price) || 0;
 			const discPct = parseFloat(item.discount_percentage) || 0;
-			const taxPct = (item.tax_type === 'standard') ? 15 : 0;
 			const lineSub = qty * price;
 			const discAmt = lineSub * (discPct / 100);
-			const taxAmt = (lineSub - discAmt) * (taxPct / 100);
-			item.line_total = lineSub - discAmt + taxAmt;
+			const netAmount = lineSub - discAmt;
+			
+			// Use VAT API for accurate calculations
+			try {
+				const response = await fetch('{{ url("/api/vat/calculate") }}', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+					},
+					body: JSON.stringify({
+						amount: netAmount,
+						tax_type: item.tax_type,
+						calculation_type: 'exclusive'
+					})
+				});
+				const vatData = await response.json();
+				item.line_total = vatData.inclusive_price;
+			} catch (error) {
+				console.error('VAT calculation error:', error);
+				// Fallback to manual calculation
+				const taxPct = (item.tax_type === 'standard') ? 15 : 0;
+				const taxAmt = netAmount * (taxPct / 100);
+				item.line_total = netAmount + taxAmt;
+			}
 			this.calculateTotals();
 		},
 		calculateTotals() {

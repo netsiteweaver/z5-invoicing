@@ -65,6 +65,61 @@ class GoodsReceiptItem extends Model
     {
         return $this->belongsTo(Uom::class, 'uom_id');
     }
+
+    // Helper methods for UOM management
+    public function getBaseQuantityAttribute(): int
+    {
+        return \App\Services\UomService::toBaseUnits(
+            $this->quantity, 
+            $this->uom_id, 
+            $this->uom_quantity
+        );
+    }
+
+    public function getDisplayQuantityAttribute(): string
+    {
+        $uom = $this->uom;
+        if (!$uom) {
+            return $this->quantity . ' units';
+        }
+        
+        return $this->quantity . ' ' . $uom->name;
+    }
+
+    public function getTotalCostAttribute(): float
+    {
+        return $this->quantity * $this->unit_cost;
+    }
+
+    public function getBaseUnitCostAttribute(): float
+    {
+        if ($this->base_quantity == 0) {
+            return 0;
+        }
+        
+        return $this->total_cost / $this->base_quantity;
+    }
+
+    // Convert this item's quantity to a different UOM
+    public function convertToUom(Uom $targetUom): float
+    {
+        if (!$this->uom || !$this->uom->isCompatibleWith($targetUom)) {
+            throw new \InvalidArgumentException('Cannot convert between incompatible UOMs');
+        }
+
+        return $this->uom->convertTo($this->quantity, $targetUom);
+    }
+
+    // Get available UOMs for this product's dimension
+    public function getAvailableUoms()
+    {
+        if (!$this->product || !$this->product->uom) {
+            return collect();
+        }
+
+        return Uom::byDimension($this->product->uom->dimension_code)
+            ->active()
+            ->ordered()
+            ->get();
+    }
 }
-
-

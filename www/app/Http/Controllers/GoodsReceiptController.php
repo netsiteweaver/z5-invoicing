@@ -184,15 +184,10 @@ class GoodsReceiptController extends Controller
                 $unitCost = (float) ($itemData['unit_cost'] ?? 0);
                 $lineTotal = $quantity * $unitCost;
                 
-                // Calculate tax
+                // Calculate tax using VatCalculationService
                 $taxType = $product?->tax_type ?? 'standard';
-                $taxPercent = match ($taxType) {
-                    'standard' => 15,
-                    'zero' => 0,
-                    'exempt' => 0,
-                    default => 0,
-                };
-                $taxAmount = $lineTotal * ($taxPercent / 100);
+                $taxAmount = \App\Services\VatCalculationService::calculateVatAmount($lineTotal, $taxType);
+                $taxPercent = \App\Services\VatCalculationService::getVatRate($taxType) * 100;
                 
                 $subtotal += $lineTotal;
                 $totalTax += $taxAmount;

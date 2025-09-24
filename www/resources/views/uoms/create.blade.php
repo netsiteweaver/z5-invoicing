@@ -18,9 +18,37 @@
                 @error('code')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
+                <label class="block text-sm font-medium text-gray-700">Dimension <span class="text-red-500">*</span></label>
+                <select name="dimension_code" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                    <option value="count" {{ old('dimension_code') == 'count' ? 'selected' : '' }}>Count</option>
+                    <option value="weight" {{ old('dimension_code') == 'weight' ? 'selected' : '' }}>Weight</option>
+                    <option value="volume" {{ old('dimension_code') == 'volume' ? 'selected' : '' }}>Volume</option>
+                    <option value="length" {{ old('dimension_code') == 'length' ? 'selected' : '' }}>Length</option>
+                </select>
+                @error('dimension_code')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
                 <label class="block text-sm font-medium text-gray-700">Units per UOM <span class="text-red-500">*</span></label>
                 <input type="number" name="units_per_uom" value="{{ old('units_per_uom', 1) }}" min="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
                 @error('units_per_uom')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Factor to Base <span class="text-red-500">*</span></label>
+                <input type="number" name="factor_to_base" value="{{ old('factor_to_base', 1) }}" step="0.000001" min="0.000001" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                <p class="mt-1 text-xs text-gray-500">Conversion factor to base unit (e.g., 1000 for kg to g)</p>
+                @error('factor_to_base')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Offset to Base</label>
+                <input type="number" name="offset_to_base" value="{{ old('offset_to_base', 0) }}" step="0.000001" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <p class="mt-1 text-xs text-gray-500">Offset value (usually 0 for most units)</p>
+                @error('offset_to_base')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Minimum Increment</label>
+                <input type="number" name="min_increment" value="{{ old('min_increment') }}" step="0.000001" min="0.000001" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <p class="mt-1 text-xs text-gray-500">Minimum increment for this unit (e.g., 0.01 for currency)</p>
+                @error('min_increment')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700">Status</label>

@@ -31,9 +31,31 @@
                     </dd>
                 </div>
                 <div>
+                    <dt class="text-sm font-medium text-gray-500">Dimension</dt>
+                    <dd class="text-sm text-gray-900">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            {{ $uom->dimension_name }}
+                        </span>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Factor to Base</dt>
+                    <dd class="text-sm text-gray-900">{{ number_format($uom->factor_to_base, 6) }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Offset to Base</dt>
+                    <dd class="text-sm text-gray-900">{{ number_format($uom->offset_to_base, 6) }}</dd>
+                </div>
+                <div>
                     <dt class="text-sm font-medium text-gray-500">Units per UOM</dt>
                     <dd class="text-sm text-gray-900">{{ $uom->units_per_uom }}</dd>
                 </div>
+                @if($uom->min_increment)
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Minimum Increment</dt>
+                    <dd class="text-sm text-gray-900">{{ number_format($uom->min_increment, 6) }}</dd>
+                </div>
+                @endif
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Status</dt>
                     <dd class="text-sm text-gray-900">
@@ -72,7 +94,7 @@
                 @method('DELETE')
                 <button type="submit" class="btn btn-delete">
                     <i class="btn-icon fa-solid fa-trash"></i>
-                    Deactivate
+                    Delete
                 </button>
             </form>
         </div>

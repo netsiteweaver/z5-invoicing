@@ -28,6 +28,11 @@ class UomController extends Controller
             $query->where('status', 1);
         }
         
+        // Filter by dimension if specified
+        if ($request->filled('dimension')) {
+            $query->where('dimension_code', $request->dimension);
+        }
+        
         if ($request->filled('search')) {
             $s = $request->search;
             $query->where(function ($q) use ($s) {
@@ -37,11 +42,18 @@ class UomController extends Controller
             });
         }
 
-        $uoms = $query->orderBy('name')->paginate(20);
+        $uoms = $query->orderBy('dimension_code')->orderBy('name')->paginate(20);
+        
+        // Get available dimensions for filter
+        $dimensions = Uom::select('dimension_code')
+            ->distinct()
+            ->where('status', 1)
+            ->orderBy('dimension_code')
+            ->pluck('dimension_code');
 
         $breadcrumbs = $this->setBreadcrumbs('uoms.index');
 
-        return view('uoms.index', compact('uoms') + $breadcrumbs);
+        return view('uoms.index', compact('uoms', 'dimensions') + $breadcrumbs);
     }
 
     public function show(Uom $uom)
@@ -65,6 +77,10 @@ class UomController extends Controller
             'code' => 'required|string|max:50|unique:uoms,code',
             'description' => 'nullable|string|max:255',
             'units_per_uom' => 'required|integer|min:1',
+            'dimension_code' => 'required|string|in:count,weight,volume,length',
+            'factor_to_base' => 'required|numeric|min:0.000001',
+            'offset_to_base' => 'nullable|numeric',
+            'min_increment' => 'nullable|numeric|min:0.000001',
             'status' => 'nullable|in:0,1',
         ]);
 
@@ -73,6 +89,7 @@ class UomController extends Controller
 
         $validated['created_by'] = auth()->id();
         $validated['status'] = (int) ($validated['status'] ?? 1);
+        $validated['offset_to_base'] = $validated['offset_to_base'] ?? 0;
 
         Uom::create($validated);
 
@@ -93,6 +110,10 @@ class UomController extends Controller
             'code' => 'required|string|max:50|unique:uoms,code,' . $uom->id,
             'description' => 'nullable|string|max:255',
             'units_per_uom' => 'required|integer|min:1',
+            'dimension_code' => 'required|string|in:count,weight,volume,length',
+            'factor_to_base' => 'required|numeric|min:0.000001',
+            'offset_to_base' => 'nullable|numeric',
+            'min_increment' => 'nullable|numeric|min:0.000001',
             'status' => 'nullable|in:0,1',
         ]);
 
@@ -101,6 +122,7 @@ class UomController extends Controller
 
         $validated['updated_by'] = auth()->id();
         $validated['status'] = (int) ($validated['status'] ?? 1);
+        $validated['offset_to_base'] = $validated['offset_to_base'] ?? 0;
 
         $uom->update($validated);
 

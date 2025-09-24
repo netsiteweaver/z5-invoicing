@@ -119,13 +119,8 @@ class OrderController extends Controller
             $totalDiscount += $discountAmount;
             $product = Product::find($item['product_id']);
             $taxType = $product?->tax_type ?? 'standard';
-            $taxPercent = match ($taxType) {
-                'standard' => 15,
-                'zero' => 0,
-                'exempt' => 0,
-                default => 0,
-            };
-            $taxAmount = ($lineTotal - $discountAmount) * ($taxPercent / 100);
+            $taxPercent = \App\Services\VatCalculationService::getVatRate($taxType) * 100;
+            $taxAmount = \App\Services\VatCalculationService::calculateVatAmount($lineTotal - $discountAmount, $taxType);
             $totalTax += $taxAmount;
         }
 
@@ -149,13 +144,8 @@ class OrderController extends Controller
             $discountAmount = $lineTotal * ($item['discount_percent'] ?? 0) / 100;
             $product = Product::find($item['product_id']);
             $taxType = $product?->tax_type ?? 'standard';
-            $taxPercent = match ($taxType) {
-                'standard' => 15,
-                'zero' => 0,
-                'exempt' => 0,
-                default => 0,
-            };
-            $taxAmount = ($lineTotal - $discountAmount) * ($taxPercent / 100);
+            $taxPercent = \App\Services\VatCalculationService::getVatRate($taxType) * 100;
+            $taxAmount = \App\Services\VatCalculationService::calculateVatAmount($lineTotal - $discountAmount, $taxType);
             
             $order->items()->create([
                 'product_id' => $item['product_id'],
@@ -245,13 +235,8 @@ class OrderController extends Controller
             $totalDiscount += $discountAmount;
             $product = Product::find($item['product_id']);
             $taxType = $product?->tax_type ?? 'standard';
-            $taxPercent = match ($taxType) {
-                'standard' => 15,
-                'zero' => 0,
-                'exempt' => 0,
-                default => 0,
-            };
-            $taxAmount = ($lineTotal - $discountAmount) * ($taxPercent / 100);
+            $taxPercent = \App\Services\VatCalculationService::getVatRate($taxType) * 100;
+            $taxAmount = \App\Services\VatCalculationService::calculateVatAmount($lineTotal - $discountAmount, $taxType);
             $totalTax += $taxAmount;
         }
 
@@ -272,13 +257,8 @@ class OrderController extends Controller
             $discountAmount = $lineTotal * ($item['discount_percent'] ?? 0) / 100;
             $product = Product::find($item['product_id']);
             $taxType = $product?->tax_type ?? 'standard';
-            $taxPercent = match ($taxType) {
-                'standard' => 15,
-                'zero' => 0,
-                'exempt' => 0,
-                default => 0,
-            };
-            $taxAmount = ($lineTotal - $discountAmount) * ($taxPercent / 100);
+            $taxPercent = \App\Services\VatCalculationService::getVatRate($taxType) * 100;
+            $taxAmount = \App\Services\VatCalculationService::calculateVatAmount($lineTotal - $discountAmount, $taxType);
             
             $order->items()->create([
                 'product_id' => $item['product_id'],

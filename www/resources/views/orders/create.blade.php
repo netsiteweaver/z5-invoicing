@@ -138,7 +138,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <select :name="`items[${index}][product_id]`" 
                                             x-model="item.product_id"
-                                            @change="updateItem(index)"
+                                            @change="await updateItem(index)"
                                             class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                         <option value="">Select Product</option>
                                         @foreach($products as $product)
@@ -348,10 +348,10 @@ function orderForm() {
 
         removeItem(index) {
             this.form.items.splice(index, 1);
-            this.calculateTotals();
+            await this.calculateTotals();
         },
 
-        updateItem(index) {
+        async updateItem(index) {
             const item = this.form.items[index];
             const productSelect = document.querySelector(`select[name="items[${index}][product_id]"]`);
             
@@ -366,14 +366,36 @@ function orderForm() {
             const quantity = parseFloat(item.quantity) || 0;
             const unitPrice = parseFloat(item.unit_price) || 0;
             const discountPercent = parseFloat(item.discount_percent) || 0;
-            const taxPercent = (item.tax_type === 'standard') ? 15 : 0;
             
             const lineSubtotal = quantity * unitPrice;
             const discountAmount = lineSubtotal * (discountPercent / 100);
-            const taxAmount = (lineSubtotal - discountAmount) * (taxPercent / 100);
-            item.line_total = lineSubtotal - discountAmount + taxAmount;
+            const netAmount = lineSubtotal - discountAmount;
             
-            this.calculateTotals();
+            // Use VAT API for accurate calculations
+            try {
+                const response = await fetch('{{ url("/api/vat/calculate") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        amount: netAmount,
+                        tax_type: item.tax_type,
+                        calculation_type: 'exclusive'
+                    })
+                });
+                const vatData = await response.json();
+                item.line_total = vatData.inclusive_price;
+            } catch (error) {
+                console.error('VAT calculation error:', error);
+                // Fallback to manual calculation
+                const taxPercent = (item.tax_type === 'standard') ? 15 : 0;
+                const taxAmount = netAmount * (taxPercent / 100);
+                item.line_total = netAmount + taxAmount;
+            }
+            
+            await this.calculateTotals();
         },
 
         async openHistory(index) {
@@ -421,7 +443,7 @@ function orderForm() {
             this.historyOpen = false;
         },
 
-        calculateTotals() {
+        async calculateTotals() {
             this.form.subtotal = this.form.items.reduce((sum, item) => {
                 const quantity = parseFloat(item.quantity) || 0;
                 const unitPrice = parseFloat(item.unit_price) || 0;
@@ -436,15 +458,38 @@ function orderForm() {
                 return sum + (lineSubtotal * (discountPercent / 100));
             }, 0);
 
-            const totalTax = this.form.items.reduce((sum, item) => {
+            // Calculate total tax using VAT API for each item
+            let totalTax = 0;
+            for (const item of this.form.items) {
                 const quantity = parseFloat(item.quantity) || 0;
                 const unitPrice = parseFloat(item.unit_price) || 0;
                 const discountPercent = parseFloat(item.discount_percent) || 0;
-                const taxPercent = (item.tax_type === 'standard') ? 15 : 0;
                 const lineSubtotal = quantity * unitPrice;
                 const discountAmount = lineSubtotal * (discountPercent / 100);
-                return sum + ((lineSubtotal - discountAmount) * (taxPercent / 100));
-            }, 0);
+                const netAmount = lineSubtotal - discountAmount;
+                
+                try {
+                    const response = await fetch('{{ url("/api/vat/calculate") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            amount: netAmount,
+                            tax_type: item.tax_type,
+                            calculation_type: 'exclusive'
+                        })
+                    });
+                    const vatData = await response.json();
+                    totalTax += vatData.vat_amount;
+                } catch (error) {
+                    console.error('VAT calculation error:', error);
+                    // Fallback to manual calculation
+                    const taxPercent = (item.tax_type === 'standard') ? 15 : 0;
+                    totalTax += netAmount * (taxPercent / 100);
+                }
+            }
             this.form.total_tax = totalTax;
             this.form.total_amount = this.form.subtotal - this.form.total_discount + totalTax;
         },

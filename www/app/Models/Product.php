@@ -160,4 +160,42 @@ class Product extends Model
     {
         return "{$this->name} ({$this->stockref})";
     }
+
+    // VAT calculation methods
+    public function getVatRateAttribute(): float
+    {
+        return \App\Services\VatCalculationService::getVatRate($this->tax_type);
+    }
+
+    public function getVatAmountAttribute(): float
+    {
+        return \App\Services\VatCalculationService::calculateVatAmount($this->cost_price, $this->tax_type);
+    }
+
+    public function getCostPriceInclusiveAttribute(): float
+    {
+        return \App\Services\VatCalculationService::calculateInclusivePrice($this->cost_price, $this->tax_type);
+    }
+
+    public function getSellingPriceInclusiveAttribute(): float
+    {
+        return \App\Services\VatCalculationService::calculateInclusivePrice($this->selling_price, $this->tax_type);
+    }
+
+    public function getVatBreakdownAttribute(): array
+    {
+        return \App\Services\VatCalculationService::getVatBreakdown($this->cost_price, $this->tax_type);
+    }
+
+    // Helper method to convert user input to storage format
+    public static function convertUserInputToExclusive(float $userInput, string $inputType = 'inclusive', string $taxType = 'standard'): float
+    {
+        return \App\Services\VatCalculationService::convertUserInputToExclusive($userInput, $inputType, $taxType);
+    }
+
+    // Helper method to convert storage format to display format
+    public function getDisplayPrice(string $displayType = 'inclusive'): float
+    {
+        return \App\Services\VatCalculationService::convertExclusiveToDisplay($this->cost_price, $displayType, $this->tax_type);
+    }
 }
