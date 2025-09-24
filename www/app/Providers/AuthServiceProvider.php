@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -21,6 +22,11 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register custom user provider for remember me functionality
+        Auth::provider('custom', function ($app, $config) {
+            return new CustomUserProvider($app['hash'], $config['model']);
+        });
+
         // Delegate all ability checks to our custom permission system
         Gate::before(function ($user, string $ability) {
             try {
