@@ -599,6 +599,52 @@
             <main class="flex-1 overflow-y-auto bg-gray-50">
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        @if(session('success'))
+                        <div class="mb-4 rounded-md bg-green-50 p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-check-circle text-green-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
+                        @if(session('error'))
+                        <div class="mb-4 rounded-md bg-red-50 p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-red-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
+                        @if ($errors->any())
+                        <div class="mb-4 rounded-md bg-red-50 p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-times-circle text-red-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">There were some problems with your input:</h3>
+                                    <div class="mt-2 text-sm text-red-700">
+                                        <ul class="list-disc pl-5 space-y-1">
+                                            @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
                         @yield('content')
                         @include('components.release-notes-modal')
                     </div>
@@ -609,7 +655,7 @@
             <div class="bg-white border-t border-gray-200">
                 <div class="px-4 py-2 text-xs text-gray-500 flex items-center justify-between">
                     <span>{{ config('app.name') }}</span>
-                    <span>Version {{ config('app.version') }}</span>
+                    <span x-data="{v:''}" x-init="(async()=>{try{const r=await fetch('{{ route('changelog.feed') }}',{cache:'no-cache'});if(r.ok){const d=await r.json();v=(d.releases?.[0]?.version)||''}}catch(e){}})()">Version <span x-text="v || '–'"></span></span>
                 </div>
             </div>
 

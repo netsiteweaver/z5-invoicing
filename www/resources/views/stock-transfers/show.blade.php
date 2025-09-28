@@ -4,10 +4,12 @@
 
 @section('actions')
 <div class="flex space-x-2">
+  @if($transfer->status !== 'received')
   <a href="{{ route('stock-transfers.edit', $transfer) }}" class="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-amber-600 hover:bg-amber-700">
     <i class="fas fa-pen mr-2"></i>
     Edit
   </a>
+  @endif
   <a href="{{ route('stock-transfers.print', $transfer) }}" class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
     <i class="fas fa-print mr-2"></i>
     Print

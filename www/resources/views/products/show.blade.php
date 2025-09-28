@@ -134,13 +134,13 @@
             </div>
 
             <!-- Stock Information -->
-            @if($product->inventory->count() > 0)
+            @if(isset($inventoryActive) && $inventoryActive->count() > 0)
                 <div class="bg-white shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Stock Levels</h3>
                         
                         <div class="space-y-3">
-                            @foreach($product->inventory as $inventory)
+                            @foreach($inventoryActive as $inventory)
                                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                     <div>
                                         <p class="text-sm font-medium text-gray-900">{{ $inventory->department->name ?? 'Unknown Department' }}</p>

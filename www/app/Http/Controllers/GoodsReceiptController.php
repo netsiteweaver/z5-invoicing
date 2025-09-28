@@ -139,6 +139,10 @@ class GoodsReceiptController extends Controller
 
     public function edit(GoodsReceipt $goods_receipt)
     {
+        if ($goods_receipt->approval_status === 'approved') {
+            return redirect()->route('goods-receipts.show', $goods_receipt)
+                ->withErrors(['error' => 'This goods receipt has been approved and cannot be edited.']);
+        }
         $goods_receipt->load(['items']);
         $departments = Department::ordered()->get();
         $products = Product::ordered()->get();
@@ -150,6 +154,10 @@ class GoodsReceiptController extends Controller
 
     public function update(Request $request, GoodsReceipt $goods_receipt)
     {
+        if ($goods_receipt->approval_status === 'approved') {
+            return redirect()->route('goods-receipts.show', $goods_receipt)
+                ->withErrors(['error' => 'This goods receipt has been approved and cannot be edited.']);
+        }
         $request->validate([
             'receipt_date' => 'required|date',
             'supplier_id' => 'required|exists:suppliers,id',
@@ -224,10 +232,48 @@ class GoodsReceiptController extends Controller
 
     public function destroy(GoodsReceipt $goods_receipt)
     {
+        DB::beginTransaction();
         try {
+            // If approved, reverse inventory movements
+            if (($goods_receipt->approval_status ?? 'submitted') === 'approved') {
+                $goods_receipt->load('items');
+                foreach ($goods_receipt->items as $item) {
+                    $baseQty = \App\Services\UomService::toBaseUnits((int) $item->quantity, $item->uom_id, $item->uom_quantity ?? 1);
+
+                    // Decrement inventory at the receipt location
+                    $inventory = \App\Models\Inventory::where('product_id', $item->product_id)
+                        ->where('department_id', $goods_receipt->department_id)
+                        ->lockForUpdate()
+                        ->first();
+                    if (!$inventory || $inventory->current_stock < $baseQty) {
+                        DB::rollBack();
+                        return back()->withErrors(['error' => 'Insufficient stock to reverse goods receipt for product ID ' . $item->product_id]);
+                    }
+                    $inventory->decrement('current_stock', $baseQty);
+
+                    // Record reversal movement (out)
+                    \App\Models\StockMovement::create([
+                        'product_id' => $item->product_id,
+                        'department_id' => $goods_receipt->department_id,
+                        'movement_type' => 'out',
+                        'quantity' => $baseQty,
+                        'reference_type' => 'adjustment',
+                        'reference_id' => $goods_receipt->id,
+                        'reference_number' => $goods_receipt->grn_number,
+                        'notes' => 'GRN deleted - reversal',
+                        'created_by' => auth()->id(),
+                    ]);
+                }
+            }
+
+            // Delete items and header
+            $goods_receipt->items()->delete();
             $goods_receipt->delete();
-            return redirect()->route('goods-receipts.index')->with('success', 'Goods receipt deleted.');
+
+            DB::commit();
+            return redirect()->route('goods-receipts.index')->with('success', 'Goods receipt deleted and inventory reversed.');
         } catch (\Throwable $e) {
+            DB::rollBack();
             return back()->withErrors(['error' => 'Failed to delete: ' . $e->getMessage()]);
         }
     }

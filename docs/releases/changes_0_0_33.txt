@@ -1,0 +1,12 @@
+2025-09-28 18:00:00
+- uom in stock transfer and goods receipt
+- create sale: initially one item line displayed
+- create order: initially one item line displayed
+- product listing: sort by name
+- deleted departments should not be visible anywhere
+- inventory updated after approving a goods receipt
+- goods receipt cannot be edited after it has been approved
+- inventory updated after marked as received a stock transfer
+- stock transfer cannot be deleted after it has been marked as received
+- inventory listing sorted by product name
+- inventory listing filter issue fixed

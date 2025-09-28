@@ -37,10 +37,22 @@
                   <i class="btn-icon fa-regular fa-eye"></i>
                   View
                 </a>
+                @if(($receipt->approval_status ?? 'submitted') !== 'approved')
                 <a href="{{ route('goods-receipts.edit', $receipt) }}" class="btn btn-edit">
                   <i class="btn-icon fa-solid fa-pen"></i>
                   Edit
                 </a>
+                @endif
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('goods_receipts.delete'))
+                <form method="POST" action="{{ route('goods-receipts.destroy', $receipt) }}" onsubmit="return confirm('Delete this goods receipt? This will reverse inventory if approved.');">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="btn btn-delete">
+                    <i class="btn-icon fa-solid fa-trash"></i>
+                    Delete
+                  </button>
+                </form>
+                @endif
               </div>
             </td>
           </tr>

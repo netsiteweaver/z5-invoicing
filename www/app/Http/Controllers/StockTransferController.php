@@ -34,7 +34,7 @@ class StockTransferController extends Controller
         }
 
         $transfers = $query->paginate(20);
-        $departments = Department::ordered()->get();
+        $departments = Department::active()->ordered()->get();
 
         $breadcrumbs = $this->setBreadcrumbs('stock-transfers.index');
         return view('stock-transfers.index', compact('transfers', 'departments') + $breadcrumbs);
@@ -42,7 +42,7 @@ class StockTransferController extends Controller
 
     public function create()
     {
-        $departments = Department::ordered()->get();
+        $departments = Department::active()->ordered()->get();
         $products = Product::ordered()->get();
         
         $breadcrumbs = $this->setBreadcrumbs('stock-transfers.create');
@@ -54,10 +54,12 @@ class StockTransferController extends Controller
         $request->validate([
             'from_department_id' => 'required|exists:departments,id|different:to_department_id',
             'to_department_id' => 'required|exists:departments,id',
-            'transfer_date' => 'required|date',
+            'transfer_date' => 'required|date|after_or_equal:today',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
+            'items.*.uom_id' => 'nullable|exists:uoms,id',
+            'items.*.uom_quantity' => 'nullable|integer|min:1',
         ]);
 
         DB::beginTransaction();
@@ -78,6 +80,8 @@ class StockTransferController extends Controller
                 $transferItem = StockTransferItem::create([
                     'stock_transfer_id' => $transfer->id,
                     'product_id' => $item['product_id'],
+                    'uom_id' => $item['uom_id'] ?? null,
+                    'uom_quantity' => $item['uom_quantity'] ?? 1,
                     'quantity' => $item['quantity'],
                     'notes' => $item['notes'] ?? null,
                 ]);
@@ -103,6 +107,10 @@ class StockTransferController extends Controller
 
     public function edit(StockTransfer $stock_transfer)
     {
+        if ($stock_transfer->status === 'received') {
+            return redirect()->route('stock-transfers.show', $stock_transfer)
+                ->withErrors(['error' => 'This transfer has been received and cannot be edited.']);
+        }
         $stock_transfer->load('items');
         $departments = Department::ordered()->get();
         $products = Product::ordered()->get();
@@ -113,15 +121,21 @@ class StockTransferController extends Controller
 
     public function update(Request $request, StockTransfer $stock_transfer)
     {
+        if ($stock_transfer->status === 'received') {
+            return redirect()->route('stock-transfers.show', $stock_transfer)
+                ->withErrors(['error' => 'This transfer has been received and cannot be edited.']);
+        }
         $request->validate([
-            'from_department_id' => 'required|exists:departments,id',
+            'from_department_id' => 'required|exists:departments,id|different:to_department_id',
             'to_department_id' => 'required|exists:departments,id',
-            'transfer_date' => 'required|date',
+            'transfer_date' => 'required|date|after_or_equal:today',
             'status' => 'required|in:draft,requested,approved,in_transit,received,cancelled',
             'notes' => 'nullable|string|max:1000',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
+            'items.*.uom_id' => 'nullable|exists:uoms,id',
+            'items.*.uom_quantity' => 'nullable|integer|min:1',
         ]);
 
         DB::beginTransaction();
@@ -142,6 +156,8 @@ class StockTransferController extends Controller
                 StockTransferItem::create([
                     'stock_transfer_id' => $stock_transfer->id,
                     'product_id' => $itemData['product_id'],
+                    'uom_id' => $itemData['uom_id'] ?? null,
+                    'uom_quantity' => $itemData['uom_quantity'] ?? 1,
                     'quantity' => $itemData['quantity'],
                 ]);
             }
@@ -156,10 +172,67 @@ class StockTransferController extends Controller
 
     public function destroy(StockTransfer $stock_transfer)
     {
+        DB::beginTransaction();
         try {
+            // If already received, reverse the movements
+            if ($stock_transfer->status === 'received') {
+                $stock_transfer->load('items');
+                foreach ($stock_transfer->items as $item) {
+                    $baseQty = \App\Services\UomService::toBaseUnits((int) $item->quantity, $item->uom_id, $item->uom_quantity ?? 1);
+
+                    // Reverse: add back to source (in)
+                    $sourceInventory = \App\Models\Inventory::firstOrCreate([
+                        'product_id' => $item->product_id,
+                        'department_id' => $stock_transfer->from_department_id,
+                    ], [
+                        'current_stock' => 0,
+                        'min_stock_level' => 0,
+                        'reorder_point' => 0,
+                        'created_by' => auth()->id(),
+                    ]);
+                    $sourceInventory->increment('current_stock', $baseQty);
+                    StockMovement::create([
+                        'product_id' => $item->product_id,
+                        'department_id' => $stock_transfer->from_department_id,
+                        'movement_type' => 'in',
+                        'quantity' => $baseQty,
+                        'reference_type' => 'transfer_reversal',
+                        'reference_id' => $item->id,
+                        'reference_number' => $stock_transfer->transfer_number,
+                        'notes' => 'Transfer deleted - reversal to source',
+                        'created_by' => auth()->id(),
+                    ]);
+
+                    // Reverse: deduct from destination (out)
+                    $destInventory = \App\Models\Inventory::where('product_id', $item->product_id)
+                        ->where('department_id', $stock_transfer->to_department_id)
+                        ->lockForUpdate()
+                        ->first();
+                    if (!$destInventory || $destInventory->current_stock < $baseQty) {
+                        DB::rollBack();
+                        return back()->withErrors(['error' => 'Insufficient stock at destination to reverse transfer for product ID ' . $item->product_id]);
+                    }
+                    $destInventory->decrement('current_stock', $baseQty);
+                    StockMovement::create([
+                        'product_id' => $item->product_id,
+                        'department_id' => $stock_transfer->to_department_id,
+                        'movement_type' => 'out',
+                        'quantity' => $baseQty,
+                        'reference_type' => 'transfer_reversal',
+                        'reference_id' => $item->id,
+                        'reference_number' => $stock_transfer->transfer_number,
+                        'notes' => 'Transfer deleted - reversal from destination',
+                        'created_by' => auth()->id(),
+                    ]);
+                }
+            }
+
+            $stock_transfer->items()->delete();
             $stock_transfer->delete();
-            return redirect()->route('stock-transfers.index')->with('success', 'Transfer deleted.');
+            DB::commit();
+            return redirect()->route('stock-transfers.index')->with('success', 'Transfer deleted and inventory reversed.');
         } catch (\Throwable $e) {
+            DB::rollBack();
             return back()->withErrors(['error' => 'Failed to delete: ' . $e->getMessage()]);
         }
     }
@@ -180,15 +253,20 @@ class StockTransferController extends Controller
                     ->lockForUpdate()
                     ->first();
                 if (!$sourceInventory || $sourceInventory->current_stock < $item->quantity) {
-                    throw new \RuntimeException('Insufficient stock at source for product ID ' . $item->product_id);
+                    // Compute base quantity in case item quantity is in packs
+                    $baseQty = \App\Services\UomService::toBaseUnits((int) $item->quantity, $item->uom_id, $item->uom_quantity ?? 1);
+                    if (!$sourceInventory || $sourceInventory->current_stock < $baseQty) {
+                        throw new \RuntimeException('Insufficient stock at source for product ID ' . $item->product_id);
+                    }
                 }
-                $sourceInventory->decrement('current_stock', $item->quantity);
+                $baseQty = \App\Services\UomService::toBaseUnits((int) $item->quantity, $item->uom_id, $item->uom_quantity ?? 1);
+                $sourceInventory->decrement('current_stock', $baseQty);
                 StockMovement::create([
                     'product_id' => $item->product_id,
                     'department_id' => $stock_transfer->from_department_id,
-                    'movement_type' => 'transfer_out',
-                    'quantity' => $item->quantity,
-                    'reference_type' => 'stock_transfer',
+                    'movement_type' => 'out',
+                    'quantity' => $baseQty,
+                    'reference_type' => 'transfer',
                     'reference_id' => $item->id,
                     'reference_number' => $stock_transfer->transfer_number,
                     'notes' => 'Transfer out (receive)',
@@ -205,13 +283,13 @@ class StockTransferController extends Controller
                     'reorder_point' => 0,
                     'created_by' => auth()->id(),
                 ]);
-                $destInventory->increment('current_stock', $item->quantity);
+                $destInventory->increment('current_stock', $baseQty);
                 StockMovement::create([
                     'product_id' => $item->product_id,
                     'department_id' => $stock_transfer->to_department_id,
-                    'movement_type' => 'transfer_in',
-                    'quantity' => $item->quantity,
-                    'reference_type' => 'stock_transfer',
+                    'movement_type' => 'in',
+                    'quantity' => $baseQty,
+                    'reference_type' => 'transfer',
                     'reference_id' => $item->id,
                     'reference_number' => $stock_transfer->transfer_number,
                     'notes' => 'Transfer in (receive)',

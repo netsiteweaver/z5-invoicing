@@ -3,7 +3,7 @@
 @section('title', 'Create Order')
 
 @section('content')
-<div class="space-y-6" x-data="orderForm()">
+<div class="space-y-6" x-data="orderForm()" x-init="addItem()">
     <!-- Header -->
     <div class="flex justify-between items-center">
         <div>
@@ -138,7 +138,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <select :name="`items[${index}][product_id]`" 
                                             x-model="item.product_id"
-                                            @change="await updateItem(index)"
+                                            @change="handleProductChange(index)"
                                             class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                         <option value="">Select Product</option>
                                         @foreach($products as $product)
@@ -346,9 +346,13 @@ function orderForm() {
             });
         },
 
-        removeItem(index) {
+        async removeItem(index) {
             this.form.items.splice(index, 1);
             await this.calculateTotals();
+        },
+
+        handleProductChange(index) {
+            this.updateItem(index);
         },
 
         async updateItem(index) {

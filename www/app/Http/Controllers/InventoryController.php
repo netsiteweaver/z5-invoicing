@@ -26,14 +26,16 @@ class InventoryController extends Controller
     use HasBreadcrumbs;
     public function index(Request $request)
     {
-        $query = Inventory::with(['product', 'department']);
+        $query = Inventory::with(['product', 'department'])
+            ->join('products', 'products.id', '=', 'inventory.product_id')
+            ->select('inventory.*');
 
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->search;
             $query->whereHas('product', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%");
+                  ->orWhere('stockref', 'like', "%{$search}%");
             });
         }
 
@@ -57,8 +59,8 @@ class InventoryController extends Controller
             }
         }
 
-        $inventory = $query->orderBy('updated_at', 'desc')->paginate(20);
-        $departments = Department::ordered()->get();
+        $inventory = $query->orderBy('products.name', 'asc')->paginate(20);
+        $departments = Department::active()->ordered()->get();
 
         $breadcrumbs = $this->setBreadcrumbs('inventory.index');
 
@@ -261,8 +263,10 @@ class InventoryController extends Controller
     public function lowStock()
     {
         $lowStockItems = Inventory::with(['product', 'department'])
+            ->join('products', 'products.id', '=', 'inventory.product_id')
+            ->select('inventory.*')
             ->whereRaw('current_stock <= min_stock_level')
-            ->orderBy('current_stock', 'asc')
+            ->orderBy('products.name', 'asc')
             ->get();
 
         return view('inventory.low-stock', compact('lowStockItems'));

@@ -57,7 +57,7 @@ class ProductController extends Controller
             $query->where('status', $request->status);
         }
 
-        $products = $query->active()->latest()->paginate(15);
+        $products = $query->active()->orderBy('name', 'asc')->paginate(15);
         $categories = ProductCategory::active()->ordered()->get();
         $brands = ProductBrand::active()->ordered()->get();
 
@@ -161,11 +161,20 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $product->load(['category', 'brand', 'inventory.department', 'createdBy', 'updatedBy']);
-        
+        $product->load(['category', 'brand', 'createdBy', 'updatedBy']);
+
+        // Load only inventory rows with active departments, ordered by department name
+        $inventoryActive = $product->inventory()
+            ->select('inventory.*')
+            ->join('departments', 'departments.id', '=', 'inventory.department_id')
+            ->where('departments.status', 1)
+            ->orderBy('departments.name', 'asc')
+            ->with('department')
+            ->get();
+
         $breadcrumbs = $this->setBreadcrumbs('products.show', ['product' => $product]);
         
-        return view('products.show', compact('product') + $breadcrumbs);
+        return view('products.show', compact('product', 'inventoryActive') + $breadcrumbs);
     }
 
     /**

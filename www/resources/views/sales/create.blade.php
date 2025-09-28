@@ -3,7 +3,7 @@
 @section('title', 'Create Sale')
 
 @section('content')
-<div class="space-y-6" x-data="saleForm()">
+<div class="space-y-6" x-data="saleForm()" x-init="addItem()">
 	<!-- Header -->
 	<div class="flex justify-between items-center">
 		<div>
@@ -199,7 +199,7 @@ function saleForm() {
 	return {
 		form: { customer_id: '', sale_date: '{{ date('Y-m-d') }}', payment_term_id: '{{ optional($paymentTerms->firstWhere('is_default', true))->id }}', due_date: '', items: [], subtotal: 0, total_discount: 0, total_tax: 0, total_amount: 0 },
 		addItem() { this.form.items.push({ product_id: '', quantity: 1, unit_price: 0, discount_percentage: 0, tax_type: 'standard', line_total: 0 }); },
-		removeItem(index) { this.form.items.splice(index, 1); this.calculateTotals(); },
+        async removeItem(index) { this.form.items.splice(index, 1); await this.calculateTotals(); },
 		async updateItem(index) {
 			const item = this.form.items[index];
 			const sel = document.querySelector(`select[name="items[${index}][product_id]"]`);

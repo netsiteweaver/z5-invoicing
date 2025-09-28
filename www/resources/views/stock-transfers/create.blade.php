@@ -54,7 +54,7 @@
 </form>
 
 <template id="item-template">
-  <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 items-end bg-gray-50 p-3 rounded">
+  <div class="grid grid-cols-1 sm:grid-cols-6 gap-3 items-end bg-gray-50 p-3 rounded">
     <div class="sm:col-span-2">
       <label class="block text-sm font-medium text-gray-700">Product</label>
       <select name="items[IDX][product_id]" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
@@ -68,7 +68,20 @@
       <label class="block text-sm font-medium text-gray-700">Qty</label>
       <input type="number" name="items[IDX][quantity]" min="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
     </div>
-    <div class="flex space-x-2">
+    <div>
+      <label class="block text-sm font-medium text-gray-700">UOM</label>
+      <select name="items[IDX][uom_id]" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        <option value="">Unit</option>
+        @foreach(\App\Models\Uom::orderBy('name')->get() as $u)
+        <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->units_per_uom }})</option>
+        @endforeach
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700">UOM Qty</label>
+      <input type="number" name="items[IDX][uom_quantity]" value="1" min="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+    </div>
+    <div class="sm:col-span-1 flex space-x-2 justify-end sm:justify-start">
       <button type="button" class="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50" onclick="removeItem(this)">Remove</button>
     </div>
   </div>

@@ -15,6 +15,8 @@ class StockTransferItem extends Model
         'uuid',
         'stock_transfer_id',
         'product_id',
+        'uom_id',
+        'uom_quantity',
         'quantity',
         'notes',
     ];
@@ -45,6 +47,11 @@ class StockTransferItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function uom(): BelongsTo
+    {
+        return $this->belongsTo(Uom::class, 'uom_id');
     }
 }
 

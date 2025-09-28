@@ -38,10 +38,22 @@
                   <i class="btn-icon fa-regular fa-eye"></i>
                   View
                 </a>
+                @if($transfer->status !== 'received')
                 <a href="{{ route('stock-transfers.edit', $transfer) }}" class="btn btn-edit">
                   <i class="btn-icon fa-solid fa-pen"></i>
                   Edit
                 </a>
+                @endif
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('stock_transfers.delete'))
+                <form method="POST" action="{{ route('stock-transfers.destroy', $transfer) }}" onsubmit="return confirm('Delete this transfer? This will reverse inventory if already received.');">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="btn btn-delete">
+                    <i class="btn-icon fa-solid fa-trash"></i>
+                    Delete
+                  </button>
+                </form>
+                @endif
               </div>
             </td>
           </tr>
