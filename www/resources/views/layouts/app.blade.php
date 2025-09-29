@@ -422,6 +422,67 @@
                     <p class="text-gray-500 text-xs font-semibold uppercase tracking-wider">System</p>
                 </div>
 
+                <!-- Reports -->
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.view'))
+                <div x-data="{ reportsOpen: {{ request()->routeIs('reports.*') ? 'true' : 'false' }} }">
+                    <button @click="reportsOpen = !reportsOpen" 
+                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('reports.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                        <div class="flex items-center">
+                            <i class="fas fa-chart-bar mr-3 h-5 w-5"></i>
+                            Reports
+                        </div>
+                        <i class="fas fa-chevron-down transition-transform duration-200" :class="reportsOpen ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="reportsOpen" x-transition class="ml-6 mt-1 space-y-1">
+                        <a href="{{ route('reports.index') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            All Reports
+                        </a>
+                        <a href="{{ route('reports.orders') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.orders') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Orders Report
+                        </a>
+                        <a href="{{ route('reports.sales') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.sales') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Sales Report
+                        </a>
+                        <a href="{{ route('reports.goods-receipts') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.goods-receipts') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Goods Receipts
+                        </a>
+                        <a href="{{ route('reports.stock-transfers') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.stock-transfers') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Stock Transfers
+                        </a>
+                        <a href="{{ route('reports.inventory') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.inventory') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Inventory Report
+                        </a>
+                        <a href="{{ route('reports.customers') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.customers') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Customer Analysis
+                        </a>
+                        <a href="{{ route('reports.payments') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.payments') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Payment Analysis
+                        </a>
+                        <a href="{{ route('reports.suppliers') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.suppliers') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Supplier Analysis
+                        </a>
+                    </div>
+                </div>
+                @endif
+
                 <!-- Settings -->
                 @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('settings.view'))
                 <div x-data="{ settingsOpen: {{ request()->routeIs('settings.*') || request()->routeIs('settings.notifications') ? 'true' : 'false' }} }">
