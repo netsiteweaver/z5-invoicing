@@ -222,7 +222,7 @@
                             {{ $product->name }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $product->sku }}
+                            {{ $product->stockref }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ number_format($product->total_quantity) }}

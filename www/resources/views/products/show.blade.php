@@ -64,10 +64,10 @@
                             <dd class="mt-1 text-sm text-gray-900">{{ $product->brand->name ?? 'No brand' }}</dd>
                         </div>
                         
-                        @if($product->sku)
+                        @if($product->stockref)
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">SKU</dt>
-                                <dd class="mt-1 text-sm text-gray-900 font-mono">{{ $product->sku }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900 font-mono">{{ $product->stockref }}</dd>
                             </div>
                         @endif
                         

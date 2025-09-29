@@ -193,7 +193,7 @@
                                 </div>
                                 <div>
                                     <div class="text-sm font-medium text-gray-900">{{ $product->name }}</div>
-                                    <div class="text-sm text-gray-500">{{ $product->sku }}</div>
+                                    <div class="text-sm text-gray-500">{{ $product->stockref }}</div>
                                 </div>
                             </div>
                         </td>

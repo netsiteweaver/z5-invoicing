@@ -175,7 +175,7 @@
                             {{ $item->product->name }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $item->product->sku }}
+                            {{ $item->product->stockref }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ number_format($item->current_stock) }}
@@ -249,7 +249,7 @@
                             {{ $movement->name }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $movement->sku }}
+                            {{ $movement->stockref }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600">
                             {{ number_format($movement->total_in) }}

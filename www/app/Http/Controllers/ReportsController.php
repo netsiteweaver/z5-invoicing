@@ -87,7 +87,7 @@ class ReportsController extends Controller
         // Best seller analysis
         $bestSellers = DB::table('sale_items')
             ->join('products', 'sale_items.product_id', '=', 'products.id')
-            ->select('products.name', 'products.sku', DB::raw('SUM(sale_items.quantity) as total_quantity'), DB::raw('SUM(sale_items.total_price) as total_revenue'))
+            ->select('products.name', 'products.stockref', DB::raw('SUM(sale_items.quantity) as total_quantity'), DB::raw('SUM(sale_items.total_price) as total_revenue'))
             ->when($request->filled('period'), function($query) use ($request) {
                 switch ($request->period) {
                     case 'this_month':
@@ -110,7 +110,7 @@ class ReportsController extends Controller
                         return $query;
                 }
             })
-            ->groupBy('products.id', 'products.name', 'products.sku')
+            ->groupBy('products.id', 'products.name', 'products.stockref')
             ->orderBy('total_quantity', 'desc')
             ->limit(10)
             ->get();
@@ -204,7 +204,7 @@ class ReportsController extends Controller
         // Stock movement analysis
         $stockMovements = DB::table('stock_movements')
             ->join('products', 'stock_movements.product_id', '=', 'products.id')
-            ->select('products.name', 'products.sku', 
+            ->select('products.name', 'products.stockref', 
                     DB::raw('SUM(CASE WHEN type = "in" THEN quantity ELSE 0 END) as total_in'),
                     DB::raw('SUM(CASE WHEN type = "out" THEN quantity ELSE 0 END) as total_out'))
             ->when($request->filled('date_from'), function($query) use ($request) {
@@ -213,7 +213,7 @@ class ReportsController extends Controller
             ->when($request->filled('date_to'), function($query) use ($request) {
                 return $query->whereDate('stock_movements.created_at', '<=', $request->date_to);
             })
-            ->groupBy('products.id', 'products.name', 'products.sku')
+            ->groupBy('products.id', 'products.name', 'products.stockref')
             ->orderBy('total_in', 'desc')
             ->get();
 
