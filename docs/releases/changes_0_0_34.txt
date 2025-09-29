@@ -3,3 +3,12 @@
 - fixed decimal issue in sales and orders
 - prevent process an order if stock not available
 - no payment for orders, only to sales
+- the following reports are ready:
+  - orders
+  - sales
+  - goods receipt
+  - stock transfer
+  - inventory
+  - customers
+  - suppliers
+  - payments

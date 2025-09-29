@@ -127,7 +127,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Low Stock</dt>
-                            <dd class="text-lg font-medium text-gray-900">{{ $inventory->whereColumn('current_stock', '<=', 'min_stock_level')->count() }}</dd>
+                            <dd class="text-lg font-medium text-gray-900">{{ $inventory->filter(function($it){ return ($it->current_stock ?? 0) <= ($it->min_stock_level ?? 0); })->count() }}</dd>
                         </dl>
                     </div>
                 </div>

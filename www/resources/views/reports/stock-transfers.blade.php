@@ -154,7 +154,7 @@
                     @forelse($stockTransfers as $transfer)
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            #{{ $transfer->id }}
+                            {{ $transfer->transfer_number ?? ('#'.$transfer->id) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ $transfer->fromDepartment->name ?? 'Department ' . $transfer->from_department_id }}

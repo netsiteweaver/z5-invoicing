@@ -80,8 +80,8 @@
     </div>
 
     <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="report-cards">
+        <div class="bg-white overflow-hidden shadow rounded-lg p-4 report-card">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -96,7 +96,7 @@
                 </div>
             </div>
         </div>
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-white overflow-hidden shadow rounded-lg p-4 report-card">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -111,7 +111,7 @@
                 </div>
             </div>
         </div>
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-white overflow-hidden shadow rounded-lg p-4 report-card">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -126,7 +126,7 @@
                 </div>
             </div>
         </div>
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-white overflow-hidden shadow rounded-lg p-4 report-card">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -165,10 +165,10 @@
                     @forelse($orders as $order)
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            #{{ $order->id }}
+                            {{ $order->order_number ?? ('#'.$order->id) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ $order->customer->name }}
+                            {{ $order->customer->display_name ?? $order->customer->company_name ?? $order->customer->full_name ?? '—' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ $order->created_at->format('M d, Y') }}

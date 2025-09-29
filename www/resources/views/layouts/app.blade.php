@@ -454,6 +454,11 @@
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Goods Receipts
                         </a>
+                        <a href="{{ route('reports.payments') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.payments') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Payment Analysis
+                        </a>
                         <a href="{{ route('reports.stock-transfers') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.stock-transfers') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
@@ -468,11 +473,6 @@
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.customers') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Customer Analysis
-                        </a>
-                        <a href="{{ route('reports.payments') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.payments') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Payment Analysis
                         </a>
                         <a href="{{ route('reports.suppliers') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.suppliers') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">

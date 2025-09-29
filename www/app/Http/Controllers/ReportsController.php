@@ -44,7 +44,7 @@ class ReportsController extends Controller
         }
 
         $orders = $query->orderBy('created_at', 'desc')->paginate(50);
-        $customers = Customer::orderBy('name')->get();
+        $customers = Customer::ordered()->get();
         $states = ['draft', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
 
         return view('reports.orders', compact('orders', 'customers', 'states'));
@@ -87,7 +87,7 @@ class ReportsController extends Controller
         // Best seller analysis
         $bestSellers = DB::table('sale_items')
             ->join('products', 'sale_items.product_id', '=', 'products.id')
-            ->select('products.name', 'products.stockref as sku', DB::raw('SUM(sale_items.quantity) as total_quantity'), DB::raw('SUM(sale_items.total_price) as total_revenue'))
+            ->select('products.name', 'products.stockref as sku', DB::raw('SUM(sale_items.quantity) as total_quantity'), DB::raw('SUM(sale_items.line_total) as total_revenue'))
             ->when($request->filled('period'), function($query) use ($request) {
                 switch ($request->period) {
                     case 'this_month':
@@ -199,7 +199,11 @@ class ReportsController extends Controller
             $query->whereColumn('current_stock', '<=', 'min_stock_level');
         }
 
-        $inventory = $query->orderBy('products.name')->paginate(50);
+        // Order by product name via relation
+        $inventory = $query->join('products', 'inventory.product_id', '=', 'products.id')
+            ->orderBy('products.name')
+            ->select('inventory.*')
+            ->paginate(50);
 
         // Stock movement analysis
         $stockMovements = DB::table('stock_movements')
@@ -231,12 +235,12 @@ class ReportsController extends Controller
             });
         }
 
-        $customers = $query->orderBy('name')->paginate(50);
+        $customers = $query->orderBy('company_name')->paginate(50);
 
         // Top customers by revenue
         $topCustomers = DB::table('sales')
             ->join('customers', 'sales.customer_id', '=', 'customers.id')
-            ->select('customers.name', 'customers.email', 
+            ->select(DB::raw("COALESCE(NULLIF(customers.company_name,''), customers.full_name) as name"), 'customers.email', 
                     DB::raw('COUNT(sales.id) as total_orders'),
                     DB::raw('SUM(sales.total_amount) as total_revenue'))
             ->when($request->filled('date_from'), function($query) use ($request) {
@@ -245,7 +249,7 @@ class ReportsController extends Controller
             ->when($request->filled('date_to'), function($query) use ($request) {
                 return $query->whereDate('sales.created_at', '<=', $request->date_to);
             })
-            ->groupBy('customers.id', 'customers.name', 'customers.email')
+            ->groupBy('customers.id', 'customers.company_name', 'customers.full_name', 'customers.email')
             ->orderBy('total_revenue', 'desc')
             ->limit(10)
             ->get();
@@ -275,11 +279,11 @@ class ReportsController extends Controller
         // Outstanding payments
         $outstandingPayments = DB::table('sales')
             ->join('customers', 'sales.customer_id', '=', 'customers.id')
-            ->select('customers.name', 'sales.id as sale_id', 'sales.total_amount', 
+            ->select(DB::raw("COALESCE(NULLIF(customers.company_name,''), customers.full_name) as name"), 'sales.id as sale_id', 'sales.total_amount', 
                     DB::raw('COALESCE(SUM(payments.amount), 0) as paid_amount'),
                     DB::raw('sales.total_amount - COALESCE(SUM(payments.amount), 0) as outstanding_amount'))
             ->leftJoin('payments', 'sales.id', '=', 'payments.sale_id')
-            ->groupBy('sales.id', 'customers.name', 'sales.total_amount')
+            ->groupBy('sales.id', 'customers.company_name', 'customers.full_name', 'sales.total_amount')
             ->having('outstanding_amount', '>', 0)
             ->orderBy('outstanding_amount', 'desc')
             ->get();

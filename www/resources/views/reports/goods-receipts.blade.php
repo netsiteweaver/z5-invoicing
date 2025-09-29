@@ -165,7 +165,7 @@
                     @forelse($goodsReceipts as $receipt)
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            #{{ $receipt->id }}
+                            {{ $receipt->grn_number ?? ('#'.$receipt->id) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ $receipt->supplier->name }}

@@ -68,8 +68,8 @@
     </div>
 
     <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="report-cards">
+        <div class="bg-white overflow-hidden shadow rounded-lg report-card">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -84,7 +84,7 @@
                 </div>
             </div>
         </div>
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-white overflow-hidden shadow rounded-lg report-card">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -99,7 +99,7 @@
                 </div>
             </div>
         </div>
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-white overflow-hidden shadow rounded-lg report-card">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -114,7 +114,7 @@
                 </div>
             </div>
         </div>
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-white overflow-hidden shadow rounded-lg report-card">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -152,10 +152,10 @@
                     @forelse($sales as $sale)
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            #{{ $sale->id }}
+                            {{ $sale->sale_number ?? ('#'.$sale->id) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ $sale->customer->name }}
+                            {{ $sale->customer->display_name ?? $sale->customer->company_name ?? $sale->customer->full_name ?? '—' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ $sale->created_at->format('M d, Y') }}
