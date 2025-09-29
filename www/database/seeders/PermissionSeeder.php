@@ -121,8 +121,14 @@ class PermissionSeeder extends Seeder
             
             // Reports
             ['name' => 'reports.view', 'display_name' => 'View Reports', 'module' => 'reports', 'action' => 'view'],
+            ['name' => 'reports.orders', 'display_name' => 'View Orders Reports', 'module' => 'reports', 'action' => 'orders'],
             ['name' => 'reports.sales', 'display_name' => 'View Sales Reports', 'module' => 'reports', 'action' => 'sales'],
+            ['name' => 'reports.goods_receipts', 'display_name' => 'View Goods Receipts Reports', 'module' => 'reports', 'action' => 'goods_receipts'],
+            ['name' => 'reports.stock_transfers', 'display_name' => 'View Stock Transfers Reports', 'module' => 'reports', 'action' => 'stock_transfers'],
             ['name' => 'reports.inventory', 'display_name' => 'View Inventory Reports', 'module' => 'reports', 'action' => 'inventory'],
+            ['name' => 'reports.customers', 'display_name' => 'View Customer Reports', 'module' => 'reports', 'action' => 'customers'],
+            ['name' => 'reports.payments', 'display_name' => 'View Payment Reports', 'module' => 'reports', 'action' => 'payments'],
+            ['name' => 'reports.suppliers', 'display_name' => 'View Supplier Reports', 'module' => 'reports', 'action' => 'suppliers'],
         ];
 
         // Create permissions
@@ -186,7 +192,7 @@ class PermissionSeeder extends Seeder
             'inventory.low_stock', 'inventory.stock_report',
             'goods_receipts.view', 'goods_receipts.create', 'goods_receipts.edit', 'goods_receipts.approve', 'goods_receipts.print',
             'stock_transfers.view', 'stock_transfers.create', 'stock_transfers.edit', 'stock_transfers.approve', 'stock_transfers.print',
-            'reports.view', 'reports.sales', 'reports.inventory',
+            'reports.view', 'reports.orders', 'reports.sales', 'reports.goods_receipts', 'reports.stock_transfers', 'reports.inventory', 'reports.customers', 'reports.payments', 'reports.suppliers',
             'uoms.view', 'uoms.create', 'uoms.edit',
         ]);
 
@@ -198,7 +204,7 @@ class PermissionSeeder extends Seeder
             'orders.view', 'orders.create', 'orders.edit', 'orders.convert_to_sale',
             'sales.view', 'sales.create', 'sales.edit',
             'inventory.view',
-            'reports.view', 'reports.sales',
+            'reports.view', 'reports.orders', 'reports.sales', 'reports.customers', 'reports.payments',
         ]);
 
         $this->assignPermissionsToRole($inventoryRole, [
@@ -209,7 +215,7 @@ class PermissionSeeder extends Seeder
             'inventory.low_stock', 'inventory.stock_report',
             'goods_receipts.view', 'goods_receipts.create', 'goods_receipts.edit', 'goods_receipts.approve', 'goods_receipts.print',
             'stock_transfers.view', 'stock_transfers.create', 'stock_transfers.edit', 'stock_transfers.approve', 'stock_transfers.print',
-            'reports.view', 'reports.inventory', 'uoms.view',
+            'reports.view', 'reports.goods_receipts', 'reports.stock_transfers', 'reports.inventory', 'reports.suppliers', 'uoms.view',
         ]);
 
         // Assign admin role to existing admin user

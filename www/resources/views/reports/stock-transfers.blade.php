@@ -157,10 +157,10 @@
                             #{{ $transfer->id }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            Department {{ $transfer->from_department_id }}
+                            {{ $transfer->fromDepartment->name ?? 'Department ' . $transfer->from_department_id }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            Department {{ $transfer->to_department_id }}
+                            {{ $transfer->toDepartment->name ?? 'Department ' . $transfer->to_department_id }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ $transfer->created_at->format('M d, Y') }}

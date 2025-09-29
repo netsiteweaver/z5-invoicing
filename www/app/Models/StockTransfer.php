@@ -98,6 +98,12 @@ class StockTransfer extends Model
     {
         return $this->hasMany(StockTransferItem::class);
     }
+
+    // Accessor for status
+    public function getStatusAttribute()
+    {
+        return $this->status;
+    }
 }
 
 
