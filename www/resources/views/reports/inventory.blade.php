@@ -112,7 +112,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Total Value</dt>
-                            <dd class="text-lg font-medium text-gray-900">${{ number_format($inventory->sum(function($item) { return $item->current_stock * $item->product->price; }), 2) }}</dd>
+                            <dd class="text-lg font-medium text-gray-900">${{ number_format($inventory->sum(function($item) { return $item->current_stock * ($item->product->selling_price ?? 0); }), 2) }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -175,7 +175,7 @@
                             {{ $item->product->name }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $item->product->sku }}
+                            {{ $item->product->stockref }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ number_format($item->current_stock) }}
@@ -199,7 +199,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${{ number_format($item->current_stock * $item->product->price, 2) }}
+                            ${{ number_format($item->current_stock * ($item->product->selling_price ?? 0), 2) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <a href="{{ route('inventory.show', $item) }}" class="text-blue-600 hover:text-blue-900">

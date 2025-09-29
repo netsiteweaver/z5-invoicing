@@ -138,15 +138,15 @@ Route::middleware(['auth', 'verified', 'check.user.status'])->group(function () 
     Route::resource('uoms', \App\Http\Controllers\UomController::class)->parameters(['uoms' => 'uom']);
 
     // Reports routes
-    Route::get('reports', [ReportsController::class, 'index'])->name('reports.index');
-    Route::get('reports/orders', [ReportsController::class, 'orders'])->name('reports.orders');
-    Route::get('reports/sales', [ReportsController::class, 'sales'])->name('reports.sales');
-    Route::get('reports/goods-receipts', [ReportsController::class, 'goodsReceipts'])->name('reports.goods-receipts');
-    Route::get('reports/stock-transfers', [ReportsController::class, 'stockTransfers'])->name('reports.stock-transfers');
-    Route::get('reports/inventory', [ReportsController::class, 'inventory'])->name('reports.inventory');
-    Route::get('reports/customers', [ReportsController::class, 'customers'])->name('reports.customers');
-    Route::get('reports/payments', [ReportsController::class, 'payments'])->name('reports.payments');
-    Route::get('reports/suppliers', [ReportsController::class, 'suppliers'])->name('reports.suppliers');
+    Route::get('reports', [ReportsController::class, 'index'])->name('reports.index')->middleware('permission:reports.view');
+    Route::get('reports/orders', [ReportsController::class, 'orders'])->name('reports.orders')->middleware('permission:reports.orders');
+    Route::get('reports/sales', [ReportsController::class, 'sales'])->name('reports.sales')->middleware('permission:reports.sales');
+    Route::get('reports/goods-receipts', [ReportsController::class, 'goodsReceipts'])->name('reports.goods-receipts')->middleware('permission:reports.goods_receipts');
+    Route::get('reports/stock-transfers', [ReportsController::class, 'stockTransfers'])->name('reports.stock-transfers')->middleware('permission:reports.stock_transfers');
+    Route::get('reports/inventory', [ReportsController::class, 'inventory'])->name('reports.inventory')->middleware('permission:reports.inventory');
+    Route::get('reports/customers', [ReportsController::class, 'customers'])->name('reports.customers')->middleware('permission:reports.customers');
+    Route::get('reports/payments', [ReportsController::class, 'payments'])->name('reports.payments')->middleware('permission:reports.payments');
+    Route::get('reports/suppliers', [ReportsController::class, 'suppliers'])->name('reports.suppliers')->middleware('permission:reports.suppliers');
 
     // (moved) changelog feed is public
 

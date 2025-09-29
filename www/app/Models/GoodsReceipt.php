@@ -97,6 +97,12 @@ class GoodsReceipt extends Model
     {
         return $this->belongsTo(Supplier::class);
     }
+
+    // Accessor for status
+    public function getStatusAttribute()
+    {
+        return $this->approval_status;
+    }
 }
 
 

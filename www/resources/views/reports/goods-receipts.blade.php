@@ -105,7 +105,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Total Value</dt>
-                            <dd class="text-lg font-medium text-gray-900">N/A</dd>
+                            <dd class="text-lg font-medium text-gray-900">${{ number_format($goodsReceipts->sum(function($receipt) { return $receipt->items->sum(function($item) { return $item->quantity * ($item->unit_cost ?? 0); }); }), 2) }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -186,7 +186,7 @@
                             {{ $receipt->items->count() }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            N/A
+                            ${{ number_format($receipt->items->sum(function($item) { return $item->quantity * ($item->unit_cost ?? 0); }), 2) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <a href="{{ route('goods-receipts.show', $receipt) }}" class="text-blue-600 hover:text-blue-900">
