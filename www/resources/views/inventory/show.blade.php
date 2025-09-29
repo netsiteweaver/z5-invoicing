@@ -34,7 +34,7 @@
                             </div>
                             <div>
                                 <div class="text-sm font-medium text-gray-900">{{ $inventory->product->name }}</div>
-                                <div class="text-sm text-gray-500">{{ $inventory->product->sku }}</div>
+                                <div class="text-sm text-gray-500">{{ $inventory->product->stockref }}</div>
                             </div>
                         </div>
                     </div>
