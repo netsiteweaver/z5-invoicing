@@ -17,6 +17,7 @@ class Order extends Model
     protected $fillable = [
         'uuid',
         'order_number',
+		'manual_invoice_number',
         'customer_id',
         'order_date',
         'delivery_date',
