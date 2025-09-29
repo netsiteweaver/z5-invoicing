@@ -94,7 +94,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Total Items</dt>
-                            <dd class="text-lg font-medium text-gray-900">{{ $stockTransfers->sum(function($transfer) { return $transfer->stockTransferItems->sum('quantity'); }) }}</dd>
+                            <dd class="text-lg font-medium text-gray-900">{{ $stockTransfers->sum(function($transfer) { return $transfer->items->sum('quantity'); }) }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -157,10 +157,10 @@
                             #{{ $transfer->id }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ $transfer->fromLocation->name ?? 'N/A' }}
+                            Department {{ $transfer->from_department_id }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ $transfer->toLocation->name ?? 'N/A' }}
+                            Department {{ $transfer->to_department_id }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ $transfer->created_at->format('M d, Y') }}
@@ -176,7 +176,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ $transfer->stockTransferItems->count() }}
+                            {{ $transfer->items->count() }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <a href="{{ route('stock-transfers.show', $transfer) }}" class="text-blue-600 hover:text-blue-900">

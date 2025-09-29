@@ -127,7 +127,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Low Stock</dt>
-                            <dd class="text-lg font-medium text-gray-900">{{ $inventory->where('current_stock', '<=', DB::raw('minimum_stock_level'))->count() }}</dd>
+                            <dd class="text-lg font-medium text-gray-900">{{ $inventory->whereColumn('current_stock', '<=', 'min_stock_level')->count() }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -181,14 +181,14 @@
                             {{ number_format($item->current_stock) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ number_format($item->minimum_stock_level) }}
+                            {{ number_format($item->min_stock_level) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            @if($item->current_stock <= $item->minimum_stock_level)
+                            @if($item->current_stock <= $item->min_stock_level)
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                     Low Stock
                                 </span>
-                            @elseif($item->current_stock <= $item->minimum_stock_level * 1.5)
+                            @elseif($item->current_stock <= $item->min_stock_level * 1.5)
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                     Warning
                                 </span>

@@ -120,7 +120,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Pending Orders</dt>
-                            <dd class="text-lg font-medium text-gray-900">{{ $orders->whereIn('state', ['draft', 'confirmed', 'processing'])->count() }}</dd>
+                            <dd class="text-lg font-medium text-gray-900">{{ $orders->whereIn('order_status', ['draft', 'confirmed', 'processing'])->count() }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -135,7 +135,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Completed</dt>
-                            <dd class="text-lg font-medium text-gray-900">{{ $orders->where('state', 'delivered')->count() }}</dd>
+                            <dd class="text-lg font-medium text-gray-900">{{ $orders->where('order_status', 'delivered')->count() }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -175,18 +175,18 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                @if($order->state == 'draft') bg-gray-100 text-gray-800
-                                @elseif($order->state == 'confirmed') bg-blue-100 text-blue-800
-                                @elseif($order->state == 'processing') bg-yellow-100 text-yellow-800
-                                @elseif($order->state == 'shipped') bg-purple-100 text-purple-800
-                                @elseif($order->state == 'delivered') bg-green-100 text-green-800
-                                @elseif($order->state == 'cancelled') bg-red-100 text-red-800
+                                @if($order->order_status == 'draft') bg-gray-100 text-gray-800
+                                @elseif($order->order_status == 'confirmed') bg-blue-100 text-blue-800
+                                @elseif($order->order_status == 'processing') bg-yellow-100 text-yellow-800
+                                @elseif($order->order_status == 'shipped') bg-purple-100 text-purple-800
+                                @elseif($order->order_status == 'delivered') bg-green-100 text-green-800
+                                @elseif($order->order_status == 'cancelled') bg-red-100 text-red-800
                                 @endif">
-                                {{ ucfirst($order->state) }}
+                                {{ ucfirst($order->order_status) }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ $order->orderItems->count() }}
+                            {{ $order->items->count() }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             ${{ number_format($order->total_amount, 2) }}
@@ -223,7 +223,7 @@
         <div class="px-6 py-4">
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 @php
-                    $stateCounts = $orders->groupBy('state')->map->count();
+                    $stateCounts = $orders->groupBy('order_status')->map->count();
                 @endphp
                 @foreach($states as $state)
                 <div class="text-center">

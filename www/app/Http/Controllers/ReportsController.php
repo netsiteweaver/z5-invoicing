@@ -23,7 +23,7 @@ class ReportsController extends Controller
 
     public function orders(Request $request)
     {
-        $query = Order::with(['customer', 'orderItems.product']);
+        $query = Order::with(['customer', 'items.product']);
 
         // Date range filter
         if ($request->filled('date_from')) {
@@ -35,7 +35,7 @@ class ReportsController extends Controller
 
         // State filter
         if ($request->filled('state')) {
-            $query->where('state', $request->state);
+            $query->where('order_status', $request->state);
         }
 
         // Customer filter
@@ -128,7 +128,7 @@ class ReportsController extends Controller
 
     public function goodsReceipts(Request $request)
     {
-        $query = GoodsReceipt::with(['supplier', 'goodsReceiptItems.product']);
+        $query = GoodsReceipt::with(['supplier', 'items.product']);
 
         // Date range filter
         if ($request->filled('date_from')) {
@@ -157,7 +157,7 @@ class ReportsController extends Controller
 
     public function stockTransfers(Request $request)
     {
-        $query = StockTransfer::with(['fromLocation', 'toLocation', 'stockTransferItems.product']);
+        $query = StockTransfer::with(['items.product']);
 
         // Date range filter
         if ($request->filled('date_from')) {
@@ -196,22 +196,22 @@ class ReportsController extends Controller
 
         // Low stock filter
         if ($request->filled('low_stock')) {
-            $query->where('current_stock', '<=', DB::raw('minimum_stock_level'));
+            $query->whereColumn('current_stock', '<=', 'min_stock_level');
         }
 
         $inventory = $query->orderBy('product.name')->paginate(50);
 
         // Stock movement analysis
-        $stockMovements = DB::table('inventory_movements')
-            ->join('products', 'inventory_movements.product_id', '=', 'products.id')
+        $stockMovements = DB::table('stock_movements')
+            ->join('products', 'stock_movements.product_id', '=', 'products.id')
             ->select('products.name', 'products.sku', 
                     DB::raw('SUM(CASE WHEN type = "in" THEN quantity ELSE 0 END) as total_in'),
                     DB::raw('SUM(CASE WHEN type = "out" THEN quantity ELSE 0 END) as total_out'))
             ->when($request->filled('date_from'), function($query) use ($request) {
-                return $query->whereDate('inventory_movements.created_at', '>=', $request->date_from);
+                return $query->whereDate('stock_movements.created_at', '>=', $request->date_from);
             })
             ->when($request->filled('date_to'), function($query) use ($request) {
-                return $query->whereDate('inventory_movements.created_at', '<=', $request->date_to);
+                return $query->whereDate('stock_movements.created_at', '<=', $request->date_to);
             })
             ->groupBy('products.id', 'products.name', 'products.sku')
             ->orderBy('total_in', 'desc')

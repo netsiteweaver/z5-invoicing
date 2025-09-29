@@ -186,11 +186,11 @@
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-sm text-gray-600">Low Stock Items</span>
-                    <span class="text-lg font-semibold text-red-600">{{ \App\Models\Inventory::whereRaw('current_stock <= minimum_stock_level')->count() }}</span>
+                    <span class="text-lg font-semibold text-red-600">{{ \App\Models\Inventory::whereColumn('current_stock', '<=', 'min_stock_level')->count() }}</span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-sm text-gray-600">Pending Orders</span>
-                    <span class="text-lg font-semibold text-yellow-600">{{ \App\Models\Order::whereIn('state', ['draft', 'confirmed', 'processing'])->count() }}</span>
+                    <span class="text-lg font-semibold text-yellow-600">{{ \App\Models\Order::whereIn('order_status', ['draft', 'confirmed', 'processing'])->count() }}</span>
                 </div>
             </div>
         </div>
