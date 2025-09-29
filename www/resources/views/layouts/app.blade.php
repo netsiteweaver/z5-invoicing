@@ -31,7 +31,7 @@
 <body class="font-sans antialiased bg-gray-50" x-data="{ sidebarOpen: true }">
     <div class="min-h-screen flex transition-all duration-300" :style="{ paddingLeft: sidebarOpen ? '16rem' : '0' }">
         <!-- Sidebar -->
-        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out"
+        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col"
              :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="-translate-x-full"
@@ -62,7 +62,7 @@
             </a>
 
             <!-- Navigation -->
-            <nav class="mt-2 px-2">
+            <nav class="mt-2 px-2 flex-1 overflow-y-auto">
                 <!-- Dashboard -->
                 <a href="{{ route('dashboard') }}" 
                    class="group flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
