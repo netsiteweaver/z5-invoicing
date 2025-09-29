@@ -10,6 +10,7 @@ use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Concerns\HasBreadcrumbs;
 
 class OrderController extends Controller
@@ -49,10 +50,7 @@ class OrderController extends Controller
             $query->where('order_status', $request->status);
         }
 
-        // Filter by payment status
-        if ($request->filled('payment_status')) {
-            $query->where('payment_status', $request->payment_status);
-        }
+        
 
         // Filter by customer
         if ($request->filled('customer_id')) {
@@ -93,8 +91,9 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'customer_id' => ['required', 'exists:customers,id'],
+			'manual_invoice_number' => ['nullable', 'string', 'max:100'],
             'order_date' => ['required', 'date'],
             'delivery_date' => ['nullable', 'date', 'after_or_equal:order_date'],
             'order_status' => ['required', 'in:draft,pending,confirmed,processing,shipped,delivered,cancelled'],
@@ -106,6 +105,23 @@ class OrderController extends Controller
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
             'items.*.discount_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
+
+        // Stock availability validation
+        $validator->after(function ($v) use ($request) {
+            $items = $request->input('items', []);
+            foreach ($items as $index => $item) {
+                $productId = $item['product_id'] ?? null;
+                $quantityRequested = (int) ($item['quantity'] ?? 0);
+                if ($productId && $quantityRequested > 0) {
+                    $available = (int) Inventory::where('product_id', $productId)->sum('current_stock');
+                    if ($quantityRequested > $available) {
+                        $v->errors()->add("items.$index.quantity", "Insufficient stock. Available: $available");
+                    }
+                }
+            }
+        });
+
+        $validated = $validator->validate();
 
         // Calculate totals
         $subtotal = 0;
@@ -209,8 +225,9 @@ class OrderController extends Controller
                 ->with('error', 'This order cannot be edited in its current status.');
         }
 
-        $validated = $request->validate([
+		$validator = Validator::make($request->all(), [
             'customer_id' => ['required', 'exists:customers,id'],
+			'manual_invoice_number' => ['nullable', 'string', 'max:100'],
             'order_date' => ['required', 'date'],
             'delivery_date' => ['nullable', 'date', 'after_or_equal:order_date'],
             'order_status' => ['required', 'in:draft,pending,confirmed,processing,shipped,delivered,cancelled'],
@@ -222,6 +239,23 @@ class OrderController extends Controller
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
             'items.*.discount_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
+
+        // Stock availability validation
+        $validator->after(function ($v) use ($request) {
+            $items = $request->input('items', []);
+            foreach ($items as $index => $item) {
+                $productId = $item['product_id'] ?? null;
+                $quantityRequested = (int) ($item['quantity'] ?? 0);
+                if ($productId && $quantityRequested > 0) {
+                    $available = (int) Inventory::where('product_id', $productId)->sum('current_stock');
+                    if ($quantityRequested > $available) {
+                        $v->errors()->add("items.$index.quantity", "Insufficient stock. Available: $available");
+                    }
+                }
+            }
+        });
+
+        $validated = $validator->validate();
 
         // Calculate totals
         $subtotal = 0;

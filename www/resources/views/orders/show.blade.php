@@ -108,32 +108,7 @@
             </div>
         </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                        </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Payment Status</dt>
-                            <dd class="text-lg font-medium text-gray-900">
-                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                    @if($order->payment_status === 'pending') bg-yellow-100 text-yellow-800
-                                    @elseif($order->payment_status === 'partial') bg-blue-100 text-blue-800
-                                    @elseif($order->payment_status === 'paid') bg-green-100 text-green-800
-                                    @elseif($order->payment_status === 'overdue') bg-red-100 text-red-800
-                                    @endif">
-                                    {{ ucfirst($order->payment_status) }}
-                                </span>
-                            </dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
 
         <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="p-5">
@@ -146,7 +121,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Total Amount</dt>
-                            <dd class="text-lg font-medium text-gray-900">Rs {{ number_format($order->total_amount, 2) }}</dd>
+                            <dd class="text-lg font-medium text-gray-900">Rs {{ number_format($order->total_amount, 0) }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -182,6 +157,12 @@
                     <dt class="text-sm font-medium text-gray-500">Order Number</dt>
                     <dd class="mt-1 text-sm text-gray-900">{{ $order->order_number }}</dd>
                 </div>
+				@if($order->manual_invoice_number)
+				<div>
+					<dt class="text-sm font-medium text-gray-500">Manual Invoice Number</dt>
+					<dd class="mt-1 text-sm text-gray-900">{{ $order->manual_invoice_number }}</dd>
+				</div>
+				@endif
                 
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Customer</dt>
@@ -310,7 +291,7 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $item->quantity }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Rs {{ number_format($item->unit_price, 2) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Rs {{ number_format($item->unit_price, 0) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     @if($item->discount_percentage > 0)
                                         {{ $item->discount_percentage }}%
@@ -319,7 +300,7 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    Rs {{ number_format($item->line_total, 2) }}
+                                    Rs {{ number_format($item->line_total, 0) }}
                                 </td>
                             </tr>
                         @endforeach
@@ -327,7 +308,7 @@
                     <tfoot class="bg-gray-50">
                         <tr>
                             <td colspan="5" class="px-6 py-4 text-right text-sm font-medium text-gray-900">Subtotal:</td>
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900">Rs {{ number_format($order->subtotal, 2) }}</td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">Rs {{ number_format($order->subtotal, 0) }}</td>
                         </tr>
                         @if($order->discount_amount > 0)
                         <tr>
@@ -337,7 +318,7 @@
                         @endif
                         <tr class="border-t-2 border-gray-200">
                             <td colspan="5" class="px-6 py-4 text-right text-base font-bold text-gray-900">Total Amount:</td>
-                            <td class="px-6 py-4 text-base font-bold text-gray-900">Rs {{ number_format($order->total_amount, 2) }}</td>
+                            <td class="px-6 py-4 text-base font-bold text-gray-900">Rs {{ number_format($order->total_amount, 0) }}</td>
                         </tr>
                     </tfoot>
                 </table>

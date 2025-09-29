@@ -26,12 +26,9 @@ class StockTransfer extends Model
         'received_by',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'transfer_date' => 'date',
-        ];
-    }
+    protected $casts = [
+        'transfer_date' => 'date',
+    ];
 
     protected static function boot()
     {
@@ -102,7 +99,7 @@ class StockTransfer extends Model
     // Accessor for status
     public function getStatusAttribute()
     {
-        return $this->status;
+        return $this->attributes['status'] ?? null;
     }
 }
 

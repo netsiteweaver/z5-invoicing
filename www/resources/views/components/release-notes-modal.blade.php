@@ -13,7 +13,9 @@
         <button class="text-gray-400 hover:text-gray-600" @click="dismiss()"><i class="fas fa-times"></i></button>
       </div>
       <div class="px-5 py-4 text-sm text-gray-700 max-h-[60vh] overflow-y-auto">
-        <div x-show="getCurrentRelease()" x-html="buildList(getCurrentRelease().notesHtml)"></div>
+        <template x-if="getCurrentRelease()">
+          <div x-html="getCurrentRelease() ? buildList(getCurrentRelease().notesHtml) : ''"></div>
+        </template>
         <div x-show="!getCurrentRelease()" class="text-gray-500">No notes available.</div>
       </div>
       <div class="px-5 py-4 bg-blue-50 border-t border-blue-100 flex items-center justify-between">
@@ -116,6 +118,7 @@
           } catch (e) { return ''; }
         },
         buildList(html) {
+          if (!html || typeof html !== 'string') return '';
           // If content already has a list, return as is
           if (/(<ul\b|<ol\b)/i.test(html)) return html;
           // Split on <br> inserted by nl2br; handle various forms

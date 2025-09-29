@@ -1,0 +1,5 @@
+2025-09-29 19:00:00
+- added manual receipt number to sales
+- fixed decimal issue in sales and orders
+- prevent process an order if stock not available
+- no payment for orders, only to sales

@@ -53,6 +53,17 @@
             <h3 class="text-lg font-medium text-gray-900 mb-4">Order Information</h3>
             
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+				<!-- Manual Invoice Number -->
+				<div>
+					<label for="manual_invoice_number" class="block text-sm font-medium text-gray-700">Manual Invoice Number</label>
+					<input type="text" name="manual_invoice_number" id="manual_invoice_number" 
+						   value="{{ old('manual_invoice_number', $order->manual_invoice_number) }}"
+						   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+						   placeholder="If issued manually during downtime">
+					@error('manual_invoice_number')
+						<p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+					@enderror
+				</div>
                 <!-- Customer Selection -->
                 <div>
                     <label for="customer_id" class="block text-sm font-medium text-gray-700">Customer <span class="text-red-500">*</span></label>
@@ -117,12 +128,7 @@
                     @enderror
                 </div>
 
-                <!-- Payment Status -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Payment Status</label>
-                    <input type="text" value="{{ ucfirst($order->payment_status) }}" disabled class="mt-1 block w-full border-gray-200 rounded-md shadow-sm bg-gray-50 text-gray-700 sm:text-sm">
-                    <p class="mt-1 text-xs text-gray-500">Automatically managed.</p>
-                </div>
+                
 
                 <!-- Notes -->
                 <div class="sm:col-span-2">
@@ -220,7 +226,7 @@
                                            class="block w-full border-gray-200 rounded-md shadow-sm bg-gray-50 text-gray-700 sm:text-sm" disabled>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm font-medium text-gray-900" x-text="formatCurrency(item.line_total)"></span>
+                                    <span class="text-sm font-medium text-gray-900" x-text="formatCurrency0(item.line_total)"></span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <button type="button" @click="removeItem(index)" 
@@ -264,7 +270,7 @@
                 <div class="border-t pt-2">
                     <div class="flex justify-between">
                         <span class="text-base font-medium text-gray-900">Total Amount (incl. VAT):</span>
-                        <span class="text-base font-bold text-gray-900" x-text="formatCurrency(form.total_amount)"></span>
+                        <span class="text-base font-bold text-gray-900" x-text="formatCurrency0(form.total_amount)"></span>
                     </div>
                 </div>
             </div>
@@ -425,7 +431,7 @@ function orderForm() {
                 }
             }
             this.form.total_tax = totalTax;
-            this.form.total_amount = this.form.subtotal - this.form.total_discount + totalTax;
+            this.form.total_amount = parseFloat((this.form.subtotal - this.form.total_discount + totalTax).toFixed(0));
         },
 
         updateCustomerInfo() {
@@ -435,6 +441,9 @@ function orderForm() {
 
         formatCurrency(amount) {
             return 'Rs ' + parseFloat(amount || 0).toFixed(2);
+        },
+        formatCurrency0(amount) {
+            return 'Rs ' + parseFloat(amount || 0).toFixed(0);
         }
     }
 }
