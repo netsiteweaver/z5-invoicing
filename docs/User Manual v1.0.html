@@ -58,7 +58,7 @@
     <main class="container">
       <header class="section">
         <h1>User Manual v1.0 — Z5 Invoicing System</h1>
-        <p class="muted small">Last updated: 2025-09-18</p>
+        <p class="muted small">Last updated: 2025-01-27</p>
         <p class="small">Audience: 
           <strong>Normal users</strong> (customers, orders, sales, inventory),
           <strong>Administrators</strong> (products, categories and brands, users, suppliers, settings).
@@ -71,6 +71,7 @@
         <strong>Contents</strong>
         <ul>
           <li><a href="#overview">Overview</a></li>
+          <li><a href="#dashboard">Dashboard</a></li>
           <li><a href="#access">Access & Accounts</a></li>
           <li><a href="#ui">Navigation & UI Basics</a></li>
           <li><a href="#roles">Roles & Permissions</a></li>
@@ -79,9 +80,13 @@
           <li><a href="#products">Products</a></li>
           <li><a href="#orders">Orders</a></li>
           <li><a href="#sales">Sales</a></li>
+          <li><a href="#payments">Payments</a></li>
           <li><a href="#inventory">Inventory</a></li>
           <li><a href="#goods-receipts">Goods Receipts</a></li>
           <li><a href="#stock-transfers">Stock Transfers</a></li>
+          <li><a href="#departments">Departments</a></li>
+          <li><a href="#payment-terms">Payment Terms</a></li>
+          <li><a href="#uoms">Units of Measure</a></li>
           <li><a href="#profile">Profile & Password</a></li>
           <li><a href="#settings">Settings (Admin)</a></li>
           <li><a href="#user-mgmt">User Management (Admin)</a></li>
@@ -94,11 +99,42 @@
 
       <section id="overview" class="section card">
         <h2>1. Overview</h2>
-        <p>The Z5 Invoicing System manages products, customers, orders, sales, inventory, suppliers, and user access across departments/locations. It provides dashboards, role-based permissions, and printable documents.</p>
+        <p>The Z5 Invoicing System is a comprehensive business management platform that handles products, customers, orders, sales, payments, inventory, suppliers, departments, and user access. It provides dashboards, role-based permissions, approval workflows, and printable documents.</p>
+        <h3>Key Features</h3>
+        <ul>
+          <li><strong>Sales Management</strong>: Complete order-to-sale workflow with payment tracking</li>
+          <li><strong>Inventory Control</strong>: Multi-department inventory with stock transfers and goods receipts</li>
+          <li><strong>Payment Processing</strong>: Track payments and payment terms</li>
+          <li><strong>Department Management</strong>: Organize business by departments/locations</li>
+          <li><strong>Units of Measure</strong>: Flexible UOM system for different product types</li>
+          <li><strong>Approval Workflows</strong>: Goods receipts and stock transfers require approval</li>
+          <li><strong>Real-time Analytics</strong>: Dashboard with sales charts and low stock alerts</li>
+          <li><strong>Notification System</strong>: Email notifications for key business events</li>
+        </ul>
+      </section>
+
+      <section id="dashboard" class="section card">
+        <h2>2. Dashboard</h2>
+        <p>The dashboard provides an overview of key business metrics and recent activities.</p>
+        <h3>Dashboard Features</h3>
+        <ul>
+          <li><strong>Statistics Cards</strong>: Total orders, sales, customers, products, revenue, and pending orders</li>
+          <li><strong>Sales Chart</strong>: Visual representation of sales over time with filtering options (monthly, yearly, custom date range)</li>
+          <li><strong>Low Stock Alert</strong>: Shows products that are running low on inventory</li>
+          <li><strong>Recent Orders</strong>: Latest 5 orders with customer and product details</li>
+          <li><strong>Recent Logins</strong>: Shows recent user login activities</li>
+        </ul>
+        <h3>Using the Dashboard</h3>
+        <ul>
+          <li>Click on any statistic card to navigate to the related section</li>
+          <li>Use the sales chart filters to view different time periods</li>
+          <li>Click on low stock items to go directly to inventory management</li>
+          <li>Recent orders can be clicked to view full order details</li>
+        </ul>
       </section>
 
       <section id="access" class="section card">
-        <h2>2. Access & Accounts</h2>
+        <h2>3. Access & Accounts</h2>
         <ul>
           <li><strong>URL</strong>: Provided by your administrator</li>
           <li><strong>Browsers</strong>: Latest Chrome, Firefox</li>
@@ -111,17 +147,35 @@
       </section>
 
       <section id="ui" class="section card">
-        <h2>3. Navigation & UI Basics</h2>
+        <h2>4. Navigation & UI Basics</h2>
         <ul>
-          <li><strong>Main navigation</strong>: Left sidebar modules (Dashboard, Customers, Products, Orders, Sales, Inventory, Suppliers, Settings, Users)</li>
+          <li><strong>Main navigation</strong>: Left sidebar modules with expandable sections:
+            <ul>
+              <li>Dashboard</li>
+              <li>Customers (All Customers, Create Customer)</li>
+              <li>Products (All Products, Categories, Brands)</li>
+              <li>Orders (All Orders, Create Order)</li>
+              <li>Sales (All Sales, Create Sale)</li>
+              <li>Payments (All Payments, Record Payment)</li>
+              <li>Inventory (All Inventory, Low Stock Alert, Goods Receipts, Stock Transfers)</li>
+              <li>Payment Terms (All Payment Terms, Create Payment Term)</li>
+              <li>Units of Measure (All UOMs, Create UOM)</li>
+              <li>Suppliers (All Suppliers, Create Supplier)</li>
+              <li>Departments (All Departments, Create Department)</li>
+              <li>User Management (All Users, Add User, Manage Roles, Manage Permissions)</li>
+              <li>Settings (Company Settings, Notifications)</li>
+            </ul>
+          </li>
           <li><strong>Search and filters</strong>: List pages include search and filter controls</li>
           <li><strong>Pagination</strong>: Controls at the bottom of list pages</li>
           <li><strong>Common actions</strong>: View, Edit, Delete/Deactivate, Print/Export</li>
+          <li><strong>Low Stock Alert</strong>: Notification badge in top navigation showing items with low stock</li>
+          <li><strong>User Profile</strong>: Click on user avatar to access profile settings</li>
         </ul>
       </section>
 
       <section id="roles" class="section card">
-        <h2>4. Roles & Permissions</h2>
+        <h2>5. Roles & Permissions</h2>
         <ul>
           <li><strong>Normal</strong>: Access to assigned features</li>
           <li><strong>Admin</strong>: Broad access including configuration and user management</li>
@@ -131,7 +185,7 @@
       </section>
 
       <section id="customers" class="section card">
-        <h2>5. Customers</h2>
+        <h2>6. Customers</h2>
         <h3>What you can do</h3>
         <ul>
           <li>Create, edit, and deactivate customers; search and filter the list</li>
@@ -184,16 +238,48 @@
       </section>
 
       <section id="sales" class="section card">
-        <h2>9. Sales</h2>
+        <h2>10. Sales</h2>
         <h3>Create a sale</h3>
         <ul>
           <li>Direct: Sales → New</li>
           <li>From Order: Orders → open order → Convert to Sale</li>
         </ul>
+        <h3>Manage sales</h3>
+        <ul>
+          <li>View all sales with customer and payment status information</li>
+          <li>Edit sales before they are finalized</li>
+          <li>Track payment status (pending, partial, paid, overdue)</li>
+          <li>Record payments against sales</li>
+        </ul>
+      </section>
+
+      <section id="payments" class="section card">
+        <h2>11. Payments</h2>
+        <h3>What you can do</h3>
+        <ul>
+          <li>Record payments against sales</li>
+          <li>View payment history and details</li>
+          <li>Track payment methods and reference numbers</li>
+        </ul>
+        <h3>Record a payment</h3>
+        <ol>
+          <li>Go to Payments → Record Payment</li>
+          <li>Select the sale to record payment against</li>
+          <li>Enter payment date, amount, and payment type</li>
+          <li>Add reference number and notes if needed</li>
+          <li>Save the payment</li>
+        </ol>
+        <h3>Payment features</h3>
+        <ul>
+          <li><strong>Payment Types</strong>: Cash, Bank Transfer, Check, Credit Card, etc.</li>
+          <li><strong>Partial Payments</strong>: Record multiple payments for the same sale</li>
+          <li><strong>Payment Status</strong>: Automatically updates sale payment status</li>
+          <li><strong>Overpayment Protection</strong>: Prevents recording payments exceeding sale amount</li>
+        </ul>
       </section>
 
       <section id="inventory" class="section card">
-        <h2>10. Inventory</h2>
+        <h2>12. Inventory</h2>
         <h3>What you can do</h3>
         <ul>
           <li>View stock by product and department</li>
@@ -203,22 +289,185 @@
       </section>
 
       <section id="goods-receipts" class="section card">
-        <h2>11. Goods Receipts</h2>
+        <h2>13. Goods Receipts</h2>
+        <h3>What you can do</h3>
         <ul>
           <li>Record received goods with multiple items, costs and VAT breakdown</li>
-          <li>Approve receipts to update inventory; print GRN as PDF</li>
+          <li>Submit receipts for approval workflow</li>
+          <li>Approve receipts to update inventory</li>
+          <li>Print GRN (Goods Receipt Note) as PDF</li>
+        </ul>
+        <h3>Create a goods receipt</h3>
+        <ol>
+          <li>Go to Inventory → Goods Receipts → Create</li>
+          <li>Select department and supplier</li>
+          <li>Enter receipt date and supplier reference</li>
+          <li>Add items with quantities, unit costs, and UOM details</li>
+          <li>Add batch numbers and expiry dates if applicable</li>
+          <li>Save the receipt (status: submitted)</li>
+        </ol>
+        <h3>Approval workflow</h3>
+        <ul>
+          <li><strong>Submitted</strong>: Initial state when goods receipt is created</li>
+          <li><strong>Approved</strong>: Receipt is approved and inventory is updated</li>
+          <li>Only approved receipts update inventory levels</li>
+          <li>Approved receipts cannot be edited</li>
+        </ul>
+        <h3>Features</h3>
+        <ul>
+          <li><strong>Multi-item Support</strong>: Add multiple products to one receipt</li>
+          <li><strong>UOM Support</strong>: Handle different units of measure</li>
+          <li><strong>VAT Calculation</strong>: Automatic tax calculation based on product settings</li>
+          <li><strong>Batch Tracking</strong>: Record batch numbers and expiry dates</li>
+          <li><strong>PDF Generation</strong>: Print professional GRN documents</li>
         </ul>
       </section>
 
       <section id="stock-transfers" class="section card">
-        <h2>12. Stock Transfers</h2>
+        <h2>14. Stock Transfers</h2>
+        <h3>What you can do</h3>
         <ul>
-          <li>Create transfers between departments; receive transfers; print documents</li>
+          <li>Create transfers between departments</li>
+          <li>Receive transfers at destination departments</li>
+          <li>Print transfer documents as PDF</li>
+          <li>Track transfer status and history</li>
+        </ul>
+        <h3>Create a stock transfer</h3>
+        <ol>
+          <li>Go to Inventory → Stock Transfers → Create</li>
+          <li>Select source and destination departments</li>
+          <li>Enter transfer date and notes</li>
+          <li>Add items with quantities and UOM details</li>
+          <li>Save the transfer (status: in_transit)</li>
+        </ol>
+        <h3>Transfer workflow</h3>
+        <ul>
+          <li><strong>In Transit</strong>: Initial state when transfer is created</li>
+          <li><strong>Received</strong>: Transfer is received and inventory is updated</li>
+          <li>Stock is deducted from source only when transfer is received</li>
+          <li>Received transfers cannot be edited</li>
+        </ul>
+        <h3>Receive a transfer</h3>
+        <ol>
+          <li>Go to the transfer detail page</li>
+          <li>Click "Receive Transfer" button</li>
+          <li>System automatically updates inventory at both departments</li>
+          <li>Transfer status changes to "Received"</li>
+        </ol>
+        <h3>Features</h3>
+        <ul>
+          <li><strong>Multi-item Support</strong>: Transfer multiple products in one transfer</li>
+          <li><strong>UOM Support</strong>: Handle different units of measure</li>
+          <li><strong>Automatic Inventory Update</strong>: Updates stock levels at both departments</li>
+          <li><strong>PDF Generation</strong>: Print professional transfer documents</li>
+          <li><strong>Status Tracking</strong>: Monitor transfer progress</li>
+        </ul>
+      </section>
+
+      <section id="departments" class="section card">
+        <h2>15. Departments</h2>
+        <h3>What you can do</h3>
+        <ul>
+          <li>Create and manage departments/locations</li>
+          <li>Assign department managers</li>
+          <li>Set main department for default operations</li>
+          <li>Deactivate departments when no longer needed</li>
+        </ul>
+        <h3>Create a department</h3>
+        <ol>
+          <li>Go to Departments → Create Department</li>
+          <li>Enter department name and description</li>
+          <li>Add address, phone, and email if needed</li>
+          <li>Assign a manager from existing users</li>
+          <li>Mark as main department if this is the primary location</li>
+          <li>Save the department</li>
+        </ol>
+        <h3>Department features</h3>
+        <ul>
+          <li><strong>Manager Assignment</strong>: Assign users as department managers</li>
+          <li><strong>Main Department</strong>: Set one department as the default for operations</li>
+          <li><strong>Status Management</strong>: Activate/deactivate departments</li>
+          <li><strong>Inventory Tracking</strong>: Departments are used for inventory location tracking</li>
+          <li><strong>Email Notifications</strong>: Department events trigger email notifications</li>
+        </ul>
+        <h3>Using departments</h3>
+        <ul>
+          <li>Departments are used for inventory location tracking</li>
+          <li>Goods receipts and stock transfers use departments</li>
+          <li>Each department maintains separate inventory levels</li>
+          <li>Main department is used as default for new operations</li>
+        </ul>
+      </section>
+
+      <section id="payment-terms" class="section card">
+        <h2>16. Payment Terms</h2>
+        <h3>What you can do</h3>
+        <ul>
+          <li>Create and manage payment terms for sales</li>
+          <li>Set default payment terms</li>
+          <li>Define different payment types (days, end of month, manual)</li>
+          <li>Deactivate payment terms when no longer needed</li>
+        </ul>
+        <h3>Create payment terms</h3>
+        <ol>
+          <li>Go to Payment Terms → Create Payment Term</li>
+          <li>Enter term name and description</li>
+          <li>Select payment type (days, end of month, or manual)</li>
+          <li>Set number of days if using "days" type</li>
+          <li>Mark as default if this should be the standard term</li>
+          <li>Save the payment term</li>
+        </ol>
+        <h3>Payment term types</h3>
+        <ul>
+          <li><strong>Days</strong>: Payment due after specified number of days</li>
+          <li><strong>End of Month (EOM)</strong>: Payment due at end of the month</li>
+          <li><strong>Manual</strong>: Payment terms handled manually</li>
+        </ul>
+        <h3>Features</h3>
+        <ul>
+          <li><strong>Default Terms</strong>: Set one payment term as default for new sales</li>
+          <li><strong>Flexible Configuration</strong>: Support for various payment scenarios</li>
+          <li><strong>Status Management</strong>: Activate/deactivate payment terms</li>
+          <li><strong>Sales Integration</strong>: Payment terms are used in sales to determine due dates</li>
+        </ul>
+      </section>
+
+      <section id="uoms" class="section card">
+        <h2>17. Units of Measure (UOM)</h2>
+        <h3>What you can do</h3>
+        <ul>
+          <li>Create and manage units of measure for products</li>
+          <li>Define conversion factors between different UOMs</li>
+          <li>Organize UOMs by dimension (count, weight, volume, length)</li>
+          <li>Deactivate UOMs when no longer needed</li>
+        </ul>
+        <h3>Create a UOM</h3>
+        <ol>
+          <li>Go to Units of Measure → Create UOM</li>
+          <li>Enter UOM name and code</li>
+          <li>Select dimension (count, weight, volume, or length)</li>
+          <li>Set conversion factor to base unit</li>
+          <li>Define minimum increment if applicable</li>
+          <li>Save the UOM</li>
+        </ol>
+        <h3>UOM dimensions</h3>
+        <ul>
+          <li><strong>Count</strong>: Individual items, pieces, units</li>
+          <li><strong>Weight</strong>: Kilograms, pounds, tons</li>
+          <li><strong>Volume</strong>: Liters, gallons, cubic meters</li>
+          <li><strong>Length</strong>: Meters, feet, yards</li>
+        </ul>
+        <h3>Features</h3>
+        <ul>
+          <li><strong>Conversion Factors</strong>: Define how UOMs convert to base units</li>
+          <li><strong>Multi-dimensional Support</strong>: Handle different types of measurements</li>
+          <li><strong>Inventory Integration</strong>: UOMs are used throughout the inventory system</li>
+          <li><strong>Flexible Configuration</strong>: Support for complex measurement scenarios</li>
         </ul>
       </section>
 
       <section id="profile" class="section card">
-        <h2>13. Profile & Password</h2>
+        <h2>18. Profile & Password</h2>
         <ul>
           <li>Profile: Update name/email via Profile page (top-left avatar)</li>
           <li>Password: Update password on the Profile page</li>
@@ -226,37 +475,122 @@
       </section>
 
       <section id="settings" class="section card">
-        <h2>14. Settings (Admin)</h2>
+        <h2>19. Settings (Admin)</h2>
+        <h3>Company Settings</h3>
         <ul>
-          <li>Company settings and general configuration</li>
+          <li>Configure company information and branding</li>
+          <li>Upload company logo</li>
+          <li>Set default settings for operations</li>
         </ul>
+        <h3>Notification Settings</h3>
+        <ul>
+          <li>Configure email notifications for system events</li>
+          <li>Set recipients for different types of notifications</li>
+          <li>Manage notification rules and templates</li>
+        </ul>
+        <h3>Available notifications</h3>
+        <ul>
+          <li><strong>User Events</strong>: User created, updated, deleted</li>
+          <li><strong>Inventory Events</strong>: Low stock alerts</li>
+          <li><strong>Product Events</strong>: Product created, updated, deleted</li>
+          <li><strong>Order Events</strong>: Order created, updated, deleted</li>
+          <li><strong>Sales Events</strong>: Sale created, updated, deleted</li>
+          <li><strong>Customer Events</strong>: Customer created, updated, deleted</li>
+          <li><strong>Supplier Events</strong>: Supplier created, updated, deleted</li>
+        </ul>
+        <h3>Configure notifications</h3>
+        <ol>
+          <li>Go to Settings → Notifications</li>
+          <li>Select which events should trigger notifications</li>
+          <li>Choose recipients for each notification type</li>
+          <li>Save the notification settings</li>
+        </ol>
       </section>
 
       <section id="user-mgmt" class="section card">
-        <h2>15. User Management (Admin)</h2>
+        <h2>20. User Management (Admin)</h2>
+        <h3>What you can do</h3>
         <ul>
-          <li>Manage users, roles, and permissions</li>
+          <li>Create and manage user accounts</li>
+          <li>Assign roles and permissions to users</li>
+          <li>Manage role definitions</li>
+          <li>Configure system permissions</li>
+        </ul>
+        <h3>User management</h3>
+        <ul>
+          <li><strong>Create Users</strong>: Add new user accounts with email and password</li>
+          <li><strong>Edit Users</strong>: Update user information and status</li>
+          <li><strong>Deactivate Users</strong>: Disable user accounts</li>
+          <li><strong>Role Assignment</strong>: Assign roles to users for access control</li>
+        </ul>
+        <h3>Role management</h3>
+        <ul>
+          <li><strong>Create Roles</strong>: Define custom roles with specific permissions</li>
+          <li><strong>Edit Roles</strong>: Modify role permissions and settings</li>
+          <li><strong>Permission Management</strong>: Configure detailed permissions for each role</li>
+        </ul>
+        <h3>Permission system</h3>
+        <ul>
+          <li><strong>Module Permissions</strong>: Control access to different system modules</li>
+          <li><strong>Action Permissions</strong>: Control create, read, update, delete operations</li>
+          <li><strong>Feature Permissions</strong>: Control access to specific features</li>
         </ul>
       </section>
 
       <section id="docs" class="section card">
-        <h2>16. Documents & Printing</h2>
+        <h2>21. Documents & Printing</h2>
+        <h3>Printable Documents</h3>
         <ul>
-          <li>Many details pages provide printable/PDF documents (e.g., Goods Receipts, Stock Transfers)</li>
+          <li><strong>Goods Receipt Notes (GRN)</strong>: Print professional GRN documents with item details, costs, and VAT breakdown</li>
+          <li><strong>Stock Transfer Documents</strong>: Print transfer documents for inter-department movements</li>
+          <li><strong>Sales Invoices</strong>: Print sales documents (when invoice system is implemented)</li>
         </ul>
+        <h3>Print Features</h3>
+        <ul>
+          <li><strong>PDF Generation</strong>: All documents are generated as PDF files</li>
+          <li><strong>Professional Layout</strong>: Clean, business-ready document formatting</li>
+          <li><strong>Company Branding</strong>: Documents include company logo and information</li>
+          <li><strong>Detailed Information</strong>: Complete item details, quantities, costs, and totals</li>
+        </ul>
+        <h3>How to Print</h3>
+        <ol>
+          <li>Navigate to the document detail page (e.g., Goods Receipt or Stock Transfer)</li>
+          <li>Click the "Print" button</li>
+          <li>PDF will be generated and downloaded automatically</li>
+          <li>Use your browser's print function or PDF viewer to print</li>
+        </ol>
+        <p class="muted small">Note: Ensure popups are allowed for the site to enable PDF downloads.</p>
       </section>
 
       <section id="tips" class="section card">
-        <h2>17. Tips & Troubleshooting</h2>
+        <h2>22. Tips & Troubleshooting</h2>
+        <h3>Common Issues</h3>
         <ul>
-          <li>Can’t log in: Use Forgot Password; if still blocked, contact admin</li>
-          <li>Missing options: Your role might not allow it</li>
-          <li>PDF blocked: Allow popups for the site</li>
+          <li><strong>Can't log in</strong>: Use "Forgot Password" link; if still blocked, contact administrator</li>
+          <li><strong>Missing menu options</strong>: Your role may not have permission for that feature</li>
+          <li><strong>PDF downloads blocked</strong>: Allow popups for the site in your browser settings</li>
+          <li><strong>Low stock alerts</strong>: Check the notification badge in the top navigation</li>
+          <li><strong>Can't edit approved documents</strong>: Goods receipts and stock transfers become read-only after approval/receipt</li>
+        </ul>
+        <h3>Best Practices</h3>
+        <ul>
+          <li><strong>Regular Backups</strong>: Ensure system administrator performs regular data backups</li>
+          <li><strong>User Training</strong>: Train users on proper workflows, especially approval processes</li>
+          <li><strong>Inventory Accuracy</strong>: Regularly reconcile inventory with physical stock counts</li>
+          <li><strong>Payment Tracking</strong>: Record payments promptly to maintain accurate financial records</li>
+          <li><strong>Department Organization</strong>: Set up departments properly before creating inventory records</li>
+        </ul>
+        <h3>Performance Tips</h3>
+        <ul>
+          <li>Use search and filters to quickly find records in large lists</li>
+          <li>Keep product catalogs organized with proper categories and brands</li>
+          <li>Set appropriate reorder points to avoid stockouts</li>
+          <li>Regularly review and clean up inactive records</li>
         </ul>
       </section>
 
       <section id="support" class="section card">
-        <h2>18. Support</h2>
+        <h2>23. Support</h2>
         <ul>
           <li>Contact your system administrator for access issues or feature requests</li>
           <li>We have a support team that can help you with any issues you may have</li>
