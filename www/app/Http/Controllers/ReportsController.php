@@ -13,6 +13,7 @@ use App\Models\Inventory;
 use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\Supplier;
+use App\Services\InventoryValuationService;
 
 class ReportsController extends Controller
 {
@@ -205,6 +206,10 @@ class ReportsController extends Controller
             ->select('inventory.*')
             ->paginate(50);
 
+        // Compute FIFO valuations for current page items
+        $valuations = InventoryValuationService::computeFifoForInventory($inventory->getCollection(), $request->date_to ?? null);
+        $totalFifoValue = array_sum(array_map(function ($v) { return (float) ($v['fifo_total_value'] ?? 0); }, $valuations));
+
         // Stock movement analysis
         $stockMovements = DB::table('stock_movements')
             ->join('products', 'stock_movements.product_id', '=', 'products.id')
@@ -221,7 +226,33 @@ class ReportsController extends Controller
             ->orderBy('total_in', 'desc')
             ->get();
 
-        return view('reports.inventory', compact('inventory', 'stockMovements'));
+        // CSV export (FIFO-based values)
+        if ($request->string('export')->lower() === 'csv') {
+            $filename = 'inventory-report.csv';
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ];
+
+            return response()->streamDownload(function() use ($inventory, $valuations) {
+                $out = fopen('php://output', 'w');
+                fputcsv($out, ['Product', 'SKU', 'Current Stock', 'Min Level', 'FIFO Unit Cost', 'FIFO Total Value']);
+                foreach ($inventory as $item) {
+                    $val = $valuations[$item->id] ?? ['fifo_avg_unit_cost' => 0, 'fifo_total_value' => 0];
+                    fputcsv($out, [
+                        optional($item->product)->name,
+                        optional($item->product)->stockref,
+                        (int) $item->current_stock,
+                        (int) $item->min_stock_level,
+                        number_format((float) ($val['fifo_avg_unit_cost'] ?? 0), 4, '.', ''),
+                        number_format((float) ($val['fifo_total_value'] ?? 0), 2, '.', ''),
+                    ]);
+                }
+                fclose($out);
+            }, $filename, $headers);
+        }
+
+        return view('reports.inventory', compact('inventory', 'stockMovements', 'valuations', 'totalFifoValue'));
     }
 
     public function customers(Request $request)

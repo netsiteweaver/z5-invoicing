@@ -111,8 +111,8 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Total Value</dt>
-                            <dd class="text-lg font-medium text-gray-900">${{ number_format($inventory->sum(function($item) { return $item->current_stock * ($item->product->selling_price ?? 0); }), 2) }}</dd>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total FIFO Value</dt>
+                            <dd class="text-lg font-medium text-gray-900">${{ number_format($totalFifoValue ?? 0, 2) }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -164,7 +164,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Stock</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Min Level</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">FIFO Value</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
@@ -199,7 +199,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${{ number_format($item->current_stock * ($item->product->selling_price ?? 0), 2) }}
+                            ${{ number_format(($valuations[$item->id]['fifo_total_value'] ?? 0), 2) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <a href="{{ route('inventory.show', $item) }}" class="text-blue-600 hover:text-blue-900">
