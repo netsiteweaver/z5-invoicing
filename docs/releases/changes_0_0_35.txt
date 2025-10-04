@@ -1,0 +1,6 @@
+2025-10-04 19:00:00
+- removed duplicate breadcrumbs
+- reformat inventory report
+- manual sales number
+- hide left navigation when printing
+- additional breadcrumb for all reports 
