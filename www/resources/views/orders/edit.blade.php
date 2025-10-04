@@ -53,17 +53,6 @@
             <h3 class="text-lg font-medium text-gray-900 mb-4">Order Information</h3>
             
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-				<!-- Manual Invoice Number -->
-				<div>
-					<label for="manual_invoice_number" class="block text-sm font-medium text-gray-700">Manual Invoice Number</label>
-					<input type="text" name="manual_invoice_number" id="manual_invoice_number" 
-						   value="{{ old('manual_invoice_number', $order->manual_invoice_number) }}"
-						   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-						   placeholder="If issued manually during downtime">
-					@error('manual_invoice_number')
-						<p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-					@enderror
-				</div>
                 <!-- Customer Selection -->
                 <div>
                     <label for="customer_id" class="block text-sm font-medium text-gray-700">Customer <span class="text-red-500">*</span></label>
@@ -87,6 +76,17 @@
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+				<!-- Manual Invoice Number -->
+				<div>
+					<label for="manual_invoice_number" class="block text-sm font-medium text-gray-700">Manual Invoice Number</label>
+					<input type="text" name="manual_invoice_number" id="manual_invoice_number" 
+						   value="{{ old('manual_invoice_number', $order->manual_invoice_number) }}"
+						   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+						   placeholder="If issued manually during downtime">
+					@error('manual_invoice_number')
+						<p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+					@enderror
+				</div>
 
                 <!-- Order Date -->
                 <div>
