@@ -199,10 +199,13 @@ class ReportsController extends Controller
             $query->whereColumn('current_stock', '<=', 'min_stock_level');
         }
 
-        // Order by product name via relation
-        $inventory = $query->join('products', 'inventory.product_id', '=', 'products.id')
-            ->orderBy('products.name')
-            ->select('inventory.*')
+        // Order by product name via subquery to avoid breaking eager loading
+        $inventory = $query
+            ->orderBy(
+                \App\Models\Product::select('name')
+                    ->whereColumn('products.id', 'inventory.product_id')
+                    ->limit(1)
+            )
             ->paginate(50);
 
         // Stock movement analysis

@@ -2,10 +2,19 @@
 
 @section('title', 'Orders Report')
 
+@section('breadcrumbs')
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+        <a href="{{ route('reports.index') }}" class="text-sm font-medium text-gray-500 hover:text-gray-700">Reports</a>
+    </div>
+    </li>
+@endsection
+
 @section('content')
 <div class="space-y-6">
     <!-- Page Header -->
-    <div class="bg-white shadow rounded-lg">
+    <div class="bg-white shadow rounded-lg print:hidden no-print">
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex justify-between items-center">
                 <div>
@@ -27,7 +36,7 @@
     </div>
 
     <!-- Filters -->
-    <div class="bg-white shadow rounded-lg">
+    <div class="bg-white shadow rounded-lg print:hidden no-print">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Filters</h3>
         </div>
@@ -216,7 +225,7 @@
     </div>
 
     <!-- State Distribution Chart -->
-    <div class="bg-white shadow rounded-lg">
+    <div class="bg-white shadow rounded-lg print:hidden no-print">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Order State Distribution</h3>
         </div>

@@ -29,12 +29,19 @@
 					<label for="customer_id" class="block text-sm font-medium text-gray-700">Customer <span class="text-red-500">*</span></label>
 					<select name="customer_id" id="customer_id" required 
 							class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-							x-model="form.customer_id">
+							x-model="form.customer_id" autofocus>
 						<option value="">Select a customer</option>
 						@foreach($customers as $customer)
 							<option value="{{ $customer->id }}">{{ $customer->display_name }} ({{ $customer->customer_type }})</option>
 						@endforeach
 					</select>
+				</div>
+				<div>
+					<label for="manual_sale_number" class="block text-sm font-medium text-gray-700">Manual Sale Number</label>
+					<input type="text" name="manual_sale_number" id="manual_sale_number" value="{{ old('manual_sale_number') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="If issued manually during downtime">
+					@error('manual_sale_number')
+						<p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+					@enderror
 				</div>
 				<div>
 					<label for="sale_date" class="block text-sm font-medium text-gray-700">Sale Date <span class="text-red-500">*</span></label>

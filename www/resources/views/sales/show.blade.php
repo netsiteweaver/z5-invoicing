@@ -156,7 +156,12 @@
             <dl class="space-y-3">
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Sale Number</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $sale->sale_number }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">
+                        {{ $sale->sale_number }}
+                        @if($sale->manual_sale_number)
+                            <span class="ml-2 text-gray-500">(Manual: {{ $sale->manual_sale_number }})</span>
+                        @endif
+                    </dd>
                 </div>
                 <div>
                     <dt class="text-sm font-medium text-gray-500">Customer</dt>
@@ -253,46 +258,87 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount %</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VAT %</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VAT</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Line Total</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
+                        @php($sumSubtotal = 0)
+                        @php($sumDiscount = 0)
+                        @php($sumVat = 0)
+                        @php($sumTotal = 0)
                         @foreach($sale->items as $item)
+                            @php(
+                                $qty = (float) ($item->quantity ?? 0)
+                            )
+                            @php(
+                                $unitPrice = (float) ($item->unit_price ?? 0)
+                            )
+                            @php(
+                                $lineSub = $qty * $unitPrice
+                            )
+                            @php(
+                                $discountPct = (float) ($item->discount_percent ?? $item->discount_percentage ?? 0)
+                            )
+                            @php(
+                                $discAmtStored = (float) ($item->discount_amount ?? 0)
+                            )
+                            @php(
+                                $discountAmt = $discAmtStored > 0 ? $discAmtStored : ($lineSub * ($discountPct/100))
+                            )
+                            @php(
+                                $taxPctStored = (float) ($item->tax_percent ?? 0)
+                            )
+                            @php(
+                                $taxPct = $taxPctStored > 0 ? $taxPctStored : ((($item->product->tax_type ?? 'standard') === 'standard') ? 15 : 0)
+                            )
+                            @php(
+                                $taxAmtStored = (float) ($item->tax_amount ?? 0)
+                            )
+                            @php(
+                                $taxAmt = $taxAmtStored > 0 ? $taxAmtStored : (($lineSub - $discountAmt) * ($taxPct/100))
+                            )
+                            @php(
+                                $lineTotal = (float) ($item->line_total ?? ($lineSub - $discountAmt + $taxAmt))
+                            )
+                            @php($sumSubtotal += $lineSub)
+                            @php($sumDiscount += $discountAmt)
+                            @php($sumVat += $taxAmt)
+                            @php($sumTotal += $lineTotal)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">{{ $item->product->name }}</div>
                                     <div class="text-sm text-gray-500">{{ $item->product->sku }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $item->quantity }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Rs {{ number_format($item->unit_price, 2) }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    @if($item->discount_percent > 0)
-                                        {{ $item->discount_percent }}%
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    Rs {{ number_format($item->line_total, 2) }}
-                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Rs {{ number_format($unitPrice, 2) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ number_format($discountPct, 2) }}%</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ number_format($taxPct, 0) }}%</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Rs {{ number_format($taxAmt, 2) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Rs {{ number_format($lineTotal, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                     <tfoot class="bg-gray-50">
                         <tr>
-                            <td colspan="4" class="px-6 py-4 text-right text-sm font-medium text-gray-900">Subtotal:</td>
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900">Rs {{ number_format($sale->subtotal, 2) }}</td>
+                            <td colspan="6" class="px-6 py-4 text-right text-sm font-medium text-gray-900">Subtotal (excl. VAT):</td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">Rs {{ number_format($sumSubtotal, 2) }}</td>
                         </tr>
-                        @if($sale->discount_amount > 0)
+                        @if($sumDiscount > 0)
                         <tr>
-                            <td colspan="4" class="px-6 py-4 text-right text-sm font-medium text-green-600">Total Discount:</td>
-                            <td class="px-6 py-4 text-sm font-medium text-green-600">-Rs {{ number_format($sale->discount_amount, 2) }}</td>
+                            <td colspan="6" class="px-6 py-4 text-right text-sm font-medium text-green-600">Total Discount:</td>
+                            <td class="px-6 py-4 text-sm font-medium text-green-600">-Rs {{ number_format($sumDiscount, 2) }}</td>
                         </tr>
                         @endif
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-right text-sm font-medium text-gray-900">VAT Total:</td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">Rs {{ number_format($sumVat, 2) }}</td>
+                        </tr>
                         <tr class="border-t-2 border-gray-200">
-                            <td colspan="4" class="px-6 py-4 text-right text-base font-bold text-gray-900">Total Amount:</td>
-                            <td class="px-6 py-4 text-base font-bold text-gray-900">Rs {{ number_format($sale->total_amount, 2) }}</td>
+                            <td colspan="6" class="px-6 py-4 text-right text-base font-bold text-gray-900">Total Amount (incl. VAT):</td>
+                            <td class="px-6 py-4 text-base font-bold text-gray-900">Rs {{ number_format($sumTotal, 2) }}</td>
                         </tr>
                     </tfoot>
                 </table>

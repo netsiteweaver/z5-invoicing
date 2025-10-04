@@ -101,6 +101,7 @@ class SaleController extends Controller
             'sale_date' => 'required|date',
             'due_date' => 'nullable|date|after_or_equal:sale_date',
             'payment_term_id' => 'nullable|exists:payment_terms,id',
+            'manual_sale_number' => 'nullable|string|max:100',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -148,7 +149,9 @@ class SaleController extends Controller
                 'discount_amount' => $totalDiscount,
                 'total_amount' => $totalAmount,
                 'notes' => $request->notes,
-                'status' => 'confirmed',
+                'manual_sale_number' => $request->manual_sale_number,
+                'sale_status' => 'confirmed',
+                'status' => 1,
                 'payment_status' => 'pending',
                 'payment_term_id' => $request->payment_term_id,
                 'created_by' => auth()->id(),
@@ -166,9 +169,12 @@ class SaleController extends Controller
                     'uom_quantity' => $item['uom_quantity'] ?? 1,
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
-                    'discount_percentage' => $item['discount_percentage'] ?? 0,
+                    'discount_percent' => $item['discount_percentage'] ?? 0,
                     'discount_amount' => $discountAmount,
-                    'total_amount' => $itemTotal - $discountAmount,
+                    'tax_percent' => 0,
+                    'tax_amount' => 0,
+                    'line_total' => $itemTotal - $discountAmount,
+                    'status' => 1,
                 ]);
 
                 // Update inventory for the user's assigned department
@@ -228,6 +234,7 @@ class SaleController extends Controller
             'sale_date' => 'required|date',
             'due_date' => 'nullable|date|after_or_equal:sale_date',
             'payment_term_id' => 'nullable|exists:payment_terms,id',
+            'manual_sale_number' => 'nullable|string|max:100',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -296,6 +303,7 @@ class SaleController extends Controller
                 'discount_amount' => $totalDiscount,
                 'total_amount' => $totalAmount,
                 'notes' => $request->notes,
+                'manual_sale_number' => $request->manual_sale_number,
                 'payment_term_id' => $request->payment_term_id,
             ]);
 

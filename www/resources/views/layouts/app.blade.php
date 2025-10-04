@@ -29,9 +29,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased bg-gray-50" x-data="{ sidebarOpen: true }">
-    <div class="min-h-screen flex transition-all duration-300" :style="{ paddingLeft: sidebarOpen ? '16rem' : '0' }">
+    <div class="min-h-screen flex transition-all duration-300 app-container" :style="{ paddingLeft: sidebarOpen ? '16rem' : '0' }">
         <!-- Sidebar -->
-        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col"
+        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col print:hidden no-print sidebar"
              :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="-translate-x-full"
@@ -515,7 +515,7 @@
         <!-- Main content -->
         <div class="flex-1 flex flex-col">
             <!-- Top navigation -->
-            <div class="bg-white shadow-sm border-b border-gray-200">
+            <div class="bg-white shadow-sm border-b border-gray-200 print:hidden no-print">
                 <div class="flex justify-between items-center h-16 px-4">
                     <!-- Mobile menu button -->
                     <button @click="sidebarOpen = !sidebarOpen" title="Toggle sidebar" aria-label="Toggle sidebar" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500">
@@ -537,6 +537,9 @@
                                         </a>
                                     </div>
                                 </li>
+                                @hasSection('breadcrumbs')
+                                @yield('breadcrumbs')
+                                @endif
                                 <li>
                                     <div class="flex items-center">
                                         <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
@@ -595,73 +598,28 @@
             </div>
 
             <!-- Page Header -->
-            <div class="bg-white border-b border-gray-200">
+            <div class="bg-white border-b border-gray-200 print:hidden no-print">
                 <div class="px-4 py-4">
                     <div class="flex justify-between items-center">
                         <div>
                             <h1 class="text-2xl font-bold text-gray-900">@yield('title', 'Dashboard')</h1>
                             <!-- <p class="mt-1 text-sm text-gray-500">@yield('description', 'Welcome to your dashboard')</p> -->
                         </div>
-                        <div class="flex space-x-3">
+                            <div class="flex space-x-3 no-print print:hidden">
                             @yield('actions')
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Breadcrumb -->
-            @if(isset($breadcrumbs) && count($breadcrumbs) > 1)
-            <div class="bg-gray-50 border-b border-gray-200">
-                <div class="px-4 py-3">
-                    <nav class="flex" aria-label="Breadcrumb">
-                        <ol class="flex items-center space-x-2">
-                            @foreach($breadcrumbs as $breadcrumb)
-                            <li>
-                                <div class="flex items-center">
-                                    @if(!$loop->first)
-                                    <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    @endif
-                                    
-                                    @if($breadcrumb['current'])
-                                        <span class="{{ $loop->first ? 'text-gray-400' : 'ml-2 text-sm font-medium text-gray-500' }}" aria-current="page">
-                                            @if($loop->first)
-                                                <svg class="flex-shrink-0 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                                                </svg>
-                                                <span class="sr-only">{{ $breadcrumb['title'] }}</span>
-                                            @else
-                                                {{ $breadcrumb['title'] }}
-                                            @endif
-                                        </span>
-                                    @else
-                                        <a href="{{ $breadcrumb['url'] }}" class="{{ $loop->first ? 'text-gray-400 hover:text-gray-500' : 'ml-2 text-sm font-medium text-gray-500 hover:text-gray-700' }}">
-                                            @if($loop->first)
-                                                <svg class="flex-shrink-0 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                                                </svg>
-                                                <span class="sr-only">{{ $breadcrumb['title'] }}</span>
-                                            @else
-                                                {{ $breadcrumb['title'] }}
-                                            @endif
-                                        </a>
-                                    @endif
-                                </div>
-                            </li>
-                            @endforeach
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-            @endif
+            
 
             <!-- Page content -->
             <main class="flex-1 overflow-y-auto bg-gray-50">
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         @if(session('success'))
-                        <div class="mb-4 rounded-md bg-green-50 p-4">
+                        <div class="mb-4 rounded-md bg-green-50 p-4 no-print print:hidden">
                             <div class="flex">
                                 <div class="flex-shrink-0">
                                     <i class="fas fa-check-circle text-green-400"></i>
@@ -674,7 +632,7 @@
                         @endif
 
                         @if(session('error'))
-                        <div class="mb-4 rounded-md bg-red-50 p-4">
+                        <div class="mb-4 rounded-md bg-red-50 p-4 no-print print:hidden">
                             <div class="flex">
                                 <div class="flex-shrink-0">
                                     <i class="fas fa-exclamation-triangle text-red-400"></i>
@@ -687,7 +645,7 @@
                         @endif
 
                         @if ($errors->any())
-                        <div class="mb-4 rounded-md bg-red-50 p-4">
+                        <div class="mb-4 rounded-md bg-red-50 p-4 no-print print:hidden">
                             <div class="flex">
                                 <div class="flex-shrink-0">
                                     <i class="fas fa-times-circle text-red-400"></i>
@@ -726,7 +684,7 @@
         <div x-show="sidebarOpen"
              x-cloak
              @click="sidebarOpen = false"
-             class="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
+             class="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden print:hidden no-print"
              x-transition:enter="transition-opacity ease-linear duration-300"
              x-transition:enter-start="opacity-0"
              x-transition:enter-end="opacity-100"

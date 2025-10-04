@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Inventory;
 use App\Models\StockMovement;
+use App\Models\InventoryLayer;
 use App\Models\Uom;
 use Illuminate\Support\Facades\DB;
 
@@ -18,6 +19,16 @@ class InventoryService
             );
 
             $inventory->increment('current_stock', $quantity);
+
+            // Create FIFO layer
+            InventoryLayer::create([
+                'product_id' => $productId,
+                'department_id' => $departmentId,
+                'quantity_remaining' => $quantity,
+                'unit_cost' => null,
+                'source_type' => $movementMeta['reference_type'] ?? null,
+                'source_id' => $movementMeta['reference_id'] ?? null,
+            ]);
 
             StockMovement::create([
                 'product_id' => $productId,
@@ -46,6 +57,28 @@ class InventoryService
             }
 
             $stockBefore = (int) $inventory->current_stock;
+            $remainingToFulfill = (int) $quantity;
+            // Deplete FIFO layers first
+            $layers = InventoryLayer::where('product_id', $productId)
+                ->where('department_id', $departmentId)
+                ->where('quantity_remaining', '>', 0)
+                ->orderBy('created_at')
+                ->lockForUpdate()
+                ->get();
+
+            foreach ($layers as $layer) {
+                if ($remainingToFulfill <= 0) break;
+                $consume = min($remainingToFulfill, (int) $layer->quantity_remaining);
+                $layer->decrement('quantity_remaining', $consume);
+                $remainingToFulfill -= $consume;
+            }
+
+            if ($remainingToFulfill > 0) {
+                // Fallback: reduce inventory anyway to maintain consistency
+                // (This should not happen because we checked current_stock earlier)
+                // But in case layers are missing, we still adjust stock count.
+            }
+
             $inventory->decrement('current_stock', $quantity);
             $stockAfter = $stockBefore - (int) $quantity;
 

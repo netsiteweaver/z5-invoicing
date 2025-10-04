@@ -2,10 +2,19 @@
 
 @section('title', 'Goods Receipts Report')
 
+@section('breadcrumbs')
+<li>
+    <div class="flex items-center">
+        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+        <a href="{{ route('reports.index') }}" class="text-sm font-medium text-gray-500 hover:text-gray-700">Reports</a>
+    </div>
+</li>
+@endsection
+
 @section('content')
 <div class="space-y-6">
     <!-- Page Header -->
-    <div class="bg-white shadow rounded-lg">
+    <div class="bg-white shadow rounded-lg print:hidden no-print">
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex justify-between items-center">
                 <div>
@@ -27,7 +36,7 @@
     </div>
 
     <!-- Filters -->
-    <div class="bg-white shadow rounded-lg">
+    <div class="bg-white shadow rounded-lg print:hidden no-print">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Filters</h3>
         </div>
@@ -80,7 +89,7 @@
     </div>
 
     <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 report-cards">
         <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="p-5">
                 <div class="flex items-center">
@@ -158,7 +167,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider print:hidden no-print">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -188,7 +197,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             ${{ number_format($receipt->items->sum(function($item) { return $item->quantity * ($item->unit_cost ?? 0); }), 2) }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium print:hidden no-print">
                             <a href="{{ route('goods-receipts.show', $receipt) }}" class="text-blue-600 hover:text-blue-900">
                                 <i class="fas fa-eye"></i>
                             </a>

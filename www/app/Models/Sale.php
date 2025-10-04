@@ -16,6 +16,7 @@ class Sale extends Model
     protected $fillable = [
         'uuid',
         'sale_number',
+        'manual_sale_number',
         'order_id',
         'customer_id',
         'sale_date',
