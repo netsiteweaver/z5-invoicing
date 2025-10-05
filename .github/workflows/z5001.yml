@@ -1,16 +1,17 @@
-name: Laravel Minimal CI
+name: Laravel CI with Cache and Migration
 
+# ✅ Trigger only on push to master
 on:
   push:
     branches:
-      - "*"  # Only triggers on push
+      - master
 
 jobs:
   laravel-ci:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout the repo
+      # 1️⃣ Checkout repo
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -19,9 +20,35 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, intl, bcmath, pdo_mysql
+          extensions: mbstring, intl, bcmath, pdo_mysql, sqlite
 
       # 3️⃣ Install Composer dependencies inside www/
       - name: Install Composer dependencies
         working-directory: www
         run: composer install --no-interaction --prefer-dist --no-progress
+
+      # 4️⃣ Create temporary .env for CI
+      - name: Setup temporary .env
+        working-directory: www
+        run: |
+          echo "APP_NAME=Laravel" > .env
+          echo "APP_ENV=testing" >> .env
+          echo "APP_KEY=" >> .env
+          echo "APP_DEBUG=true" >> .env
+          echo "DB_CONNECTION=sqlite" >> .env
+          echo "DB_DATABASE=:memory:" >> .env
+          php artisan key:generate --no-interaction
+
+      # 5️⃣ Clear caches
+      - name: Clear Laravel caches
+        working-directory: www
+        run: |
+          php artisan cache:clear --no-interaction
+          php artisan config:clear --no-interaction
+          php artisan route:clear --no-interaction
+          php artisan view:clear --no-interaction
+
+      # 6️⃣ Run migrations
+      - name: Run migrations
+        working-directory: www
+        run: php artisan migrate --force --no-interaction
