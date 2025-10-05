@@ -1,0 +1,124 @@
+name: Laravel CI/CD with Frontend Build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  laravel-ci-cd:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      # 1️⃣ Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup PHP 8.2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, bcmath, pdo_mysql, xml, gd
+
+      # 3️⃣ Install Composer dependencies
+      - name: Install Composer dependencies
+        working-directory: www
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      # 4️⃣ Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      # 5️⃣ Install Node dependencies
+      - name: Install Node dependencies
+        working-directory: www
+        run: npm install
+
+      # 6️⃣ Build front-end assets
+      - name: Build front-end assets
+        working-directory: www
+        run: npm run build  # or npm run prod if using Laravel Mix
+
+      # 7️⃣ Setup CI .env for MySQL
+      - name: Setup CI .env
+        working-directory: www
+        run: |
+          echo "APP_NAME=Laravel" > .env
+          echo "APP_ENV=testing" >> .env
+          echo "APP_KEY=" >> .env
+          echo "APP_DEBUG=true" >> .env
+          echo "DB_CONNECTION=mysql" >> .env
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=test_db" >> .env
+          echo "DB_USERNAME=root" >> .env
+          echo "DB_PASSWORD=root" >> .env
+          php artisan key:generate --no-interaction
+
+      # 8️⃣ Clear Laravel caches
+      - name: Clear Laravel caches
+        working-directory: www
+        run: |
+          php artisan cache:clear --no-interaction
+          php artisan config:clear --no-interaction
+          php artisan route:clear --no-interaction
+          php artisan view:clear --no-interaction
+
+      # 9️⃣ Run migrations
+      - name: Run migrations
+        working-directory: www
+        run: php artisan migrate --force --no-interaction
+
+      # 🔟 Deploy to production via SSH
+      - name: Deploy to Production (Zero Downtime)
+        if: github.ref == 'refs/heads/master'
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: 22
+          script: |
+            cd ${{ secrets.PROD_PATH }}
+            # 1 Put Laravel in maintenance mode
+            php artisan down --message="Deploying updates..." --retry=60
+
+            # 2 Pull latest code
+            git pull origin master
+
+            # 3 Install PHP dependencies
+            composer install --no-interaction --prefer-dist --no-progress
+
+            # 4 Install Node dependencies and build assets
+            npm install
+            npm run build
+
+            # 5 Run migrations safely
+            php artisan migrate --force
+
+            # 6 Clear caches
+            php artisan cache:clear
+            php artisan config:clear
+            php artisan route:clear
+            php artisan view:clear
+
+            # 7 Bring Laravel back online
+            php artisan up
+
