@@ -24,7 +24,10 @@ class ViewServiceProvider extends ServiceProvider
         // Share company settings with all views
         View::composer('*', function ($view) {
             $companySettings = CompanySetting::getCurrent();
+            $appName = config('app.name');
+            $displayAppName = is_string($appName) ? str_replace('_', ' ', $appName) : $appName;
             $view->with('companySettings', $companySettings);
+            $view->with('displayAppName', $displayAppName);
         });
     }
 }

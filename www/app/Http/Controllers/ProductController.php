@@ -11,6 +11,7 @@ use App\Models\Param;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Concerns\HasBreadcrumbs;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -20,8 +21,29 @@ class ProductController extends Controller
         $this->middleware(['auth', 'verified']);
         $this->middleware('permission:products.view')->only(['index', 'show']);
         $this->middleware('permission:products.create')->only(['create', 'store']);
+        $this->middleware('permission:products.create')->only(['nextSerial']);
         $this->middleware('permission:products.edit')->only(['edit', 'update']);
         $this->middleware('permission:products.delete')->only(['destroy']);
+    }
+
+    /**
+     * Return next sequential 3-digit serial for a given brand/category combo.
+     */
+    public function nextSerial(Request $request)
+    {
+        $brandId = (int) $request->query('brand_id', 0);
+        $categoryId = (int) $request->query('category_id', 0);
+        $key = sprintf('barcode.serial.%d.%d', $brandId, $categoryId);
+        $next = Param::incrementAndGet($key, 0);
+        $serial = str_pad((string) ($next % 1000), 3, '0', STR_PAD_LEFT);
+
+        return response()->json([
+            'success' => true,
+            'brand_id' => $brandId,
+            'category_id' => $categoryId,
+            'serial' => $serial,
+            'counter' => $next,
+        ]);
     }
     /**
      * Display a listing of products.
@@ -36,7 +58,12 @@ class ProductController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('stockref', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('barcode', 'like', "%{$search}%");
+                // If a scanner inputs a full 12/13-digit code, also try exact match on barcode
+                if (preg_match('/^\d{12,13}$/', $search)) {
+                    $q->orWhere('barcode', $search);
+                }
             });
         }
 
@@ -105,6 +132,7 @@ class ProductController extends Controller
             'sku' => ['nullable', 'string', 'max:100'],
             'barcode' => ['nullable', 'string', 'max:100'],
             'notes' => ['nullable', 'string'],
+            'photo' => ['nullable', 'image', 'max:2048'],
         ]);
 
         // Generate stock reference automatically
@@ -127,6 +155,12 @@ class ProductController extends Controller
             if (isset($validated['min_selling_price'])) {
                 $validated['min_selling_price'] = round(($validated['min_selling_price'] ?? 0) / (1 + $vatRate), 2);
             }
+        }
+
+        // Handle image upload
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('products', 'public');
+            $validated['photo'] = $path;
         }
 
         $product = Product::create($validated);
@@ -212,6 +246,7 @@ class ProductController extends Controller
             'sku' => ['nullable', 'string', 'max:100'],
             'barcode' => ['nullable', 'string', 'max:100'],
             'notes' => ['nullable', 'string'],
+            'photo' => ['nullable', 'image', 'max:2048'],
         ]);
 
         $validated['updated_by'] = auth()->id();
@@ -226,6 +261,21 @@ class ProductController extends Controller
             if (isset($validated['min_selling_price'])) {
                 $validated['min_selling_price'] = round(($validated['min_selling_price'] ?? 0) / (1 + $vatRate), 2);
             }
+        }
+
+        // Handle image removal
+        if ($request->boolean('remove_photo') && !empty($product->photo)) {
+            Storage::disk('public')->delete($product->photo);
+            $validated['photo'] = null;
+        }
+
+        // Handle image upload (replace existing)
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('products', 'public');
+            if (!empty($product->photo)) {
+                Storage::disk('public')->delete($product->photo);
+            }
+            $validated['photo'] = $path;
         }
 
         $product->update($validated);

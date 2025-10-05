@@ -19,7 +19,7 @@
 
     <!-- Form -->
     <div class="bg-white shadow rounded-lg">
-        <form method="POST" action="{{ route('products.update', $product) }}" class="space-y-6 p-6">
+        <form method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data" class="space-y-6 p-6">
             @csrf
             @method('PUT')
             
@@ -43,8 +43,9 @@
                     <div>
                         <label for="barcode" class="block text-sm font-medium text-gray-700">Barcode</label>
                         <input type="text" name="barcode" id="barcode" value="{{ old('barcode', $product->barcode) }}" 
+                               inputmode="numeric" maxlength="13" autocomplete="off"
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('barcode') border-red-300 @enderror" 
-                               placeholder="Barcode number">
+                               placeholder="13-digit EAN">
                         @error('barcode')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -82,6 +83,35 @@
                         @error('brand_id')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
+                    </div>
+
+                    <!-- Photo -->
+                    <div>
+                        <label for="photo" class="block text-sm font-medium text-gray-700">Product Image</label>
+                        @if($product->photo)
+                            <div class="mb-2">
+                            <!-- <img src="{{ Storage::disk('public')->url($product->photo) }}" alt="Current image" class="h-20 w-20 object-cover rounded"> -->
+                            <img src="{{ asset('storage/' . $product->photo) }}" alt="Current image" class="h-20 w-20 object-cover rounded">
+                            <div class="mt-1 text-xs">
+                                    <a href="{{ asset('storage/' . $product->photo) }}" target="_blank" class="text-blue-600 hover:underline">View image</a>
+                                </div>
+                            </div>
+                        @endif
+                        <input type="file" name="photo" id="photo" accept="image/*"
+                               class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-blue-500 focus:border-blue-500 @error('photo') border-red-300 @enderror">
+                        <p class="mt-1 text-xs text-gray-500">Upload to replace. JPG, PNG, or WebP up to 2MB.</p>
+                        @error('photo')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                        @if($product->photo)
+                        <label class="inline-flex items-center mt-2 text-sm text-gray-700">
+                            <input type="checkbox" name="remove_photo" value="1" class="mr-2 border-gray-300 rounded">
+                            Remove current image
+                        </label>
+                        @endif
+                        <div id="photo_preview_wrap" class="mt-2 hidden">
+                            <img id="photo_preview" src="#" alt="Preview" class="h-20 w-20 object-cover rounded border">
+                        </div>
                     </div>
 
                     <!-- Default UOM -->
@@ -227,6 +257,34 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Live preview for photo
+    const photoInput = document.getElementById('photo');
+    const previewImg = document.getElementById('photo_preview');
+    const previewWrap = document.getElementById('photo_preview_wrap');
+    if (photoInput && previewImg && previewWrap) {
+        photoInput.addEventListener('change', function() {
+            const file = this.files && this.files[0];
+            if (!file) { previewWrap.classList.add('hidden'); return; }
+            const reader = new FileReader();
+            reader.onload = e => {
+                previewImg.src = e.target?.result || '#';
+                previewWrap.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    // Barcode: enforce numeric and max 13
+    const barcodeInput = document.getElementById('barcode');
+    function enforceBarcodeLength() {
+        if (!barcodeInput) return;
+        const digits = (barcodeInput.value || '').replace(/\D/g, '').slice(0, 13);
+        if (barcodeInput.value !== digits) barcodeInput.value = digits;
+    }
+    if (barcodeInput) {
+        barcodeInput.addEventListener('input', enforceBarcodeLength);
+        barcodeInput.addEventListener('blur', enforceBarcodeLength);
+        enforceBarcodeLength();
+    }
     // Display VAT-inclusive values in inputs while storing exclusive
     const costPriceInput = document.getElementById('cost_price');
     const sellingPriceInput = document.getElementById('selling_price');

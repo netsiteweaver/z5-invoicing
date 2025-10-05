@@ -22,8 +22,9 @@
             <div>
                 <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
                 <input type="text" name="search" id="search" value="{{ request('search') }}" 
+                       inputmode="search" autofocus
                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
-                       placeholder="Name, stockref, description...">
+                       placeholder="Name, stockref, description, or scan barcode (12/13 digits)">
             </div>
             
             <div>
@@ -51,11 +52,27 @@
             </div>
             
             
-            <div class="flex items-end">
-                <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <div class="flex items-end space-x-2">
+                <button type="submit" class="inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     <i class="-ml-1 mr-2 fa-solid fa-magnifying-glass"></i>
                     Filter
                 </button>
+                <a href="{{ route('products.index') }}" class="inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    <i class="-ml-1 mr-2 fa-solid fa-rotate-left"></i>
+                    Clear
+                </a>
+            </div>
+            <div class="flex items-end">
+                <label class="inline-flex items-center text-sm text-gray-700">
+                    <input type="checkbox" id="toggle_barcode" class="mr-2 border-gray-300 rounded" checked>
+                    Show barcode
+                </label>
+            </div>
+            <div class="flex items-end">
+                <label class="inline-flex items-center text-sm text-gray-700">
+                    <input type="checkbox" id="toggle_image" class="mr-2 border-gray-300 rounded" checked>
+                    Show image
+                </label>
             </div>
         </form>
     </div>
@@ -67,6 +84,8 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
+                            <th scope="col" class="col-barcode px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Barcode</th>
+                            <th scope="col" class="col-image px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
@@ -81,6 +100,24 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @foreach($products as $product)
                             <tr class="hover:bg-gray-50">
+                                <td class="col-barcode px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    @if($product->barcode)
+                                        <div class="barcode-holder" data-barcode="{{ $product->barcode }}">
+                                            <svg class="barcode-svg"></svg>
+                                            <div class="text-xs text-gray-400 font-mono mt-1">{{ $product->barcode }}</div>
+                                        </div>
+                                    @else
+                                        <span class="font-mono">-</span>
+                                    @endif
+                                </td>
+                                <td class="col-image px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    @if($product->photo)
+                                    <!-- <img src="{{ Storage::disk('public')->url($product->photo) }}" alt="{{ $product->name }}" class="h-10 w-10 rounded object-cover"> -->
+                                    <img src="{{ asset('storage/' . $product->photo) }}" alt="{{ $product->name }}" class="h-10 w-10 rounded object-cover">
+                                    @else
+                                        <span class="text-gray-400">—</span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">{{ $product->name }}</div>
                                 </td>
@@ -153,4 +190,126 @@
         </div>
     @endif
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.getElementById('toggle_barcode');
+    const toggleImg = document.getElementById('toggle_image');
+    const STORAGE_KEYS = { barcode: 'pref_products_show_barcode', image: 'pref_products_show_image' };
+
+    // Initialize from localStorage (defaults: both true)
+    const storedBarcode = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.barcode) : null;
+    const storedImage = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.image) : null;
+    if (toggle && storedBarcode !== null) toggle.checked = (storedBarcode === '1');
+    if (toggleImg && storedImage !== null) toggleImg.checked = (storedImage === '1');
+    const update = () => {
+        const show = !!(toggle && toggle.checked);
+        document.querySelectorAll('.col-barcode').forEach(el => {
+            if (show) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        });
+        const showImg = !!(toggleImg && toggleImg.checked);
+        document.querySelectorAll('.col-image').forEach(el => {
+            if (showImg) el.classList.remove('hidden'); else el.classList.add('hidden');
+        });
+    };
+    if (toggle) {
+        toggle.addEventListener('change', function() {
+            try { localStorage.setItem(STORAGE_KEYS.barcode, toggle.checked ? '1' : '0'); } catch (e) {}
+            update();
+        });
+    }
+    if (toggleImg) {
+        toggleImg.addEventListener('change', function() {
+            try { localStorage.setItem(STORAGE_KEYS.image, toggleImg.checked ? '1' : '0'); } catch (e) {}
+            update();
+        });
+    }
+    update();
+
+    // Render EAN-13 barcodes using minimal JS (no external lib)
+    function renderBarcode(svg, code) {
+        // Basic validation: EAN-13 digits only, length 12 or 13 (compute checksum if 12)
+        let digits = String(code).replace(/\D/g, '');
+        if (digits.length === 12) {
+            const cd = ean13CheckDigit(digits);
+            digits += cd;
+        }
+        if (digits.length !== 13) return;
+
+        const encodings = {
+            L: {
+                0: '0001101', 1: '0011001', 2: '0010011', 3: '0111101', 4: '0100011',
+                5: '0110001', 6: '0101111', 7: '0111011', 8: '0110111', 9: '0001011'
+            },
+            G: {
+                0: '0100111', 1: '0110011', 2: '0011011', 3: '0100001', 4: '0011101',
+                5: '0111001', 6: '0000101', 7: '0010001', 8: '0001001', 9: '0010111'
+            },
+            R: {
+                0: '1110010', 1: '1100110', 2: '1101100', 3: '1000010', 4: '1011100',
+                5: '1001110', 6: '1010000', 7: '1000100', 8: '1001000', 9: '1110100'
+            }
+        };
+        const parityMap = {
+            0: 'LLLLLL', 1: 'LLGLGG', 2: 'LLGGLG', 3: 'LLGGGL', 4: 'LGLLGG',
+            5: 'LGGLLG', 6: 'LGGGLL', 7: 'LGLGLG', 8: 'LGLGGL', 9: 'LGGLGL'
+        };
+
+        const first = parseInt(digits[0], 10);
+        const left = digits.slice(1, 7).split('').map(d => parseInt(d, 10));
+        const right = digits.slice(7).split('').map(d => parseInt(d, 10));
+        const parity = parityMap[first];
+
+        let pattern = '101'; // start guard
+        for (let i = 0; i < 6; i++) {
+            const set = parity[i];
+            pattern += encodings[set][left[i]];
+        }
+        pattern += '01010'; // center guard
+        for (let i = 0; i < 6; i++) {
+            pattern += encodings.R[right[i]];
+        }
+        pattern += '101'; // end guard
+
+        // Draw bars
+        const barWidth = 1; // px per module
+        const barHeight = 28; // px
+        svg.setAttribute('width', String(pattern.length * barWidth));
+        svg.setAttribute('height', String(barHeight));
+        svg.setAttribute('viewBox', `0 0 ${pattern.length * barWidth} ${barHeight}`);
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+        let x = 0;
+        for (const bit of pattern) {
+            if (bit === '1') {
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', String(x));
+                rect.setAttribute('y', '0');
+                rect.setAttribute('width', String(barWidth));
+                rect.setAttribute('height', String(barHeight));
+                rect.setAttribute('fill', '#111827');
+                svg.appendChild(rect);
+            }
+            x += barWidth;
+        }
+    }
+
+    function ean13CheckDigit(code12) {
+        const digits = code12.split('').map(d => parseInt(d, 10));
+        const sumOdd = digits.filter((_, i) => i % 2 === 0).reduce((a, b) => a + b, 0);
+        const sumEven = digits.filter((_, i) => i % 2 === 1).reduce((a, b) => a + b, 0);
+        const total = sumOdd + sumEven * 3;
+        const mod = total % 10;
+        return (mod === 0 ? 0 : 10 - mod).toString();
+    }
+
+    document.querySelectorAll('.barcode-holder').forEach(holder => {
+        const code = holder.getAttribute('data-barcode');
+        const svg = holder.querySelector('svg.barcode-svg');
+        if (svg && code) renderBarcode(svg, code);
+    });
+});
+</script>
 @endsection

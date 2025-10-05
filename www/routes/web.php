@@ -59,7 +59,10 @@ Route::middleware(['auth', 'verified', 'check.user.status'])->group(function () 
     // Customer routes
     Route::resource('customers', CustomerController::class);
     
-    // Product routes
+    // Product routes (specific first to avoid conflict with resource catch-all)
+    Route::get('products/next-serial', [ProductController::class, 'nextSerial'])
+        ->name('products.next-serial')
+        ->middleware('permission:products.create');
     Route::resource('products', ProductController::class);
     
     // Product Category routes

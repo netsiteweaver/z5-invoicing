@@ -48,6 +48,14 @@
                     <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Product Information</h3>
                     
                     <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                        @if($product->photo)
+                            <div class="sm:col-span-2">
+                                <dt class="text-sm font-medium text-gray-500">Image</dt>
+                                <dd class="mt-1 text-sm text-gray-900">
+                                    <img src="{{ asset('storage/' . $product->photo) }}" alt="{{ $product->name }}" class="h-32 w-32 object-cover rounded">
+                                </dd>
+                            </div>
+                        @endif
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Product Name</dt>
                             <dd class="mt-1 text-sm text-gray-900">{{ $product->name }}</dd>

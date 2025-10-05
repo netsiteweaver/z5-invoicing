@@ -15,6 +15,7 @@ class Product extends Model
     protected $fillable = [
         'uuid',
         'stockref',
+        'barcode',
         'name',
         'description',
         'cost_price',

@@ -19,7 +19,7 @@
 
     <!-- Form -->
     <div class="bg-white shadow rounded-lg">
-        <form method="POST" action="{{ route('products.store') }}" class="space-y-6 p-6">
+        <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data" class="space-y-6 p-6">
             @csrf
             
             <!-- Basic Information -->
@@ -41,9 +41,20 @@
                     <!-- Barcode -->
                     <div>
                         <label for="barcode" class="block text-sm font-medium text-gray-700">Barcode</label>
-                        <input type="text" name="barcode" id="barcode" value="{{ old('barcode') }}" 
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('barcode') border-red-300 @enderror" 
-                               placeholder="Barcode number">
+                        <div class="mt-1 flex items-center space-x-2">
+                            <input type="text" name="barcode" id="barcode" value="{{ old('barcode') }}" 
+                                   inputmode="numeric" maxlength="13" autocomplete="off"
+                                   class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('barcode') border-red-300 @enderror" 
+                                   placeholder="13-digit EAN">
+                            <button type="button" id="generate_barcode_btn"
+                                    data-country-code="{{ \App\Models\Param::getValue('barcode.country_code', '01') }}"
+                                    data-company-code="{{ \App\Models\Param::getValue('barcode.company_code', '001') }}"
+                                    class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Generate
+                            </button>
+                        </div>
+                        <p id="generate_hint" class="mt-1 text-xs text-gray-500 hidden">Please select a Brand and a Category before generating a barcode.</p>
+                        <p class="mt-1 text-xs text-gray-500">Generates an EAN‑13 barcode only when empty.</p>
                         @error('barcode')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -67,6 +78,20 @@
                         @error('category_id')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
+                    </div>
+
+                    <!-- Photo -->
+                    <div>
+                        <label for="photo" class="block text-sm font-medium text-gray-700">Product Image</label>
+                        <input type="file" name="photo" id="photo" accept="image/*"
+                               class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-blue-500 focus:border-blue-500 @error('photo') border-red-300 @enderror">
+                        <p class="mt-1 text-xs text-gray-500">JPG, PNG, or WebP up to 2MB.</p>
+                        @error('photo')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                        <div id="photo_preview_wrap" class="mt-2 hidden">
+                            <img id="photo_preview" src="#" alt="Preview" class="h-20 w-20 object-cover rounded border">
+                        </div>
                     </div>
 
                     <!-- Brand -->
@@ -228,6 +253,124 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // --- Barcode generation (EAN-13) ---
+    const barcodeInput = document.getElementById('barcode');
+    const genBtn = document.getElementById('generate_barcode_btn');
+    const brandSelect = document.getElementById('brand_id');
+    const categorySelect = document.getElementById('category_id');
+    function enforceBarcodeLength() {
+        if (!barcodeInput) return;
+        const digits = (barcodeInput.value || '').replace(/\D/g, '').slice(0, 13);
+        if (barcodeInput.value !== digits) barcodeInput.value = digits;
+    }
+    if (barcodeInput) {
+        barcodeInput.addEventListener('input', enforceBarcodeLength);
+        barcodeInput.addEventListener('blur', enforceBarcodeLength);
+        enforceBarcodeLength();
+    }
+    console.log(barcodeInput, genBtn, brandSelect, categorySelect);
+    function padNumber(num, length) {
+        const s = String(num ?? '')
+            .replace(/\D/g, '')
+            .padStart(length, '0');
+        return s.slice(-length);
+    }
+    function ean13CheckDigit(code12) {
+        // code12: first 12 digits
+        const digits = code12.split('').map(d => parseInt(d, 10));
+        const sumOdd = digits.filter((_, i) => i % 2 === 0).reduce((a, b) => a + b, 0);   // positions 1,3,5,7,9,11 (0-indexed even)
+        const sumEven = digits.filter((_, i) => i % 2 === 1).reduce((a, b) => a + b, 0);  // positions 2,4,6,8,10,12 (0-indexed odd)
+        const total = sumOdd + sumEven * 3;
+        const mod = total % 10;
+        return (mod === 0 ? 0 : 10 - mod).toString();
+    }
+    async function fetchSerial(brandId, categoryId) {
+        try {
+            const url = new URL("{{ route('products.next-serial') }}", window.location.origin);
+            url.searchParams.set('brand_id', String(brandId || 0));
+            url.searchParams.set('category_id', String(categoryId || 0));
+            const resp = await fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            if (!resp.ok) throw new Error('Failed to fetch serial');
+            const data = await resp.json();
+            if (!data?.success) throw new Error('Invalid response');
+            return String(data.serial || '').replace(/\D/g, '').padStart(3, '0').slice(-3);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    async function generatePatternEan13() {
+        const countryRaw = genBtn?.getAttribute('data-country-code') || '00';
+        const companyRaw = genBtn?.getAttribute('data-company-code') || '000';
+        const country = padNumber(countryRaw, 2);     // CC (2)
+        const company = padNumber(companyRaw, 3);     // CMP (3)
+        let serial = await fetchSerial(parseInt(brandSelect?.value || '0', 10), parseInt(categorySelect?.value || '0', 10));
+        if (!serial) {
+            serial = padNumber(Math.floor(Math.random()*1000), 3); // fallback
+        }
+        const brandVal = padNumber((parseInt(brandSelect?.value || '0', 10) % 100), 2);   // BR (2)
+        const categoryVal = padNumber((parseInt(categorySelect?.value || '0', 10) % 100), 2); // CT (2)
+        const base12 = country + company + brandVal + categoryVal + serial; // total 12
+        return base12 + ean13CheckDigit(base12);
+    }
+    function updateGenerateState() {
+        if (!genBtn) return;
+        const hasBrand = !!(brandSelect && brandSelect.value);
+        const hasCategory = !!(categorySelect && categorySelect.value);
+        const hasBoth = hasBrand && hasCategory;
+        const hint = document.getElementById('generate_hint');
+        if (hint) {
+            if (hasBoth) hint.classList.add('hidden'); else hint.classList.remove('hidden');
+        }
+        // Visual disabled state without blocking click (so we can show message)
+        const cls = genBtn.classList;
+        if (!hasBoth) {
+            cls.add('opacity-50');
+            cls.add('cursor-not-allowed');
+            genBtn.setAttribute('title', 'Select Brand and Category first');
+        } else {
+            cls.remove('opacity-50');
+            cls.remove('cursor-not-allowed');
+            genBtn.removeAttribute('title');
+        }
+    }
+
+    if (brandSelect) brandSelect.addEventListener('change', updateGenerateState);
+    if (categorySelect) categorySelect.addEventListener('change', updateGenerateState);
+    updateGenerateState();
+
+    if (genBtn) {
+        genBtn.addEventListener('click', async function() {
+            if (!barcodeInput) return;
+            if (!brandSelect?.value || !categorySelect?.value) {
+                const hint = document.getElementById('generate_hint');
+                if (hint) hint.classList.remove('hidden');
+                (brandSelect?.value ? categorySelect : brandSelect)?.focus();
+                return;
+            }
+            if ((barcodeInput.value || '').trim().length === 0) {
+                barcodeInput.value = await generatePatternEan13();
+            }
+        });
+    }
+
+    // Live preview for photo
+    const photoInput = document.getElementById('photo');
+    const previewImg = document.getElementById('photo_preview');
+    const previewWrap = document.getElementById('photo_preview_wrap');
+    if (photoInput && previewImg && previewWrap) {
+        photoInput.addEventListener('change', function() {
+            const file = this.files && this.files[0];
+            if (!file) { previewWrap.classList.add('hidden'); return; }
+            const reader = new FileReader();
+            reader.onload = e => {
+                previewImg.src = e.target?.result || '#';
+                previewWrap.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
     // Maintain VAT-exclusive base values; display inclusive in inputs when requested
     const costPriceInput = document.getElementById('cost_price');
     const sellingPriceInput = document.getElementById('selling_price');
