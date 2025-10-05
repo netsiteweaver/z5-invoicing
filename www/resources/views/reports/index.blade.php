@@ -15,6 +15,7 @@
     <!-- Report Categories -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Sales & Orders Reports -->
+        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.orders') || auth()->user()->hasPermission('reports.sales'))
         <div class="bg-white shadow rounded-lg p-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -28,6 +29,7 @@
                 </div>
             </div>
             <div class="mt-4 space-y-2">
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.orders'))
                 <a href="{{ route('reports.orders') }}" class="block p-3 rounded-md hover:bg-gray-50 border border-gray-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -38,6 +40,8 @@
                     </div>
                     <p class="text-xs text-gray-500 mt-1">Date range, state, and customer filters</p>
                 </a>
+                @endif
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.sales'))
                 <a href="{{ route('reports.sales') }}" class="block p-3 rounded-md hover:bg-gray-50 border border-gray-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -48,10 +52,13 @@
                     </div>
                     <p class="text-xs text-gray-500 mt-1">Period analysis and best sellers</p>
                 </a>
+                @endif
             </div>
         </div>
+        @endif
 
         <!-- Inventory Reports -->
+        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.inventory') || auth()->user()->hasPermission('reports.goods_receipts') || auth()->user()->hasPermission('reports.stock_transfers'))
         <div class="bg-white shadow rounded-lg p-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -65,6 +72,7 @@
                 </div>
             </div>
             <div class="mt-4 space-y-2">
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.inventory'))
                 <a href="{{ route('reports.inventory') }}" class="block p-3 rounded-md hover:bg-gray-50 border border-gray-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -75,6 +83,8 @@
                     </div>
                     <p class="text-xs text-gray-500 mt-1">Stock levels and movement analysis</p>
                 </a>
+                @endif
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.goods_receipts'))
                 <a href="{{ route('reports.goods-receipts') }}" class="block p-3 rounded-md hover:bg-gray-50 border border-gray-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -85,6 +95,8 @@
                     </div>
                     <p class="text-xs text-gray-500 mt-1">Incoming stock and supplier analysis</p>
                 </a>
+                @endif
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.stock_transfers'))
                 <a href="{{ route('reports.stock-transfers') }}" class="block p-3 rounded-md hover:bg-gray-50 border border-gray-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -95,10 +107,13 @@
                     </div>
                     <p class="text-xs text-gray-500 mt-1">Internal stock movement tracking</p>
                 </a>
+                @endif
             </div>
         </div>
+        @endif
 
         <!-- Customer & Payment Reports -->
+        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.customers') || auth()->user()->hasPermission('reports.payments'))
         <div class="bg-white shadow rounded-lg p-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -112,6 +127,7 @@
                 </div>
             </div>
             <div class="mt-4 space-y-2">
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.customers'))
                 <a href="{{ route('reports.customers') }}" class="block p-3 rounded-md hover:bg-gray-50 border border-gray-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -122,6 +138,8 @@
                     </div>
                     <p class="text-xs text-gray-500 mt-1">Customer performance and top buyers</p>
                 </a>
+                @endif
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.payments'))
                 <a href="{{ route('reports.payments') }}" class="block p-3 rounded-md hover:bg-gray-50 border border-gray-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -132,10 +150,13 @@
                     </div>
                     <p class="text-xs text-gray-500 mt-1">Payment tracking and outstanding amounts</p>
                 </a>
+                @endif
             </div>
         </div>
+        @endif
 
         <!-- Supplier Reports -->
+        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.suppliers'))
         <div class="bg-white shadow rounded-lg p-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -149,6 +170,7 @@
                 </div>
             </div>
             <div class="mt-4">
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.suppliers'))
                 <a href="{{ route('reports.suppliers') }}" class="block p-3 rounded-md hover:bg-gray-50 border border-gray-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -159,10 +181,13 @@
                     </div>
                     <p class="text-xs text-gray-500 mt-1">Supplier performance and purchase trends</p>
                 </a>
+                @endif
             </div>
         </div>
+        @endif
 
         <!-- Quick Stats -->
+        @if(auth()->user()->is_admin || auth()->user()->is_root)
         <div class="bg-white shadow rounded-lg p-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -194,6 +219,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
         <!-- Additional Reports -->
         <div class="bg-white shadow rounded-lg p-6">
@@ -209,32 +235,48 @@
                 </div>
             </div>
             <div class="mt-4 space-y-2">
-                <div class="p-3 rounded-md bg-gray-50 border border-gray-200">
-                    <div class="flex items-center">
-                        <i class="fas fa-calendar-alt text-gray-400 mr-3"></i>
-                        <span class="text-sm font-medium text-gray-900">Monthly Summary</span>
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.monthly_summary'))
+                <a href="{{ route('reports.monthly-summary') }}" class="block p-3 rounded-md hover:bg-gray-50 border border-gray-200 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar-alt text-gray-400 mr-3"></i>
+                            <span class="text-sm font-medium text-gray-900">Monthly Summary</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
                     </div>
                     <p class="text-xs text-gray-500 mt-1">Comprehensive monthly business overview</p>
-                </div>
-                <div class="p-3 rounded-md bg-gray-50 border border-gray-200">
-                    <div class="flex items-center">
-                        <i class="fas fa-trending-up text-gray-400 mr-3"></i>
-                        <span class="text-sm font-medium text-gray-900">Growth Analysis</span>
+                </a>
+                @endif
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.growth_analysis'))
+                <a href="{{ route('reports.growth-analysis') }}" class="block p-3 rounded-md hover:bg-gray-50 border border-gray-200 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fas fa-trending-up text-gray-400 mr-3"></i>
+                            <span class="text-sm font-medium text-gray-900">Growth Analysis</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
                     </div>
                     <p class="text-xs text-gray-500 mt-1">Year-over-year growth metrics</p>
-                </div>
-                <div class="p-3 rounded-md bg-gray-50 border border-gray-200">
-                    <div class="flex items-center">
-                        <i class="fas fa-exclamation-triangle text-gray-400 mr-3"></i>
-                        <span class="text-sm font-medium text-gray-900">Alerts & Warnings</span>
+                </a>
+                @endif
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.alerts_warnings'))
+                <a href="{{ route('reports.alerts-warnings') }}" class="block p-3 rounded-md hover:bg-gray-50 border border-gray-200 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-triangle text-gray-400 mr-3"></i>
+                            <span class="text-sm font-medium text-gray-900">Alerts & Warnings</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
                     </div>
                     <p class="text-xs text-gray-500 mt-1">System alerts and recommendations</p>
-                </div>
+                </a>
+                @endif
             </div>
         </div>
     </div>
 
     <!-- Recent Activity -->
+    @if(auth()->user()->is_admin || auth()->user()->is_root)
     <div class="bg-white shadow rounded-lg">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Recent Activity</h3>
@@ -303,5 +345,6 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 @endsection

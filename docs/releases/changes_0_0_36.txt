@@ -1,0 +1,16 @@
+2025-10-05 12:00:00
+- barcode for products:
+  - can manually generate barcode for product
+  - can generate internal barcode (EAN13 standard) based on category and brand
+- cleanup app name in footer (remove underscores if any)
+- allow to upload image for product. useful for manual input in sales/order
+- allow to manage payment types in case new ones become available (MyT Money, MCB Juice ...)
+- Payment Reports: add total per payment type
+- added custom 403 (permission) page
+- reports: 
+  - controlled by permissions
+  - more sections in sales reports"
+    - by brands
+    - by categories
+  - added a default page title for each
+  

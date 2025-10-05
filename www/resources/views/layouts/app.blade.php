@@ -463,46 +463,83 @@
                             <i class="far fa-circle mr-2 text-xs"></i>
                             All Reports
                         </a>
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.orders'))
                         <a href="{{ route('reports.orders') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.orders') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Orders Report
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.sales'))
                         <a href="{{ route('reports.sales') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.sales') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Sales Report
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.goods_receipts'))
                         <a href="{{ route('reports.goods-receipts') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.goods-receipts') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Goods Receipts
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.payments'))
                         <a href="{{ route('reports.payments') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.payments') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Payment Analysis
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.stock_transfers'))
                         <a href="{{ route('reports.stock-transfers') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.stock-transfers') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Stock Transfers
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.inventory'))
                         <a href="{{ route('reports.inventory') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.inventory') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Inventory Report
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.customers'))
                         <a href="{{ route('reports.customers') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.customers') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Customer Analysis
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.suppliers'))
                         <a href="{{ route('reports.suppliers') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.suppliers') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Supplier Analysis
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.monthly_summary'))
+                        <a href="{{ route('reports.monthly-summary') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.monthly-summary') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Monthly Summary
+                        </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.growth_analysis'))
+                        <a href="{{ route('reports.growth-analysis') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.growth-analysis') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Growth Analysis
+                        </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('reports.alerts_warnings'))
+                        <a href="{{ route('reports.alerts-warnings') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('reports.alerts-warnings') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Alerts & Warnings
+                        </a>
+                        @endif
                     </div>
                 </div>
                 @endif
@@ -647,6 +684,14 @@
 
             <!-- Page content -->
             <main class="flex-1 overflow-y-auto bg-gray-50">
+                @if(request()->routeIs('reports.*'))
+                <div class="px-4 py-4 hidden print:block">
+                    <div class="max-w-7xl mx-auto">
+                        <h1 class="text-2xl font-bold text-gray-900">@yield('title', 'Report')</h1>
+                        <p class="text-sm text-gray-700">Printed on {{ now()->format('M d, Y H:i') }}</p>
+                    </div>
+                </div>
+                @endif
                 <div class="py-6">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         @if(session('success'))

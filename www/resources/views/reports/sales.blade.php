@@ -252,6 +252,53 @@
         </div>
     </div>
 
+    <!-- Sales by Brand and Category -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Sales by Brand -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Sales by Brand</h3>
+                <p class="mt-1 text-sm text-gray-600">Revenue breakdown by product brand.</p>
+            </div>
+            <div class="px-6 py-4">
+                @if($salesByBrand->count() > 0)
+                    <div class="h-80">
+                        <canvas id="salesByBrandChart"></canvas>
+                    </div>
+                @else
+                    <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                        <div class="text-center">
+                            <i class="fas fa-tags text-gray-400 text-4xl mb-2"></i>
+                            <p class="text-gray-500">No brand sales data available</p>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Sales by Category -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Sales by Category</h3>
+                <p class="mt-1 text-sm text-gray-600">Revenue breakdown by product category.</p>
+            </div>
+            <div class="px-6 py-4">
+                @if($salesByCategory->count() > 0)
+                    <div class="h-80">
+                        <canvas id="salesByCategoryChart"></canvas>
+                    </div>
+                @else
+                    <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                        <div class="text-center">
+                            <i class="fas fa-list text-gray-400 text-4xl mb-2"></i>
+                            <p class="text-gray-500">No category sales data available</p>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
     <!-- Sales Trend Chart -->
     <div class="bg-white shadow rounded-lg">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -259,17 +306,24 @@
             <p class="mt-1 text-sm text-gray-600">Daily sales performance for the selected period.</p>
         </div>
         <div class="px-6 py-4">
-            <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-                <div class="text-center">
-                    <i class="fas fa-chart-area text-gray-400 text-4xl mb-2"></i>
-                    <p class="text-gray-500">Sales trend chart would be displayed here</p>
-                    <p class="text-sm text-gray-400">Integration with charting library needed</p>
+            @if($salesTrend->count() > 0)
+                <div class="h-80">
+                    <canvas id="salesTrendChart"></canvas>
                 </div>
-            </div>
+            @else
+                <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                    <div class="text-center">
+                        <i class="fas fa-chart-area text-gray-400 text-4xl mb-2"></i>
+                        <p class="text-gray-500">No sales found for the selected period</p>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </div>
 
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 function toggleCustomDates() {
     const period = document.getElementById('period').value;
@@ -298,5 +352,185 @@ function exportToCSV() {
     link.click();
     document.body.removeChild(link);
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Color palette for charts
+    const colors = [
+        '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', 
+        '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6B7280',
+        '#F43F5E', '#8B5A2B', '#059669', '#DC2626', '#7C3AED'
+    ];
+
+    // Sales by Brand Chart
+    @if($salesByBrand->count() > 0)
+    const salesByBrandData = @json($salesByBrand->map(function($brand) {
+        return [
+            'name' => $brand->brand_name,
+            'quantity' => $brand->total_quantity,
+            'revenue' => $brand->total_revenue
+        ];
+    }));
+
+    const brandCtx = document.getElementById('salesByBrandChart').getContext('2d');
+    new Chart(brandCtx, {
+        type: 'doughnut',
+        data: {
+            labels: salesByBrandData.map(item => item.name),
+            datasets: [{
+                data: salesByBrandData.map(item => item.revenue),
+                backgroundColor: colors.slice(0, salesByBrandData.length),
+                borderColor: '#ffffff',
+                borderWidth: 2,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: $${value.toLocaleString()} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    @endif
+
+    // Sales by Category Chart
+    @if($salesByCategory->count() > 0)
+    const salesByCategoryData = @json($salesByCategory->map(function($category) {
+        return [
+            'name' => $category->category_name,
+            'quantity' => $category->total_quantity,
+            'revenue' => $category->total_revenue
+        ];
+    }));
+
+    const categoryCtx = document.getElementById('salesByCategoryChart').getContext('2d');
+    new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: salesByCategoryData.map(item => item.name),
+            datasets: [{
+                data: salesByCategoryData.map(item => item.revenue),
+                backgroundColor: colors.slice(0, salesByCategoryData.length),
+                borderColor: '#ffffff',
+                borderWidth: 2,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: $${value.toLocaleString()} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    @endif
+
+    // Sales Trend Chart
+    @if($salesTrend->count() > 0)
+    const salesTrendData = @json($salesTrendFormatted);
+
+    const trendCtx = document.getElementById('salesTrendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: salesTrendData.map(item => item.date),
+            datasets: [{
+                label: 'Sales Amount ($)',
+                data: salesTrendData.map(item => item.amount),
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: 'rgb(59, 130, 246)',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                yAxisID: 'y'
+            }, {
+                label: 'Number of Sales',
+                data: salesTrendData.map(item => item.count),
+                borderColor: 'rgb(16, 185, 129)',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.4,
+                pointBackgroundColor: 'rgb(16, 185, 129)',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 3,
+                yAxisID: 'y1'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: { grid: { display: false } },
+                y: {
+                    position: 'left',
+                    ticks: { callback: (v) => '$' + Number(v).toLocaleString() }
+                },
+                y1: {
+                    position: 'right',
+                    grid: { drawOnChartArea: false },
+                }
+            },
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const val = context.parsed.y;
+                            if (context.datasetIndex === 0) {
+                                return 'Amount: $' + Number(val).toLocaleString();
+                            }
+                            return 'Count: ' + val;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    @endif
+});
 </script>
+@endpush
 @endsection

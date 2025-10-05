@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>403 Forbidden</title>
+<title>404 Not Found</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://kit.fontawesome.com/4b851d0dd9.js" crossorigin="anonymous"></script>
 <style>
@@ -42,7 +42,7 @@
   h1 {
     font-size: 96px;
     margin: 0;
-    color: #ff8400;
+    color: #c93634;
   }
 
   p {
@@ -53,19 +53,19 @@
   a.button {
     display: inline-block;
     padding: 14px 32px;
-    background-color: #ff8400;
+    background-color: #c93634;
     color: #fff;
     font-weight: bold;
     text-decoration: none;
     border-radius: 3px;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgb(247, 161, 71);
+    box-shadow: 0 5px 15px rgb(196, 99, 97);
   }
 
   a.button:hover {
-    background-color: #d76f00;
+    background-color:rgb(116, 20, 19);
     transform: translateY(5px);
-    box-shadow: 0 8px 20px rgb(247, 161, 71);
+    box-shadow: 0 8px 20px rgb(196, 99, 97);
   }
 
   /* Background floating circles */
@@ -73,7 +73,7 @@
     position: absolute;
     border-radius: 50%;
     opacity: 0.2;
-    background-color: #ff8400;
+    background-color: #c93634;
     animation: drift 20s linear infinite;
   }
 
@@ -99,9 +99,9 @@
   <div class="circle"></div>
 
   <div class="container">
-    <img class="illustration" src="{{ asset('images/11104-256px.png') }}" alt="Forbidden">
-    <h1>403</h1>
-    <p>Sorry, you don’t have permission to access this page.</p>
+    <img class="illustration" src="{{ asset('images/page-not-found.png') }}" alt="Not Found">
+    <h1>404</h1>
+    <p>Oops! The page you’re looking for doesn’t exist or has been moved.</p>
     <a href="/" class="button"><i class="fas fa-home"></i> Go Home</a>
   </div>
 </body>

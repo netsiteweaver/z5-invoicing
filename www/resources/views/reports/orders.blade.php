@@ -167,7 +167,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-print">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -200,7 +200,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             ${{ number_format($order->total_amount, 2) }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium no-print">
                             <a href="{{ route('orders.show', $order) }}" class="text-blue-600 hover:text-blue-900">
                                 <i class="fas fa-eye"></i>
                             </a>

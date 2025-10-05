@@ -155,6 +155,9 @@ Route::middleware(['auth', 'verified', 'check.user.status'])->group(function () 
     Route::get('reports/customers', [ReportsController::class, 'customers'])->name('reports.customers')->middleware('permission:reports.customers');
     Route::get('reports/payments', [ReportsController::class, 'payments'])->name('reports.payments')->middleware('permission:reports.payments');
     Route::get('reports/suppliers', [ReportsController::class, 'suppliers'])->name('reports.suppliers')->middleware('permission:reports.suppliers');
+    Route::get('reports/monthly-summary', [ReportsController::class, 'monthlySummary'])->name('reports.monthly-summary')->middleware('permission:reports.monthly_summary');
+    Route::get('reports/growth-analysis', [ReportsController::class, 'growthAnalysis'])->name('reports.growth-analysis')->middleware('permission:reports.growth_analysis');
+    Route::get('reports/alerts-warnings', [ReportsController::class, 'alertsWarnings'])->name('reports.alerts-warnings')->middleware('permission:reports.alerts_warnings');
 
     // (moved) changelog feed is public
 

@@ -135,6 +135,9 @@ class PermissionSeeder extends Seeder
             ['name' => 'reports.customers', 'display_name' => 'View Customer Reports', 'module' => 'reports', 'action' => 'customers'],
             ['name' => 'reports.payments', 'display_name' => 'View Payment Reports', 'module' => 'reports', 'action' => 'payments'],
             ['name' => 'reports.suppliers', 'display_name' => 'View Supplier Reports', 'module' => 'reports', 'action' => 'suppliers'],
+            ['name' => 'reports.monthly_summary', 'display_name' => 'View Monthly Summary Report', 'module' => 'reports', 'action' => 'monthly_summary'],
+            ['name' => 'reports.growth_analysis', 'display_name' => 'View Growth Analysis Report', 'module' => 'reports', 'action' => 'growth_analysis'],
+            ['name' => 'reports.alerts_warnings', 'display_name' => 'View Alerts & Warnings', 'module' => 'reports', 'action' => 'alerts_warnings'],
         ];
 
         // Create permissions
@@ -199,7 +202,7 @@ class PermissionSeeder extends Seeder
             'inventory.low_stock', 'inventory.stock_report',
             'goods_receipts.view', 'goods_receipts.create', 'goods_receipts.edit', 'goods_receipts.approve', 'goods_receipts.print',
             'stock_transfers.view', 'stock_transfers.create', 'stock_transfers.edit', 'stock_transfers.approve', 'stock_transfers.print',
-            'reports.view', 'reports.orders', 'reports.sales', 'reports.goods_receipts', 'reports.stock_transfers', 'reports.inventory', 'reports.customers', 'reports.payments', 'reports.suppliers',
+            'reports.view', 'reports.orders', 'reports.sales', 'reports.goods_receipts', 'reports.stock_transfers', 'reports.inventory', 'reports.customers', 'reports.payments', 'reports.suppliers', 'reports.monthly_summary', 'reports.growth_analysis', 'reports.alerts_warnings',
             'uoms.view', 'uoms.create', 'uoms.edit',
         ]);
 
