@@ -49,6 +49,12 @@ class PermissionSeeder extends Seeder
             ['name' => 'product_brands.edit', 'display_name' => 'Edit Product Brands', 'module' => 'product_brands', 'action' => 'edit'],
             ['name' => 'product_brands.delete', 'display_name' => 'Delete Product Brands', 'module' => 'product_brands', 'action' => 'delete'],
             
+            // Payment Types
+            ['name' => 'payment-types.view', 'display_name' => 'View Payment Types', 'module' => 'payment_types', 'action' => 'view'],
+            ['name' => 'payment-types.create', 'display_name' => 'Create Payment Types', 'module' => 'payment_types', 'action' => 'create'],
+            ['name' => 'payment-types.edit', 'display_name' => 'Edit Payment Types', 'module' => 'payment_types', 'action' => 'edit'],
+            ['name' => 'payment-types.delete', 'display_name' => 'Delete Payment Types', 'module' => 'payment_types', 'action' => 'delete'],
+            
             // Orders
             ['name' => 'orders.view', 'display_name' => 'View Orders', 'module' => 'orders', 'action' => 'view'],
             ['name' => 'orders.create', 'display_name' => 'Create Orders', 'module' => 'orders', 'action' => 'create'],
@@ -186,6 +192,7 @@ class PermissionSeeder extends Seeder
             'products.view', 'products.create', 'products.edit',
             'product_categories.view', 'product_categories.create', 'product_categories.edit',
             'product_brands.view', 'product_brands.create', 'product_brands.edit',
+            'payment-types.view', 'payment-types.create', 'payment-types.edit',
             'orders.view', 'orders.create', 'orders.edit', 'orders.convert_to_sale',
             'sales.view', 'sales.create', 'sales.edit',
             'inventory.view', 'inventory.create', 'inventory.edit', 'inventory.stock_movement',
@@ -201,6 +208,7 @@ class PermissionSeeder extends Seeder
             'departments.view',
             'customers.view', 'customers.create', 'customers.edit',
             'products.view',
+            'payment-types.view',
             'orders.view', 'orders.create', 'orders.edit', 'orders.convert_to_sale',
             'sales.view', 'sales.create', 'sales.edit',
             'inventory.view',

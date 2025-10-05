@@ -10,6 +10,15 @@ use App\Http\Controllers\Concerns\HasBreadcrumbs;
 class CustomerController extends Controller
 {
     use HasBreadcrumbs;
+
+    public function __construct()
+    {
+        $this->middleware(['auth', 'verified']);
+        $this->middleware('permission:customers.view')->only(['index', 'show']);
+        $this->middleware('permission:customers.create')->only(['create', 'store']);
+        $this->middleware('permission:customers.edit')->only(['edit', 'update']);
+        $this->middleware('permission:customers.delete')->only(['destroy']);
+    }
     /**
      * Display a listing of customers.
      */

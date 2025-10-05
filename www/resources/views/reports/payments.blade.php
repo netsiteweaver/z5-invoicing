@@ -56,12 +56,19 @@
                     <label for="payment_method" class="block text-sm font-medium text-gray-700">Payment Method</label>
                     <select name="payment_method" id="payment_method" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                         <option value="">All Methods</option>
-                        @foreach($paymentMethods as $method)
-                        <option value="{{ $method }}" {{ request('payment_method') == $method ? 'selected' : '' }}>
-                            {{ ucfirst(str_replace('_', ' ', $method)) }}
+                        @foreach($paymentTypes as $paymentType)
+                        <option value="{{ $paymentType->name }}" {{ request('payment_method') == $paymentType->name ? 'selected' : '' }}>
+                            {{ $paymentType->name }}
                         </option>
                         @endforeach
                     </select>
+                </div>
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="hide_zero_totals" value="1" {{ request('hide_zero_totals') ? 'checked' : '' }} 
+                               class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500">
+                        <span class="ml-2 text-sm text-gray-700">Hide zero totals</span>
+                    </label>
                 </div>
                 <div class="flex items-end space-x-3">
                     <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
@@ -230,7 +237,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                {{ ucfirst(str_replace('_', ' ', $payment->payment_method)) }}
+                                {{ $payment->payment_method }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -260,22 +267,108 @@
         @endif
     </div>
 
-    <!-- Payment Method Distribution -->
-    <div class="bg-white shadow rounded-lg hidden">
+    <!-- Payment Type Summary -->
+    <div class="bg-white shadow rounded-lg">
         <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Payment Method Distribution</h3>
+            <h3 class="text-lg font-medium text-gray-900">Payment Type Summary</h3>
+            <p class="mt-1 text-sm text-gray-600">Total amounts and counts by payment type.</p>
         </div>
         <div class="px-6 py-4">
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                @php
-                    $methodCounts = $payments->groupBy('payment_method')->map->count();
-                @endphp
-                @foreach($paymentMethods as $method)
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-gray-900">{{ $methodCounts->get($method, 0) }}</div>
-                    <div class="text-sm text-gray-500">{{ ucfirst(str_replace('_', ' ', $method)) }}</div>
-                </div>
-                @endforeach
+            @php
+                $methodCounts = $payments->groupBy('payment_method')->map->count();
+                $methodTotals = $payments->groupBy('payment_method')->map->sum('amount');
+            @endphp
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Average Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @php
+                            // Calculate totals based on visible payment types
+                            $visibleTotals = [];
+                            $visibleCounts = [];
+                            
+                            foreach($paymentTypes as $paymentType) {
+                                $count = $methodCounts->get($paymentType->name, 0);
+                                $total = $methodTotals->get($paymentType->name, 0);
+                                
+                                // Include in calculations if not hiding zeros or if has non-zero total
+                                if (!request('hide_zero_totals') || $total > 0) {
+                                    $visibleTotals[] = $total;
+                                    $visibleCounts[] = $count;
+                                }
+                            }
+                            
+                            $grandTotal = array_sum($visibleTotals);
+                            $grandCount = array_sum($visibleCounts);
+                        @endphp
+                        @foreach($paymentTypes as $paymentType)
+                        @php
+                            $count = $methodCounts->get($paymentType->name, 0);
+                            $total = $methodTotals->get($paymentType->name, 0);
+                            $average = $count > 0 ? $total / $count : 0;
+                            $percentage = $grandTotal > 0 ? ($total / $grandTotal) * 100 : 0;
+                            
+                            // Skip if hide_zero_totals is checked and this payment type has zero total
+                            if (request('hide_zero_totals') && $total == 0) {
+                                continue;
+                            }
+                        @endphp
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-3">
+                                        {{ $paymentType->name }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ $count }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                ${{ number_format($total, 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                ${{ number_format($average, 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-full bg-gray-200 rounded-full h-2 mr-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $percentage }}%"></div>
+                                    </div>
+                                    <span class="text-sm text-gray-600">{{ number_format($percentage, 1) }}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                        
+                        <!-- Grand Total Row -->
+                        <tr class="bg-gray-50 font-medium">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <strong>Total</strong>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <strong>{{ $grandCount }}</strong>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <strong>${{ number_format($grandTotal, 2) }}</strong>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <strong>${{ $grandCount > 0 ? number_format($grandTotal / $grandCount, 2) : '0.00' }}</strong>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <strong>100.0%</strong>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

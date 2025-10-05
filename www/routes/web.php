@@ -14,6 +14,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PaymentTypeController;
 use App\Http\Controllers\ChangelogController;
 use App\Http\Controllers\ReportsController;
 use Illuminate\Support\Facades\Route;
@@ -70,6 +71,10 @@ Route::middleware(['auth', 'verified', 'check.user.status'])->group(function () 
     
     // Product Brand routes
     Route::resource('product-brands', ProductBrandController::class);
+    
+    // Payment Types routes
+    Route::post('payment-types/update-order', [PaymentTypeController::class, 'updateOrder'])->name('payment-types.update-order');
+    Route::resource('payment-types', PaymentTypeController::class);
     
     // Order routes
     Route::get('orders/price-history', [OrderController::class, 'priceHistory'])->name('orders.price-history');

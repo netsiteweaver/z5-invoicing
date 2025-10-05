@@ -12,6 +12,7 @@ use App\Models\StockTransfer;
 use App\Models\Inventory;
 use App\Models\Customer;
 use App\Models\Payment;
+use App\Models\PaymentType;
 use App\Models\Supplier;
 
 class ReportsController extends Controller
@@ -291,9 +292,9 @@ class ReportsController extends Controller
             ->orderBy('outstanding_amount', 'desc')
             ->get();
 
-        $paymentMethods = ['cash', 'bank_transfer', 'credit_card', 'check', 'other'];
+        $paymentTypes = PaymentType::active()->ordered()->get();
 
-        return view('reports.payments', compact('payments', 'outstandingPayments', 'paymentMethods'));
+        return view('reports.payments', compact('payments', 'outstandingPayments', 'paymentTypes'));
     }
 
     public function suppliers(Request $request)
