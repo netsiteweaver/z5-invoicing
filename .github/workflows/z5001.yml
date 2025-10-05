@@ -1,0 +1,27 @@
+name: Laravel Minimal CI
+
+on:
+  push:
+    branches:
+      - "*"  # Only triggers on push
+
+jobs:
+  laravel-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup PHP 8.2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, bcmath, pdo_mysql
+
+      # 3️⃣ Install Composer dependencies inside www/
+      - name: Install Composer dependencies
+        working-directory: www
+        run: composer install --no-interaction --prefer-dist --no-progress
