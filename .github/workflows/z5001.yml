@@ -1,6 +1,5 @@
-name: Laravel CI with Cache and Migration
+name: Laravel CI with MySQL
 
-# ✅ Trigger only on push to master
 on:
   push:
     branches:
@@ -10,36 +9,54 @@ jobs:
   laravel-ci:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
-      # 1️⃣ Checkout repo
+      # 1️⃣ Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup PHP 8.2
+      # 2️⃣ Setup PHP 8.2 with extensions
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, intl, bcmath, pdo_mysql, sqlite
+          extensions: mbstring, intl, bcmath, pdo_mysql, xml, gd
 
-      # 3️⃣ Install Composer dependencies inside www/
+      # 3️⃣ Install Composer dependencies in www/
       - name: Install Composer dependencies
         working-directory: www
         run: composer install --no-interaction --prefer-dist --no-progress
 
-      # 4️⃣ Create temporary .env for CI
-      - name: Setup temporary .env
+      # 4️⃣ Setup .env for MySQL
+      - name: Setup .env
         working-directory: www
         run: |
           echo "APP_NAME=Laravel" > .env
           echo "APP_ENV=testing" >> .env
           echo "APP_KEY=" >> .env
           echo "APP_DEBUG=true" >> .env
-          echo "DB_CONNECTION=sqlite" >> .env
-          echo "DB_DATABASE=:memory:" >> .env
+          echo "DB_CONNECTION=mysql" >> .env
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=test_db" >> .env
+          echo "DB_USERNAME=root" >> .env
+          echo "DB_PASSWORD=root" >> .env
           php artisan key:generate --no-interaction
 
-      # 5️⃣ Clear caches
+      # 5️⃣ Clear Laravel caches
       - name: Clear Laravel caches
         working-directory: www
         run: |
