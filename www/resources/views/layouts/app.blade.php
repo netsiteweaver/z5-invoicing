@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Dashboard') - {{ $companySettings ? $companySettings->company_name : config('app.name', 'Welcome') }}</title>
+    <title>@yield('title', 'Dashboard') - {{ $companySettings ? $companySettings->company_name : ($displayAppName ?? config('app.name', 'Welcome')) }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -28,7 +28,7 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gray-50" x-data="{ sidebarOpen: true }">
+<body class="font-sans antialiased bg-gray-50" x-data="{ sidebarOpen: false }" x-init="sidebarOpen = window.matchMedia('(min-width: 1024px)').matches">
     <div class="min-h-screen flex transition-all duration-300 app-container" :style="{ paddingLeft: sidebarOpen ? '16rem' : '0' }">
         <!-- Sidebar -->
         <div class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col print:hidden no-print sidebar"
@@ -46,7 +46,7 @@
                     <div class="w-8 h-8 bg-white rounded flex items-center justify-center mr-3 overflow-hidden">
                         <img src="{{ asset('favicon-32x32.png') }}" alt="Logo" class="h-8 w-8 object-contain">
                     </div>
-                    <h1 class="text-xl font-bold text-white">{{ $companySettings ? $companySettings->company_name : config('app.name', 'Welcome') }}</h1>
+                    <h1 class="text-xl font-bold text-white">{{ $companySettings ? $companySettings->company_name : ($displayAppName ?? config('app.name', 'Welcome')) }}</h1>
                 </div>
             </div>
 
@@ -62,7 +62,7 @@
             </a>
 
             <!-- Navigation -->
-            <nav class="mt-2 px-2 flex-1 overflow-y-auto">
+            <nav class="mt-2 px-2 flex-1 overflow-y-auto" @click="if (window.innerWidth < 1024 && $event.target.closest('a')) sidebarOpen = false">
                 <!-- Dashboard -->
                 <a href="{{ route('dashboard') }}" 
                    class="group flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
@@ -101,6 +101,7 @@
                 @endif
 
                 <!-- Products -->
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('products.view') || auth()->user()->hasPermission('product_categories.view') || auth()->user()->hasPermission('product_brands.view'))
                 <div x-data="{ productsOpen: {{ request()->routeIs('products.*') || request()->routeIs('product-categories.*') || request()->routeIs('product-brands.*') ? 'true' : 'false' }} }">
                     <button @click="productsOpen = !productsOpen" 
                             class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('products.*') || request()->routeIs('product-categories.*') || request()->routeIs('product-brands.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
@@ -111,23 +112,30 @@
                         <i class="fas fa-chevron-down transition-transform duration-200" :class="productsOpen ? 'rotate-180' : ''"></i>
                     </button>
                     <div x-show="productsOpen" x-transition class="ml-6 mt-1 space-y-1">
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('products.view'))
                         <a href="{{ route('products.index') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('products.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             All Products
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('product_categories.view'))
                         <a href="{{ route('product-categories.index') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('product-categories.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Categories
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('product_brands.view'))
                         <a href="{{ route('product-brands.index') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('product-brands.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Brands
                         </a>
+                        @endif
                     </div>
                 </div>
+                @endif
 
                 <!-- Orders -->
                 @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.view'))
@@ -359,6 +367,7 @@
                 @endif
 
                 <!-- Departments -->
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('departments.view'))
                 <div x-data="{ departmentsOpen: {{ request()->routeIs('departments.*') ? 'true' : 'false' }} }">
                     <button @click="departmentsOpen = !departmentsOpen" 
                             class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('departments.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
@@ -369,20 +378,26 @@
                         <i class="fas fa-chevron-down transition-transform duration-200" :class="departmentsOpen ? 'rotate-180' : ''"></i>
                     </button>
                     <div x-show="departmentsOpen" x-transition class="ml-6 mt-1 space-y-1">
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('departments.view'))
                         <a href="{{ route('departments.index') }}" 
-                        class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('departments.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('departments.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             All Departments
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('departments.create'))
                         <a href="{{ route('departments.create') }}" 
-                        class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('departments.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('departments.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Create Department
                         </a>
+                        @endif
                     </div>
                 </div>
+                @endif
 
                 <!-- User Management -->
+                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('user_management.view'))
                 <div x-data="{ userManagementOpen: {{ request()->routeIs('user-management.*') ? 'true' : 'false' }} }">
                     <button @click="userManagementOpen = !userManagementOpen" 
                             class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('user-management.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
@@ -393,28 +408,37 @@
                         <i class="fas fa-chevron-down transition-transform duration-200" :class="userManagementOpen ? 'rotate-180' : ''"></i>
                     </button>
                     <div x-show="userManagementOpen" x-transition class="ml-6 mt-1 space-y-1">
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('user_management.view'))
                         <a href="{{ route('user-management.index') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('user-management.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             All Users
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('user_management.create'))
                         <a href="{{ route('user-management.create') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('user-management.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Add User
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('user_management.roles'))
                         <a href="{{ route('user-management.roles') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('user-management.roles') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Manage Roles
                         </a>
+                        @endif
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('user_management.permissions'))
                         <a href="{{ route('user-management.permissions') }}" 
                            class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('user-management.permissions') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Manage Permissions
                         </a>
+                        @endif
                     </div>
                 </div>
+                @endif
 
                 <!-- Divider -->
                 <div class="border-t border-gray-700 my-4"></div>
@@ -485,9 +509,9 @@
 
                 <!-- Settings -->
                 @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('settings.view'))
-                <div x-data="{ settingsOpen: {{ request()->routeIs('settings.*') || request()->routeIs('settings.notifications') ? 'true' : 'false' }} }">
+                <div x-data="{ settingsOpen: {{ request()->routeIs('settings.*') || request()->routeIs('settings.notifications') || request()->routeIs('payment-types.*') ? 'true' : 'false' }} }">
                     <button @click="settingsOpen = !settingsOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('settings.*') || request()->routeIs('settings.notifications') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('settings.*') || request()->routeIs('settings.notifications') || request()->routeIs('payment-types.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
                         <div class="flex items-center">
                             <i class="fas fa-cogs mr-3 h-5 w-5"></i>
                             Settings
@@ -505,6 +529,13 @@
                             <i class="far fa-circle mr-2 text-xs"></i>
                             Notifications
                         </a>
+                        @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('payment-types.view'))
+                        <a href="{{ route('payment-types.index') }}" 
+                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('payment-types.*') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-2 text-xs"></i>
+                            Payment Types
+                        </a>
+                        @endif
                     </div>
                 </div>
                 @endif
@@ -673,7 +704,7 @@
             <!-- Footer: version info -->
             <div class="bg-white border-t border-gray-200">
                 <div class="px-4 py-2 text-xs text-gray-500 flex items-center justify-between">
-                    <span>{{ config('app.name') }}</span>
+                    <span>{{ $displayAppName ?? config('app.name') }}</span>
                     <span x-data="{v:''}" x-init="(async()=>{try{const r=await fetch('{{ route('changelog.feed') }}',{cache:'no-cache'});if(r.ok){const d=await r.json();v=(d.releases?.[0]?.version)||''}}catch(e){}})()">Version <span x-text="v || '–'"></span></span>
                 </div>
             </div>
