@@ -1,0 +1,56 @@
+name: Laravel CI
+
+# 🧠 Trigger only when pushing to any branch
+on:
+  push:
+    branches:
+      - "*"
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout the code from the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup PHP 8.x with required extensions
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, bcmath, gd, xml, ctype, json, tokenizer, pdo_mysql
+          coverage: none
+
+      # 3️⃣ Copy .env.example if no .env (for testing)
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      # 4️⃣ Install dependencies
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      # 5️⃣ Setup application key, cache config
+      - name: Optimize Laravel
+        run: |
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+
+      # 6️⃣ Run migrations (optional if you have tests depending on DB)
+      # - name: Run database migrations
+      #   run: php artisan migrate --force
+
+      # 7️⃣ Run tests (optional)
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit || echo "No tests found"
+
+      # ✅ Optional: Deploy after successful push (disabled for now)
+      # - name: Deploy to production
+      #   if: github.ref == 'refs/heads/main'
+      #   run: |
+      #     curl -X POST https://your-app.com/deploy \
+      #          -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}"
