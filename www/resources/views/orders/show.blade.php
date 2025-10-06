@@ -29,12 +29,58 @@
         </div>
     @endif
     <!-- Header -->
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Order Details</h1>
             <p class="mt-1 text-sm text-gray-500">Order #{{ $order->order_number }}</p>
         </div>
-        <div class="flex space-x-3">
+        
+        <!-- Mobile Actions -->
+        <div class="flex flex-col space-y-2 sm:hidden">
+            <div class="flex space-x-2">
+                @if($order->canBeEdited())
+                    <a href="{{ route('orders.edit', $order) }}" 
+                       class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit
+                    </a>
+                @endif
+                <a href="{{ route('orders.index') }}" 
+                   class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back
+                </a>
+            </div>
+            @if($order->order_status === 'confirmed' && ($order->sales_count ?? 0) === 0)
+                <a href="{{ route('orders.convert-to-sale', $order) }}"
+                   class="w-full inline-flex items-center justify-center px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" pointer-events="none">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Convert to Sale
+                </a>
+            @endif
+            @if($order->canBeEdited())
+                <form method="POST" action="{{ route('orders.destroy', $order) }}" onsubmit="return confirm('Delete this order? This is a soft delete and can\'t be undone.');" class="w-full">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" 
+                            class="w-full inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
+                        </svg>
+                        Delete Order
+                    </button>
+                </form>
+            @endif
+        </div>
+        
+        <!-- Desktop Actions -->
+        <div class="hidden sm:flex space-x-3">
             @if($order->canBeEdited())
                 <a href="{{ route('orders.edit', $order) }}" 
                    class="inline-flex items-center h-10 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -265,7 +311,98 @@
         <h3 class="text-lg font-medium text-gray-900 mb-4">Order Items</h3>
         
         @if($order->items->count() > 0)
-            <div class="overflow-x-auto">
+            @php($sumSubtotal = 0)
+            @php($sumDiscount = 0)
+            @php($sumVat = 0)
+            @php($sumTotal = 0)
+            @foreach($order->items as $item)
+                @php($qty = (float) ($item->quantity ?? 0))
+                @php($unitPrice = (float) ($item->unit_price ?? 0))
+                @php($lineSub = $qty * $unitPrice)
+                @php($discountPct = (float) ($item->discount_percentage ?? $item->discount_percent ?? 0))
+                @php($discountAmt = $lineSub * ($discountPct/100))
+                @php($taxPct = (float) (($item->product->tax_type ?? 'standard') === 'standard' ? 15 : 0))
+                @php($taxAmt = ($lineSub - $discountAmt) * ($taxPct/100))
+                @php($lineTotal = $lineSub - $discountAmt + $taxAmt)
+                @php($sumSubtotal += $lineSub)
+                @php($sumDiscount += $discountAmt)
+                @php($sumVat += $taxAmt)
+                @php($sumTotal += $lineTotal)
+            @endforeach
+
+            <!-- Mobile Cards View -->
+            <div class="sm:hidden space-y-4">
+                @foreach($order->items as $item)
+                    @php($qty = (float) ($item->quantity ?? 0))
+                    @php($unitPrice = (float) ($item->unit_price ?? 0))
+                    @php($lineSub = $qty * $unitPrice)
+                    @php($discountPct = (float) ($item->discount_percentage ?? $item->discount_percent ?? 0))
+                    @php($discountAmt = $lineSub * ($discountPct/100))
+                    @php($taxPct = (float) (($item->product->tax_type ?? 'standard') === 'standard' ? 15 : 0))
+                    @php($taxAmt = ($lineSub - $discountAmt) * ($taxPct/100))
+                    @php($lineTotal = $lineSub - $discountAmt + $taxAmt)
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex-1">
+                                <h4 class="text-sm font-medium text-gray-900">{{ $item->product->name }}</h4>
+                                <p class="text-xs text-gray-500">{{ $item->product->sku }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-900">Rs {{ number_format($lineTotal, 0) }}</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                            <div>
+                                <span class="font-medium">Category:</span>
+                                <span>{{ $item->product->category->name ?? 'N/A' }}</span>
+                            </div>
+                            <div>
+                                <span class="font-medium">Qty:</span>
+                                <span>{{ $item->quantity }}</span>
+                            </div>
+                            <div>
+                                <span class="font-medium">Unit Price:</span>
+                                <span>Rs {{ number_format($unitPrice, 0) }}</span>
+                            </div>
+                            <div>
+                                <span class="font-medium">Discount:</span>
+                                <span>{{ number_format($discountPct, 1) }}%</span>
+                            </div>
+                            @if($item->product->brand)
+                            <div class="col-span-2">
+                                <span class="font-medium">Brand:</span>
+                                <span>{{ $item->product->brand->name }}</span>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+                
+                <!-- Mobile Summary -->
+                <div class="border-t pt-4 space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Subtotal (excl. VAT):</span>
+                        <span class="font-medium text-gray-900">Rs {{ number_format($sumSubtotal, 0) }}</span>
+                    </div>
+                    @if($sumDiscount > 0)
+                    <div class="flex justify-between text-sm">
+                        <span class="text-green-600">Total Discount:</span>
+                        <span class="font-medium text-green-600">-Rs {{ number_format($sumDiscount, 0) }}</span>
+                    </div>
+                    @endif
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">VAT Total:</span>
+                        <span class="font-medium text-gray-900">Rs {{ number_format($sumVat, 0) }}</span>
+                    </div>
+                    <div class="flex justify-between text-base font-bold border-t pt-2">
+                        <span class="text-gray-900">Total Amount (incl. VAT):</span>
+                        <span class="text-gray-900">Rs {{ number_format($sumTotal, 0) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Table View -->
+            <div class="hidden sm:block overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -280,10 +417,6 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @php($sumSubtotal = 0)
-                        @php($sumDiscount = 0)
-                        @php($sumVat = 0)
-                        @php($sumTotal = 0)
                         @foreach($order->items as $item)
                             @php($qty = (float) ($item->quantity ?? 0))
                             @php($unitPrice = (float) ($item->unit_price ?? 0))
@@ -293,10 +426,6 @@
                             @php($taxPct = (float) (($item->product->tax_type ?? 'standard') === 'standard' ? 15 : 0))
                             @php($taxAmt = ($lineSub - $discountAmt) * ($taxPct/100))
                             @php($lineTotal = $lineSub - $discountAmt + $taxAmt)
-                            @php($sumSubtotal += $lineSub)
-                            @php($sumDiscount += $discountAmt)
-                            @php($sumVat += $taxAmt)
-                            @php($sumTotal += $lineTotal)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">{{ $item->product->name }}</div>

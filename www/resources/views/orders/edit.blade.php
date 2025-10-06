@@ -20,12 +20,35 @@
      data-subtotal="{{ $order->subtotal }}" data-total-discount="{{ $order->discount_amount }}"
      data-total-amount="{{ $order->total_amount }}">
     <!-- Header -->
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Edit Order</h1>
             <p class="mt-1 text-sm text-gray-500">Order #{{ $order->order_number }}</p>
         </div>
-        <div class="flex space-x-3">
+        
+        <!-- Mobile Actions -->
+        <div class="flex flex-col space-y-2 sm:hidden">
+            <div class="flex space-x-2">
+                <a href="{{ route('orders.show', $order) }}" 
+                   class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    View
+                </a>
+                <a href="{{ route('orders.index') }}" 
+                   class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back
+                </a>
+            </div>
+        </div>
+        
+        <!-- Desktop Actions -->
+        <div class="hidden sm:flex space-x-3">
             <a href="{{ route('orders.show', $order) }}" 
                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -156,8 +179,100 @@
                 </button>
             </div>
 
-            <!-- Items Table -->
-            <div class="overflow-x-auto" x-show="form.items.length > 0">
+            <!-- Mobile Items View -->
+            <div class="sm:hidden space-y-4" x-show="form.items.length > 0">
+                <template x-for="(item, index) in form.items" :key="index">
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-sm font-medium text-gray-900">Item <span x-text="index + 1"></span></h4>
+                            <button type="button" @click="removeItem(index)" 
+                                    class="text-red-600 hover:text-red-900 text-xs">
+                                Remove
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <!-- Product Selection -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Product</label>
+                                <select :name="'items[' + index + '][product_id]'" 
+                                        x-model="item.product_id"
+                                        @change="handleProductChange(index)"
+                                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                    <option value="">Select Product</option>
+                                    @foreach($products as $product)
+                                        <option value="{{ $product->id }}" 
+                                                data-price="{{ $product->selling_price }}"
+                                                data-tax-type="{{ $product->tax_type }}"
+                                                data-stock="{{ $product->inventory->sum('current_stock') ?? 0 }}">
+                                            {{ $product->name }} - Rs {{ number_format($product->selling_price, 2) }}
+                                            @if($product->inventory->sum('current_stock') ?? 0 > 0)
+                                                (Stock: {{ $product->inventory->sum('current_stock') }})
+                                            @else
+                                                (Out of Stock)
+                                            @endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <!-- Quantity and Price Row -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Quantity</label>
+                                    <input type="number" 
+                                           :name="'items[' + index + '][quantity]'"
+                                           x-model="item.quantity"
+                                           @input="updateItem(index)"
+                                           min="1"
+                                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Unit Price</label>
+                                    <input type="number" 
+                                           :name="'items[' + index + '][unit_price]'"
+                                           x-model="item.unit_price"
+                                           @input="updateItem(index)"
+                                           step="0.01"
+                                           min="0"
+                                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                </div>
+                            </div>
+                            
+                            <!-- Discount and VAT Row -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Discount %</label>
+                                    <input type="number" 
+                                           :name="'items[' + index + '][discount_percent]'"
+                                           x-model="item.discount_percent"
+                                           @input="updateItem(index)"
+                                           step="0.01"
+                                           min="0"
+                                           max="100"
+                                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">VAT</label>
+                                    <input type="text" :value="(item.tax_type === 'standard' ? '15%' : (item.tax_type === 'zero' ? '0%' : 'EX'))" 
+                                           class="block w-full border-gray-200 rounded-md shadow-sm bg-gray-50 text-gray-700 text-sm" disabled>
+                                </div>
+                            </div>
+                            
+                            <!-- Line Total -->
+                            <div class="border-t pt-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-medium text-gray-700">Line Total:</span>
+                                    <span class="text-sm font-bold text-gray-900" x-text="formatCurrency0(item.line_total)"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Desktop Items Table -->
+            <div class="hidden sm:block overflow-x-auto" x-show="form.items.length > 0">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -277,14 +392,14 @@
         </div>
 
         <!-- Form Actions -->
-        <div class="flex justify-end space-x-3">
+        <div class="flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3">
             <a href="{{ route('orders.show', $order) }}" 
-               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+               class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Cancel
             </a>
             <button type="submit" 
                     :disabled="form.items.length === 0"
-                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
                 Update Order
             </button>
         </div>
