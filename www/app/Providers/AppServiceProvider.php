@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Blade;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Customer;
@@ -13,6 +14,7 @@ use App\Observers\UserObserver;
 use App\Observers\ProductObserver;
 use App\Observers\CustomerObserver;
 use App\Observers\SupplierObserver;
+use App\Helpers\ButtonHelper;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -45,6 +47,11 @@ class AppServiceProvider extends ServiceProvider
             } catch (\Exception $e) {
                 $view->with('lowStockCount', 0);
             }
+        });
+
+        // Register custom Blade directive for buttons
+        Blade::directive('button', function ($expression) {
+            return "<?php echo view('components.action-button', $expression)->render(); ?>";
         });
     }
 }
