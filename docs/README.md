@@ -1,4 +1,4 @@
-# Z5 Distribution System - Laravel Development Documentation
+# Z5 Distribution System
 
 ## Overview
 This documentation provides comprehensive specifications for building a new Laravel-based Z5 Distribution System with TailwindCSS. The system is a modern business management application for distribution companies handling orders, sales, inventory, and customer relationships.
