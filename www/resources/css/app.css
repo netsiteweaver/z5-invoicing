@@ -33,6 +33,18 @@
     /* Reports: 4-up summary grid */
     .report-cards { @apply grid grid-cols-4 gap-6; }
 
+    /* Sidebar scrolling fix */
+    .sidebar {
+        max-height: 100vh;
+        overflow: hidden;
+    }
+    
+    .sidebar nav {
+        max-height: calc(100vh - 8rem); /* Account for header and user panel */
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+
     /* Print helpers */
     @media print {
         /* Force report cards into 4 columns on print */
