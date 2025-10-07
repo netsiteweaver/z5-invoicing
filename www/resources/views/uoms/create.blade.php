@@ -63,10 +63,7 @@
             </div>
         </div>
         <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-            <button type="submit" class="btn btn-primary">
-                <i class="btn-icon fa-solid fa-check"></i>
-                Create UOM
-            </button>
+            <x-action-button type="save">Create UOM</x-action-button>
         </div>
     </form>
 </div>

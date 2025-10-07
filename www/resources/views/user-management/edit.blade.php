@@ -187,15 +187,8 @@
 
                 <!-- Form Actions -->
                 <div class="mt-6 flex justify-end space-x-3">
-                    <a href="{{ route('user-management.show', ['user_management' => $user_management->id]) }}" 
-                       class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Cancel
-                    </a>
-                    <button type="submit" 
-                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <i class="fas fa-save mr-2"></i>
-                        Update User
-                    </button>
+                    <x-action-button type="cancel" :href="route('user-management.show', ['user_management' => $user_management->id])" />
+                    <x-action-button type="save">Update User</x-action-button>
                 </div>
             </form>
         </div>

@@ -123,24 +123,18 @@
                         <!-- Actions -->
                         <div class="flex flex-col space-y-2">
                             <div class="flex space-x-2">
-                                <a href="{{ route('user-management.show', ['user_management' => $user->id]) }}" class="flex-1 btn btn-view text-center">
-                                    <i class="btn-icon fa-regular fa-eye"></i>
-                                    View
-                                </a>
-                                <a href="{{ route('user-management.edit', ['user_management' => $user->id]) }}" class="flex-1 btn btn-edit text-center">
-                                    <i class="btn-icon fa-solid fa-pen"></i>
-                                    Edit
-                                </a>
+                                <x-action-button type="view" :href="route('user-management.show', ['user_management' => $user->id])" class="flex-1" />
+                                <x-action-button type="edit" :href="route('user-management.edit', ['user_management' => $user->id])" class="flex-1" />
                             </div>
                             @if($user->id !== auth()->id())
-                                <form method="POST" action="{{ route('user-management.destroy', ['user_management' => $user->id]) }}" onsubmit="return confirm('Are you sure you want to delete this user?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="w-full btn btn-delete">
-                                        <i class="btn-icon fa-solid fa-trash"></i>
-                                        Delete User
-                                    </button>
-                                </form>
+                                <x-action-button 
+                                    type="delete" 
+                                    :form-action="route('user-management.destroy', ['user_management' => $user->id])"
+                                    confirm-message="Are you sure you want to delete this user?"
+                                    class="w-full"
+                                >
+                                    Delete User
+                                </x-action-button>
                             @endif
                         </div>
                     </div>
@@ -203,23 +197,15 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
-                                        <a href="{{ route('user-management.show', ['user_management' => $user->id]) }}" class="btn btn-view">
-                                            <i class="btn-icon fa-regular fa-eye"></i>
-                                            View
-                                        </a>
-                                        <a href="{{ route('user-management.edit', ['user_management' => $user->id]) }}" class="btn btn-edit">
-                                            <i class="btn-icon fa-solid fa-pen"></i>
-                                            Edit
-                                        </a>
+                                        <x-action-button type="view" :href="route('user-management.show', ['user_management' => $user->id])" />
+                                        <x-action-button type="edit" :href="route('user-management.edit', ['user_management' => $user->id])" />
+                                        
                                         @if($user->id !== auth()->id())
-                                            <form method="POST" action="{{ route('user-management.destroy', ['user_management' => $user->id]) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this user?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-delete">
-                                                    <i class="btn-icon fa-solid fa-trash"></i>
-                                                    Delete
-                                                </button>
-                                            </form>
+                                            <x-action-button 
+                                                type="delete" 
+                                                :form-action="route('user-management.destroy', ['user_management' => $user->id])"
+                                                confirm-message="Are you sure you want to delete this user?"
+                                            />
                                         @endif
                                     </div>
                                 </td>

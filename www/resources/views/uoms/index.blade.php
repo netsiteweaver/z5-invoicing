@@ -4,10 +4,9 @@
 
 @section('actions')
 @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('uoms.create'))
-<a href="{{ route('uoms.create') }}" class="btn btn-create">
-    <i class="btn-icon fa-solid fa-plus"></i>
+<x-action-button type="create" :href="route('uoms.create')">
     Add UOM
-</a>
+</x-action-button>
 @endif
 @endsection
 
@@ -68,25 +67,18 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm">{!! $uom->status ? '<span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Active</span>' : '<span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">Inactive</span>' !!}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <div class="flex space-x-2">
-                                    <a href="{{ route('uoms.show', $uom) }}" class="btn btn-view">
-                                        <i class="btn-icon fa-regular fa-eye"></i>
-                                        View
-                                    </a>
+                                    <x-action-button type="view" :href="route('uoms.show', $uom)" />
+                                    
                                     @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('uoms.edit'))
-                                    <a href="{{ route('uoms.edit', $uom) }}" class="btn btn-edit">
-                                        <i class="btn-icon fa-solid fa-pen"></i>
-                                        Edit
-                                    </a>
+                                    <x-action-button type="edit" :href="route('uoms.edit', $uom)" />
                                     @endif
+                                    
                                     @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('uoms.delete'))
-                                    <form method="POST" action="{{ route('uoms.destroy', $uom) }}" class="inline" onsubmit="return confirm('Are you sure you want to deactivate this UOM?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-delete">
-                                            <i class="btn-icon fa-solid fa-trash"></i>
-                                            Delete
-                                        </button>
-                                    </form>
+                                    <x-action-button 
+                                        type="delete" 
+                                        :form-action="route('uoms.destroy', $uom)"
+                                        confirm-message="Are you sure you want to deactivate this UOM?"
+                                    />
                                     @endif
                                 </div>
                             </td>

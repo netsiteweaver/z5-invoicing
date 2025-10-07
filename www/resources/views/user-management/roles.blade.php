@@ -72,31 +72,23 @@
                         <!-- Actions -->
                         <div class="flex flex-wrap gap-2">
                             @if(!$role->is_system)
-                                <a href="{{ route('user-management.roles.edit', $role) }}" class="btn btn-edit">
-                                    <i class="btn-icon fas fa-edit"></i>
-                                    Edit
-                                </a>
+                                <x-action-button type="edit" :href="route('user-management.roles.edit', $role)" />
+                                
                                 <form method="POST" action="{{ route('user-management.roles.toggle', $role) }}" class="inline">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="btn btn-warning">
-                                        <i class="btn-icon fas fa-{{ $role->is_active ? 'pause' : 'play' }}"></i>
+                                    <x-action-button type="reset" icon="fas fa-{{ $role->is_active ? 'pause' : 'play' }}">
                                         {{ $role->is_active ? 'Deactivate' : 'Activate' }}
-                                    </button>
+                                    </x-action-button>
                                 </form>
-                                <form method="POST" action="{{ route('user-management.roles.destroy', $role) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this role?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-delete">
-                                        <i class="btn-icon fas fa-trash"></i>
-                                        Delete
-                                    </button>
-                                </form>
+                                
+                                <x-action-button 
+                                    type="delete" 
+                                    :form-action="route('user-management.roles.destroy', $role)"
+                                    confirm-message="Are you sure you want to delete this role?"
+                                />
                             @else
-                                <a href="{{ route('user-management.roles.show', $role) }}" class="btn btn-view">
-                                    <i class="btn-icon fas fa-eye"></i>
-                                    View
-                                </a>
+                                <x-action-button type="view" :href="route('user-management.roles.show', $role)" />
                             @endif
                         </div>
                     </div>
