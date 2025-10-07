@@ -841,34 +841,71 @@ document.addEventListener('DOMContentLoaded', function() {
     // Mobile navigation enhancements
     function enhanceMobileNavigation() {
         if (window.innerWidth < 1024) {
+            console.log('Enhancing mobile navigation...');
+            
             // Find all active sections and ensure they're expanded
             const activeSections = document.querySelectorAll('[x-data*="Open: true"]');
-            activeSections.forEach(section => {
+            console.log('Found active sections:', activeSections.length);
+            
+            activeSections.forEach((section, index) => {
+                console.log(`Processing section ${index + 1}:`, section);
+                
                 const dropdown = section.querySelector('[x-show]');
                 const button = section.querySelector('button');
                 const chevron = section.querySelector('i.fa-chevron-down');
                 
+                console.log('Dropdown:', dropdown, 'Button:', button, 'Chevron:', chevron);
+                
                 if (dropdown && button && chevron) {
                     // Get the Alpine.js component data
                     const alpineData = section.getAttribute('x-data');
+                    console.log('Alpine data:', alpineData);
+                    
                     const match = alpineData.match(/(\w+)Open:\s*true/);
+                    console.log('Match:', match);
                     
                     if (match) {
                         const varName = match[1];
+                        console.log('Variable name:', varName);
                         
                         // Try to access the Alpine component and set it to open
                         try {
                             const component = Alpine.$data(section);
+                            console.log('Alpine component:', component);
+                            
                             if (component && component[varName + 'Open'] !== undefined) {
+                                console.log(`Setting ${varName}Open to true`);
                                 component[varName + 'Open'] = true;
                             }
                         } catch (e) {
+                            console.log('Alpine access failed, using DOM fallback:', e);
                             // Fallback: directly manipulate the DOM
                             dropdown.style.display = 'block';
                             chevron.style.transform = 'rotate(180deg)';
                         }
                     } else {
+                        console.log('No match found, using DOM fallback');
                         // Fallback: directly manipulate the DOM
+                        dropdown.style.display = 'block';
+                        chevron.style.transform = 'rotate(180deg)';
+                    }
+                }
+            });
+            
+            // Also try to find sections with active sub-items (highlighted in blue)
+            const activeSubItems = document.querySelectorAll('.sidebar a[class*="bg-blue-500"]');
+            console.log('Found active sub-items:', activeSubItems.length);
+            
+            activeSubItems.forEach(subItem => {
+                const parentSection = subItem.closest('[x-data]');
+                if (parentSection) {
+                    console.log('Found parent section for active sub-item:', parentSection);
+                    const dropdown = parentSection.querySelector('[x-show]');
+                    const button = parentSection.querySelector('button');
+                    const chevron = parentSection.querySelector('i.fa-chevron-down');
+                    
+                    if (dropdown && button && chevron) {
+                        console.log('Expanding parent section for active sub-item');
                         dropdown.style.display = 'block';
                         chevron.style.transform = 'rotate(180deg)';
                     }
