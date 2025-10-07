@@ -10,10 +10,7 @@
             <h1 class="text-2xl font-bold text-gray-900">Products</h1>
             <p class="mt-1 text-sm text-gray-500">Manage your product catalog</p>
         </div>
-        <a href="{{ route('products.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <i class="-ml-1 mr-2 fa-solid fa-plus"></i>
-            Add Product
-        </a>
+        <x-action-button type="add" href="{{ route('products.create') }}">Add Product</x-action-button>
     </div>
 
     <!-- Filters -->
@@ -252,12 +249,7 @@
             <h3 class="mt-2 text-sm font-medium text-gray-900">No products</h3>
             <p class="mt-1 text-sm text-gray-500">Get started by creating a new product.</p>
             <div class="mt-6">
-                <a href="{{ route('products.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Add Product
-                </a>
+                <x-action-button type="add" href="{{ route('products.create') }}">Add Product</x-action-button>
             </div>
         </div>
     @endif
