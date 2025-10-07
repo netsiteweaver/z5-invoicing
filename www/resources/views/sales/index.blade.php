@@ -12,9 +12,20 @@
 
 @section('content')
 <!-- Filters -->
-<div class="bg-white shadow rounded-lg mb-6">
+<div class="bg-white shadow rounded-lg mb-6" x-data="{ mobileOpen: false }">
     <div class="px-4 py-5 sm:p-6">
-        <form method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-6">
+        <!-- Mobile toggle -->
+        <div class="flex items-center justify-between sm:hidden mb-4">
+            <span class="text-sm font-medium text-gray-700">Filters</span>
+            <button type="button" @click="mobileOpen = !mobileOpen" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <span x-show="!mobileOpen">Show</span>
+                <span x-show="mobileOpen">Hide</span>
+                <i class="fas fa-chevron-down ml-2 transform transition-transform" :class="mobileOpen ? 'rotate-180' : ''"></i>
+            </button>
+        </div>
+        
+        <!-- Form -->
+        <form method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-6" x-cloak x-show="mobileOpen || window.matchMedia('(min-width: 640px)').matches">
             <div>
                 <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
                 <input type="text" name="search" id="search" value="{{ request('search') }}" 
@@ -77,7 +88,88 @@
 @if($sales->count() > 0)
     <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
-            <div class="overflow-x-auto">
+            
+            <!-- Mobile cards (visible on small screens) -->
+            <div class="sm:hidden space-y-4">
+                @foreach($sales as $sale)
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-gray-600 font-medium text-sm">{{ substr($sale->customer->display_name, 0, 1) }}</span>
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">{{ $sale->sale_number }}</div>
+                                <div class="text-xs text-gray-500">{{ $sale->customer->display_name }}</div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col space-y-1">
+                            @if($sale->status === 'draft')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ ucfirst($sale->status) }}</span>
+                            @elseif($sale->status === 'confirmed')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{{ ucfirst($sale->status) }}</span>
+                            @elseif($sale->status === 'shipped')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">{{ ucfirst($sale->status) }}</span>
+                            @elseif($sale->status === 'delivered')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{{ ucfirst($sale->status) }}</span>
+                            @elseif($sale->status === 'cancelled')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">{{ ucfirst($sale->status) }}</span>
+                            @endif
+                            @if($sale->payment_status === 'pending')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">{{ ucfirst($sale->payment_status) }}</span>
+                            @elseif($sale->payment_status === 'partial')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{{ ucfirst($sale->payment_status) }}</span>
+                            @elseif($sale->payment_status === 'paid')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{{ ucfirst($sale->payment_status) }}</span>
+                            @elseif($sale->payment_status === 'overdue')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">{{ ucfirst($sale->payment_status) }}</span>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <div class="text-xs text-gray-500 mb-1">Date</div>
+                            <div class="text-sm text-gray-900">{{ $sale->sale_date ? \Carbon\Carbon::parse($sale->sale_date)->format('M d, Y') : 'N/A' }}</div>
+                            @if($sale->due_date)
+                                <div class="text-xs text-gray-500">Due: {{ \Carbon\Carbon::parse($sale->due_date)->format('M d, Y') }}</div>
+                            @endif
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500 mb-1">Total</div>
+                            <div class="text-sm font-medium text-gray-900">Rs {{ number_format($sale->total_amount, 2) }}</div>
+                            @if($sale->discount_amount > 0)
+                                <div class="text-xs text-green-600">-Rs {{ number_format($sale->discount_amount, 2) }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-500 mb-1">Items</div>
+                        <div class="text-sm text-gray-900">{{ $sale->items->count() }} items</div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <a href="{{ route('sales.show', $sale) }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors">
+                            <i class="fas fa-eye mr-1"></i> View
+                        </a>
+                        @if($sale->canBeEdited())
+                            <a href="{{ route('sales.edit', $sale) }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-yellow-600 hover:text-yellow-900 bg-yellow-50 hover:bg-yellow-100 rounded-md transition-colors">
+                                <i class="fas fa-edit mr-1"></i> Edit
+                            </a>
+                        @endif
+                        @if($sale->payment_status !== 'paid')
+                            <a href="{{ route('sales.payments.create', $sale) }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 rounded-md transition-colors">
+                                <i class="fas fa-money-bill-wave mr-1"></i> Payment
+                            </a>
+                        @endif
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            
+            <!-- Desktop table (hidden on small screens) -->
+            <div class="hidden sm:block overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>

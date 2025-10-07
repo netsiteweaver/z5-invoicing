@@ -41,9 +41,20 @@
   </div>
 @endif
 <!-- Filters -->
-<div class="bg-white shadow rounded-lg mb-6">
+<div class="bg-white shadow rounded-lg mb-6" x-data="{ mobileOpen: false }">
     <div class="px-4 py-5 sm:p-6">
-        <form method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-5">
+        <!-- Mobile toggle -->
+        <div class="flex items-center justify-between sm:hidden mb-4">
+            <span class="text-sm font-medium text-gray-700">Filters</span>
+            <button type="button" @click="mobileOpen = !mobileOpen" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <span x-show="!mobileOpen">Show</span>
+                <span x-show="mobileOpen">Hide</span>
+                <i class="fas fa-chevron-down ml-2 transform transition-transform" :class="mobileOpen ? 'rotate-180' : ''"></i>
+            </button>
+        </div>
+        
+        <!-- Form -->
+        <form method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-5" x-cloak x-show="mobileOpen || window.matchMedia('(min-width: 640px)').matches">
             <div>
                 <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
                 <input type="text" name="search" id="search" value="{{ request('search') }}" 
@@ -94,7 +105,83 @@
 @if($inventory->count() > 0)
     <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
-            <div class="overflow-x-auto">
+            
+            <!-- Mobile cards (visible on small screens) -->
+            <div class="sm:hidden space-y-4">
+                @foreach($inventory as $item)
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-gray-600 font-medium text-sm">{{ substr($item->product->name, 0, 1) }}</span>
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">{{ $item->product->name }}</div>
+                                <div class="text-xs text-gray-500">{{ $item->product->sku }}</div>
+                            </div>
+                        </div>
+                        @if($item->current_stock == 0)
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                Out of Stock
+                            </span>
+                        @elseif($item->current_stock <= $item->min_stock_level)
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                Low Stock
+                            </span>
+                        @else
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                In Stock
+                            </span>
+                        @endif
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <div class="text-xs text-gray-500 mb-1">Location</div>
+                            <div class="text-sm text-gray-900">{{ $item->department->name }}</div>
+                            <div class="text-xs text-gray-500">{{ $item->department->location }}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500 mb-1">Current Stock</div>
+                            <div class="text-sm font-medium text-gray-900">{{ $item->current_stock }}</div>
+                            @if($item->max_stock_level)
+                                <div class="text-xs text-gray-500">Max: {{ $item->max_stock_level }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <div class="text-xs text-gray-500 mb-1">Min Level</div>
+                            <div class="text-sm text-gray-900">{{ $item->min_stock_level }}</div>
+                            @if($item->reorder_point)
+                                <div class="text-xs text-gray-500">Reorder: {{ $item->reorder_point }}</div>
+                            @endif
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500 mb-1">Cost Price</div>
+                            @if($item->cost_price)
+                                <div class="text-sm text-gray-900">Rs {{ number_format($item->cost_price, 2) }}</div>
+                            @else
+                                <div class="text-sm text-gray-500">Not set</div>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-2">
+                        <a href="{{ route('inventory.show', $item) }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors">
+                            <i class="fas fa-eye mr-1"></i> View
+                        </a>
+                        <a href="{{ route('inventory.edit', $item) }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-yellow-600 hover:text-yellow-900 bg-yellow-50 hover:bg-yellow-100 rounded-md transition-colors">
+                            <i class="fas fa-edit mr-1"></i> Edit
+                        </a>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            
+            <!-- Desktop table (hidden on small screens) -->
+            <div class="hidden sm:block overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>

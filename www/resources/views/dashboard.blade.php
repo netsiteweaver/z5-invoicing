@@ -172,7 +172,48 @@
                 {{ $stats['low_stock_products']->count() }} Items
             </span>
         </div>
-        <div class="overflow-x-auto">
+        
+        <!-- Mobile cards (visible on small screens) -->
+        <div class="sm:hidden space-y-4">
+            @foreach($stats['low_stock_products'] as $product)
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-gray-600 font-medium text-sm">{{ substr($product->name, 0, 1) }}</span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">{{ $product->name }}</div>
+                            <div class="text-xs text-gray-500">{{ $product->sku }}</div>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        Low Stock
+                    </span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <div class="text-xs text-gray-500 mb-1">Current Stock</div>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            {{ $product->current_stock }}
+                        </span>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 mb-1">Min Stock</div>
+                        <div class="text-sm font-medium text-gray-900">{{ $product->min_stock_level }}</div>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <a href="{{ route('products.show', $product) }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors">
+                        <i class="fas fa-eye mr-1"></i> View
+                    </a>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        
+        <!-- Desktop table (hidden on small screens) -->
+        <div class="hidden sm:block overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -235,7 +276,58 @@
                 View all orders
             </a>
         </div>
-        <div class="overflow-x-auto">
+        
+        <!-- Mobile cards (visible on small screens) -->
+        <div class="sm:hidden space-y-4">
+            @foreach($stats['recent_orders'] as $order)
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-gray-600 font-medium text-xs">{{ substr($order->customer->display_name ?? 'N', 0, 1) }}</span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">{{ $order->order_number }}</div>
+                            <div class="text-xs text-gray-500">{{ $order->customer->display_name ?? 'N/A' }}</div>
+                        </div>
+                    </div>
+                    @if($order->order_status === 'draft')
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ ucfirst($order->order_status) }}</span>
+                    @elseif($order->order_status === 'pending')
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">{{ ucfirst($order->order_status) }}</span>
+                    @elseif($order->order_status === 'confirmed')
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{{ ucfirst($order->order_status) }}</span>
+                    @elseif($order->order_status === 'processing')
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">{{ ucfirst($order->order_status) }}</span>
+                    @elseif($order->order_status === 'shipped')
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">{{ ucfirst($order->order_status) }}</span>
+                    @elseif($order->order_status === 'delivered')
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{{ ucfirst($order->order_status) }}</span>
+                    @elseif($order->order_status === 'cancelled')
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">{{ ucfirst($order->order_status) }}</span>
+                    @endif
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <div class="text-xs text-gray-500 mb-1">Date</div>
+                        <div class="text-sm text-gray-900">{{ $order->order_date ? \Carbon\Carbon::parse($order->order_date)->format('M d, Y') : 'N/A' }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 mb-1">Total</div>
+                        <div class="text-sm font-medium text-gray-900">Rs {{ number_format($order->total_amount, 2) }}</div>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors">
+                        <i class="fas fa-eye mr-1"></i> View
+                    </a>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        
+        <!-- Desktop table (hidden on small screens) -->
+        <div class="hidden sm:block overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -308,7 +400,49 @@
             </h3>
         </div>
         @if(isset($recentLogins) && $recentLogins->count() > 0)
-        <div class="overflow-x-auto">
+        
+        <!-- Mobile cards (visible on small screens) -->
+        <div class="sm:hidden space-y-4">
+            @foreach($recentLogins as $log)
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-gray-600 text-xs"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">{{ $log->user_name ?? $log->email ?? 'Unknown' }}</div>
+                            <div class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($log->created_at)->format('Y-m-d H:i') }}</div>
+                        </div>
+                    </div>
+                    @if($log->status === 'success')
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Success</span>
+                    @else
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Failed</span>
+                    @endif
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-gray-500">Device:</span>
+                        <span class="text-gray-900">{{ $log->device }}</span>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-gray-500">OS / Browser:</span>
+                        <span class="text-gray-900">{{ $log->os }} / {{ $log->browser }}</span>
+                    </div>
+                    @if(auth()->user()->is_root)
+                    <div class="flex justify-between text-xs">
+                        <span class="text-gray-500">IP:</span>
+                        <span class="text-gray-900 font-mono">{{ $log->ip_address }}</span>
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+        
+        <!-- Desktop table (hidden on small screens) -->
+        <div class="hidden sm:block overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -344,6 +478,7 @@
                 </tbody>
             </table>
         </div>
+        
         @else
         <div class="text-sm text-gray-500">No login activity yet.</div>
         @endif
