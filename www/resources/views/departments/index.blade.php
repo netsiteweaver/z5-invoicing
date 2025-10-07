@@ -9,10 +9,9 @@
             <p class="mt-1 text-sm text-gray-500">Manage your departments</p>
         </div>
         @can('departments.create')
-        <a href="{{ route('departments.create') }}" class="btn btn-create">
-            <i class="btn-icon fa-solid fa-plus"></i>
+        <x-action-button type="create" :href="route('departments.create')">
             Add Department
-        </a>
+        </x-action-button>
         @endcan
     </div>
 
@@ -108,26 +107,19 @@
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     @can('departments.view')
-                                    <a href="{{ route('departments.show', $department) }}" class="btn btn-view">
-                                        <i class="btn-icon fa-regular fa-eye"></i>
-                                        View
-                                    </a>
+                                    <x-action-button type="view" :href="route('departments.show', $department)" />
                                     @endcan
+                                    
                                     @can('departments.edit')
-                                    <a href="{{ route('departments.edit', $department) }}" class="btn btn-edit">
-                                        <i class="btn-icon fa-solid fa-pen"></i>
-                                        Edit
-                                    </a>
+                                    <x-action-button type="edit" :href="route('departments.edit', $department)" />
                                     @endcan
+                                    
                                     @can('departments.delete')
-                                    <form method="POST" action="{{ route('departments.destroy', $department) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this department?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-delete">
-                                            <i class="btn-icon fa-solid fa-trash"></i>
-                                            Delete
-                                        </button>
-                                    </form>
+                                    <x-action-button 
+                                        type="delete" 
+                                        :form-action="route('departments.destroy', $department)"
+                                        confirm-message="Are you sure you want to delete this department?"
+                                    />
                                     @endcan
                                 </div>
                             </div>

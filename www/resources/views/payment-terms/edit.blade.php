@@ -41,18 +41,12 @@
             </div>
         </div>
         <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-            <button type="submit" class="btn btn-primary">
-                <i class="btn-icon fa-solid fa-check"></i>
-                Update
-            </button>
-            <form method="POST" action="{{ route('payment-terms.destroy', $payment_term) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this payment term?')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-delete">
-                    <i class="btn-icon fa-solid fa-trash"></i>
-                    Delete
-                </button>
-            </form>
+            <x-action-button type="save">Update</x-action-button>
+            <x-action-button 
+                type="delete" 
+                :form-action="route('payment-terms.destroy', $payment_term)"
+                confirm-message="Are you sure you want to delete this payment term?"
+            />
         </div>
     </form>
 </div>

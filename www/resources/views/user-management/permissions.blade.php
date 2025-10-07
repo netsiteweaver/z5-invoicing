@@ -61,10 +61,7 @@
                 </div>
                 
                 <div class="flex items-end">
-                    <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <i class="fas fa-search mr-2"></i>
-                        Filter
-                    </button>
+                    <x-action-button type="filter" class="w-full" />
                 </div>
             </form>
         </div>
@@ -128,13 +125,12 @@
                         
                         <!-- Actions -->
                         <div class="flex justify-end">
-                            <form method="POST" action="{{ route('user-management.permissions.toggle', $permission) }}" class="inline">
+                                <form method="POST" action="{{ route('user-management.permissions.toggle', $permission) }}" class="inline">
                                 @csrf
                                 @method('PATCH')
-                                <button type="submit" class="btn btn-warning">
-                                    <i class="btn-icon fas fa-{{ $permission->is_active ? 'pause' : 'play' }}"></i>
+                                <x-action-button type="reset" icon="fas fa-{{ $permission->is_active ? 'pause' : 'play' }}">
                                     {{ $permission->is_active ? 'Deactivate' : 'Activate' }}
-                                </button>
+                                </x-action-button>
                             </form>
                         </div>
                     </div>

@@ -10,10 +10,7 @@
             <h1 class="text-2xl font-bold text-gray-900">Products</h1>
             <p class="mt-1 text-sm text-gray-500">Manage your product catalog</p>
         </div>
-        <a href="{{ route('products.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <i class="-ml-1 mr-2 fa-solid fa-plus"></i>
-            Add Product
-        </a>
+        <x-action-button type="add" href="{{ route('products.create') }}">Add Product</x-action-button>
     </div>
 
     <!-- Filters -->
@@ -164,11 +161,11 @@
                             <th scope="col" class="col-barcode px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Barcode</th>
                             <th scope="col" class="col-image px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VAT Type</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category<br>Brand</th>
+                            <!-- <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th> -->
+                            <!-- <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VAT Type</th> -->
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Selling Price</th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">VAT</th>
+                            <!-- <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">VAT</th> -->
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount w/ VAT</th>
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -198,9 +195,9 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">{{ $product->name }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $product->category->name ?? '-' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $product->brand->name ?? '-' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $product->category->name ?? '-' }}<br>{{ $product->brand->name ?? '-' }}</td>
+                                <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td> -->
+                                <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     @php
                                         $vatLabel = match($product->tax_type) {
                                             'standard' => '15%',
@@ -210,28 +207,28 @@
                                         };
                                     @endphp
                                     {{ $vatLabel }}
-                                </td>
+                                </td> -->
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">Rs {{ number_format($product->selling_price, 2) }}</td>
                                 @php
                                     $vatRate = $product->tax_type === 'standard' ? 0.15 : 0;
                                     $vatAmount = $product->selling_price * $vatRate;
                                     $amountWithVat = $product->selling_price + $vatAmount;
                                 @endphp
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">Rs {{ number_format($vatAmount, 2) }}</td>
+                                <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">Rs {{ number_format($vatAmount, 2) }}</td> -->
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">Rs {{ number_format($amountWithVat, 2) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
                                     {{ $product->inventory->sum('current_stock') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end space-x-2">
-                                        <a href="{{ route('products.show', $product) }}" class="btn btn-view"><i class="btn-icon fa-regular fa-eye"></i>View</a>
-                                        <a href="{{ route('products.edit', $product) }}" class="btn btn-edit"><i class="btn-icon fa-solid fa-pen"></i>Edit</a>
+                                        <x-action-button type="view" :href="route('products.show', $product)" />
+                                        <x-action-button type="edit" :href="route('products.edit', $product)" />
                                         @can('products.delete')
-                                        <form method="POST" action="{{ route('products.destroy', $product) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this product?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-delete"><i class="btn-icon fa-solid fa-trash"></i>Delete</button>
-                                        </form>
+                                        <x-action-button 
+                                            type="delete" 
+                                            :form-action="route('products.destroy', $product)"
+                                            confirm-message="Are you sure you want to delete this product?"
+                                        />
                                         @endcan
                                     </div>
                                 </td>
@@ -252,12 +249,7 @@
             <h3 class="mt-2 text-sm font-medium text-gray-900">No products</h3>
             <p class="mt-1 text-sm text-gray-500">Get started by creating a new product.</p>
             <div class="mt-6">
-                <a href="{{ route('products.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Add Product
-                </a>
+                <x-action-button type="add" href="{{ route('products.create') }}">Add Product</x-action-button>
             </div>
         </div>
     @endif

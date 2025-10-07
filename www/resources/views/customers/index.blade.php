@@ -11,10 +11,9 @@
             <p class="mt-1 text-sm text-gray-500">Manage your customer database</p>
         </div>
         @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.create'))
-        <a href="{{ route('customers.create') }}" class="btn btn-create">
-            <i class="btn-icon fa-solid fa-plus"></i>
+        <x-action-button type="create" :href="route('customers.create')">
             Add Customer
-        </a>
+        </x-action-button>
         @endif
     </div>
 
@@ -125,25 +124,18 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center space-x-2">
-                                    <a href="{{ route('customers.show', $customer) }}" class="btn btn-view">
-                                        <i class="btn-icon fa-regular fa-eye"></i>
-                                        View
-                                    </a>
+                                    <x-action-button type="view" :href="route('customers.show', $customer)" />
+                                    
                                     @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.edit'))
-                                    <a href="{{ route('customers.edit', $customer) }}" class="btn btn-edit">
-                                        <i class="btn-icon fa-solid fa-pen"></i>
-                                        Edit
-                                    </a>
+                                    <x-action-button type="edit" :href="route('customers.edit', $customer)" />
                                     @endif
+                                    
                                     @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.delete'))
-                                    <form method="POST" action="{{ route('customers.destroy', $customer) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this customer?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-delete">
-                                            <i class="btn-icon fa-solid fa-trash"></i>
-                                            Delete
-                                        </button>
-                                    </form>
+                                    <x-action-button 
+                                        type="delete" 
+                                        :form-action="route('customers.destroy', $customer)"
+                                        confirm-message="Are you sure you want to delete this customer?"
+                                    />
                                     @endif
                                 </div>
                             </div>
@@ -202,27 +194,20 @@
                         
                         <!-- Actions -->
                         <div class="flex space-x-2 pt-3 border-t border-gray-100">
-                            <a href="{{ route('customers.show', $customer) }}" 
-                               class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                <i class="fas fa-eye mr-1"></i>
-                                View
-                            </a>
+                            <x-action-button type="view" :href="route('customers.show', $customer)" size="sm" class="flex-1" />
+                            
                             @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.edit'))
-                            <a href="{{ route('customers.edit', $customer) }}" 
-                               class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                <i class="fas fa-edit mr-1"></i>
-                                Edit
-                            </a>
+                            <x-action-button type="edit" :href="route('customers.edit', $customer)" size="sm" class="flex-1" />
                             @endif
+                            
                             @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.delete'))
-                            <form method="POST" action="{{ route('customers.destroy', $customer) }}" onsubmit="return confirm('Are you sure you want to delete this customer?');" class="flex-1">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="w-full inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                    <i class="fas fa-trash mr-1"></i>
-                                    Delete
-                                </button>
-                            </form>
+                            <x-action-button 
+                                type="delete" 
+                                :form-action="route('customers.destroy', $customer)"
+                                confirm-message="Are you sure you want to delete this customer?"
+                                size="sm"
+                                class="flex-1"
+                            />
                             @endif
                         </div>
                     </div>

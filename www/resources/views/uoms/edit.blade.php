@@ -63,28 +63,16 @@
                 Save Changes
             </button>
             @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('uoms.delete'))
-            <button type="button" onclick="confirmDelete()" class="btn btn-delete">
-                <i class="btn-icon fa-solid fa-trash"></i>
+            <x-action-button 
+                type="delete" 
+                :form-action="route('uoms.destroy', $uom)"
+                confirm-message="Are you sure you want to deactivate this UOM?"
+            >
                 Deactivate
-            </button>
+            </x-action-button>
             @endif
         </div>
     </form>
-    
-    @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('uoms.delete'))
-    <form method="POST" action="{{ route('uoms.destroy', $uom) }}" id="delete-form" style="display: none;">
-        @csrf
-        @method('DELETE')
-    </form>
-    
-    <script>
-    function confirmDelete() {
-        if (confirm('Are you sure you want to deactivate this UOM?')) {
-            document.getElementById('delete-form').submit();
-        }
-    }
-    </script>
-    @endif
 </div>
 
 <script>

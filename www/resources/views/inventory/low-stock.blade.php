@@ -102,18 +102,9 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex items-center space-x-2">
-                                        <a href="{{ route('inventory.show', $item) }}" class="btn btn-view">
-                                            <i class="btn-icon fa-regular fa-eye"></i>
-                                            View
-                                        </a>
-                                        <a href="{{ route('inventory.edit', $item) }}" class="btn btn-edit">
-                                            <i class="btn-icon fa-solid fa-pen"></i>
-                                            Edit
-                                        </a>
-                                        <!-- <button onclick="openStockMovementModal({{ $item->id }}, '{{ $item->product->name }}', {{ $item->current_stock }})" class="btn btn-create">
-                                            <i class="btn-icon fa-solid fa-plus"></i>
-                                            Add Stock
-                                        </button> -->
+                                        <x-action-button type="view" :href="route('inventory.show', $item)" />
+                                        <x-action-button type="edit" :href="route('inventory.edit', $item)" />
+                                        <!-- <x-action-button type="add" onclick="openStockMovementModal({{ $item->id }}, '{{ $item->product->name }}', {{ $item->current_stock }})">Add Stock</x-action-button> -->
                                     </div>
                                 </td>
                             </tr>

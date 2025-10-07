@@ -7,10 +7,7 @@
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-900">{{ $uom->name }}</h1>
         <div class="flex space-x-3">
-            <a href="{{ route('uoms.edit', $uom) }}" class="btn btn-edit">
-                <i class="btn-icon fa-solid fa-pen"></i>
-                Edit
-            </a>
+            <x-action-button type="edit" :href="route('uoms.edit', $uom)" />
         </div>
     </div>
 
@@ -89,14 +86,11 @@
                     | Updated: {{ $uom->updated_at->format('M d, Y') }}
                 @endif
             </div>
-            <form method="POST" action="{{ route('uoms.destroy', $uom) }}" class="inline" onsubmit="return confirm('Are you sure you want to deactivate this UOM?')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-delete">
-                    <i class="btn-icon fa-solid fa-trash"></i>
-                    Delete
-                </button>
-            </form>
+            <x-action-button 
+                type="delete" 
+                :form-action="route('uoms.destroy', $uom)"
+                confirm-message="Are you sure you want to deactivate this UOM?"
+            />
         </div>
     </div>
 </div>
