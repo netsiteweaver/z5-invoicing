@@ -31,7 +31,7 @@
     .btn-delete { @apply btn bg-rose-600 hover:bg-rose-700 focus:ring-rose-500; }
 
     /* Reports: 4-up summary grid */
-    .report-cards { @apply grid grid-cols-4 gap-6; }
+    .report-cards { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6; }
 
     /* Sidebar scrolling fix */
     .sidebar {
@@ -78,7 +78,7 @@
     /* Print helpers */
     @media print {
         /* Force report cards into 4 columns on print */
-        .report-cards { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 1rem !important; }
+        .report-cards { display: grid !important; grid-template-columns: 1fr !important; gap: 1rem !important; }
         .report-cards > * { break-inside: avoid; }
         .print\:hidden, .no-print { display: none !important; }
         .print\:block { display: block !important; }

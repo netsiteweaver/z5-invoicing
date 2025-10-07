@@ -36,55 +36,67 @@
     </div>
 
     <!-- Filters -->
-    <div class="bg-white shadow rounded-lg print:hidden no-print">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Filters</h3>
+    <div class="bg-white shadow rounded-lg print:hidden no-print" x-data="{ mobileOpen: false }">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
+            <!-- Mobile toggle -->
+            <div class="flex items-center justify-between sm:hidden">
+                <h3 class="text-lg font-medium text-gray-900">Filters</h3>
+                <button type="button" @click="mobileOpen = !mobileOpen" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-filter mr-2"></i>
+                    <span x-show="!mobileOpen">Show</span>
+                    <span x-show="mobileOpen">Hide</span>
+                </button>
+            </div>
+            <!-- Desktop title -->
+            <h3 class="hidden sm:block text-lg font-medium text-gray-900">Filters</h3>
         </div>
-        <div class="px-6 py-4">
-            <form method="GET" action="{{ route('reports.orders') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                    <label for="date_from" class="block text-sm font-medium text-gray-700">Date From</label>
-                    <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" 
-                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div>
-                    <label for="date_to" class="block text-sm font-medium text-gray-700">Date To</label>
-                    <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" 
-                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div>
-                    <label for="state" class="block text-sm font-medium text-gray-700">State</label>
-                    <select name="state" id="state" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        <option value="">All States</option>
-                        @foreach($states as $state)
-                        <option value="{{ $state }}" {{ request('state') == $state ? 'selected' : '' }}>
-                            {{ ucfirst($state) }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label for="customer_id" class="block text-sm font-medium text-gray-700">Customer</label>
-                    <select name="customer_id" id="customer_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        <option value="">All Customers</option>
-                        @foreach($customers as $customer)
-                        <option value="{{ $customer->id }}" {{ request('customer_id') == $customer->id ? 'selected' : '' }}>
-                            {{ $customer->name }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="flex items-end space-x-3">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-                        <i class="fas fa-search mr-2"></i>
-                        Apply Filters
-                    </button>
-                    <a href="{{ route('reports.orders') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                        <i class="fas fa-times mr-2"></i>
-                        Clear
-                    </a>
-                </div>
-            </form>
+        <div class="px-4 sm:px-6 py-4">
+            <div class="mt-4 sm:mt-0" x-cloak x-show="mobileOpen || window.matchMedia('(min-width: 640px)').matches">
+                <form method="GET" action="{{ route('reports.orders') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label for="date_from" class="block text-sm font-medium text-gray-700">Date From</label>
+                        <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="date_to" class="block text-sm font-medium text-gray-700">Date To</label>
+                        <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="state" class="block text-sm font-medium text-gray-700">State</label>
+                        <select name="state" id="state" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="">All States</option>
+                            @foreach($states as $state)
+                            <option value="{{ $state }}" {{ request('state') == $state ? 'selected' : '' }}>
+                                {{ ucfirst($state) }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="customer_id" class="block text-sm font-medium text-gray-700">Customer</label>
+                        <select name="customer_id" id="customer_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="">All Customers</option>
+                            @foreach($customers as $customer)
+                            <option value="{{ $customer->id }}" {{ request('customer_id') == $customer->id ? 'selected' : '' }}>
+                                {{ $customer->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex items-end space-x-3">
+                        <button type="submit" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                            <i class="fas fa-search mr-2"></i>
+                            Apply Filters
+                        </button>
+                        <a href="{{ route('reports.orders') }}" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                            <i class="fas fa-times mr-2"></i>
+                            Clear
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 

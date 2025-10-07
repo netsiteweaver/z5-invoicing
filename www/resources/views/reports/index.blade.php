@@ -188,7 +188,7 @@
 
         <!-- Quick Stats -->
         @if(auth()->user()->is_admin || auth()->user()->is_root)
-        <div class="bg-white shadow rounded-lg p-6">
+        <div class="bg-white shadow rounded-lg p-4 sm:p-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
                     <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
