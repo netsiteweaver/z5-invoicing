@@ -4,10 +4,9 @@
 @section('description', 'List of received goods (GRN)')
 
 @section('actions')
-<a href="{{ route('goods-receipts.create') }}" class="btn btn-create">
-    <i class="btn-icon fa-solid fa-plus"></i>
+<x-action-button type="create" :href="route('goods-receipts.create')">
     New Receipt
-</a>
+</x-action-button>
 @endsection
 
 @section('content')
@@ -34,25 +33,18 @@
             <td class="px-6 py-4 whitespace-nowrap">{{ $receipt->supplier->name ?? ($receipt->supplier_name ?? '-') }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
               <div class="flex space-x-2">
-                <a href="{{ route('goods-receipts.show', $receipt) }}" class="btn btn-view">
-                  <i class="btn-icon fa-regular fa-eye"></i>
-                  View
-                </a>
+                <x-action-button type="view" :href="route('goods-receipts.show', $receipt)" />
+                
                 @if(($receipt->approval_status ?? 'submitted') !== 'approved')
-                <a href="{{ route('goods-receipts.edit', $receipt) }}" class="btn btn-edit">
-                  <i class="btn-icon fa-solid fa-pen"></i>
-                  Edit
-                </a>
+                <x-action-button type="edit" :href="route('goods-receipts.edit', $receipt)" />
                 @endif
+                
                 @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('goods_receipts.delete'))
-                <form method="POST" action="{{ route('goods-receipts.destroy', $receipt) }}" onsubmit="return confirm('Delete this goods receipt? This will reverse inventory if approved.');">
-                  @csrf
-                  @method('DELETE')
-                  <button type="submit" class="btn btn-delete">
-                    <i class="btn-icon fa-solid fa-trash"></i>
-                    Delete
-                  </button>
-                </form>
+                <x-action-button 
+                  type="delete" 
+                  :form-action="route('goods-receipts.destroy', $receipt)"
+                  confirm-message="Delete this goods receipt? This will reverse inventory if approved."
+                />
                 @endif
               </div>
             </td>
@@ -62,10 +54,9 @@
             <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
               <div class="flex flex-col items-center space-y-4">
                 <p>No receipts found.</p>
-                <a href="{{ route('goods-receipts.create') }}" class="btn btn-create">
-                  <i class="btn-icon fa-solid fa-plus"></i>
+                <x-action-button type="create" :href="route('goods-receipts.create')">
                   Create Receipt
-                </a>
+                </x-action-button>
               </div>
             </td>
           </tr>
