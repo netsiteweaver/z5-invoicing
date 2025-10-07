@@ -36,55 +36,67 @@
     </div>
 
     <!-- Filters -->
-    <div class="bg-white shadow rounded-lg print:hidden no-print">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Filters</h3>
+    <div class="bg-white shadow rounded-lg print:hidden no-print" x-data="{ mobileOpen: false }">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
+            <!-- Mobile toggle -->
+            <div class="flex items-center justify-between sm:hidden">
+                <h3 class="text-lg font-medium text-gray-900">Filters</h3>
+                <button type="button" @click="mobileOpen = !mobileOpen" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-filter mr-2"></i>
+                    <span x-show="!mobileOpen">Show</span>
+                    <span x-show="mobileOpen">Hide</span>
+                </button>
+            </div>
+            <!-- Desktop title -->
+            <h3 class="hidden sm:block text-lg font-medium text-gray-900">Filters</h3>
         </div>
-        <div class="px-6 py-4">
-            <form method="GET" action="{{ route('reports.goods-receipts') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                    <label for="date_from" class="block text-sm font-medium text-gray-700">Date From</label>
-                    <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" 
-                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div>
-                    <label for="date_to" class="block text-sm font-medium text-gray-700">Date To</label>
-                    <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" 
-                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div>
-                    <label for="supplier_id" class="block text-sm font-medium text-gray-700">Supplier</label>
-                    <select name="supplier_id" id="supplier_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        <option value="">All Suppliers</option>
-                        @foreach($suppliers as $supplier)
-                        <option value="{{ $supplier->id }}" {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>
-                            {{ $supplier->name }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                    <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        <option value="">All Statuses</option>
-                        @foreach($statuses as $status)
-                        <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
-                            {{ ucfirst($status) }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="flex items-end space-x-3">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-                        <i class="fas fa-search mr-2"></i>
-                        Apply Filters
-                    </button>
-                    <a href="{{ route('reports.goods-receipts') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                        <i class="fas fa-times mr-2"></i>
-                        Clear
-                    </a>
-                </div>
-            </form>
+        <div class="px-4 sm:px-6 py-4">
+            <div class="mt-4 sm:mt-0" x-cloak x-show="mobileOpen || window.matchMedia('(min-width: 640px)').matches">
+                <form method="GET" action="{{ route('reports.goods-receipts') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label for="date_from" class="block text-sm font-medium text-gray-700">Date From</label>
+                        <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="date_to" class="block text-sm font-medium text-gray-700">Date To</label>
+                        <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="supplier_id" class="block text-sm font-medium text-gray-700">Supplier</label>
+                        <select name="supplier_id" id="supplier_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="">All Suppliers</option>
+                            @foreach($suppliers as $supplier)
+                            <option value="{{ $supplier->id }}" {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>
+                                {{ $supplier->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                        <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="">All Statuses</option>
+                            @foreach($statuses as $status)
+                            <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
+                                {{ ucfirst($status) }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex items-end space-x-3">
+                        <button type="submit" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                            <i class="fas fa-search mr-2"></i>
+                            Apply Filters
+                        </button>
+                        <a href="{{ route('reports.goods-receipts') }}" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                            <i class="fas fa-times mr-2"></i>
+                            Clear
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -154,10 +166,12 @@
 
     <!-- Goods Receipts Table -->
     <div class="bg-white shadow rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Goods Receipts</h3>
         </div>
-        <div class="overflow-x-auto">
+        
+        <!-- Desktop Table -->
+        <div class="hidden sm:block overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -214,8 +228,61 @@
             </table>
         </div>
         
+        <!-- Mobile Cards -->
+        <div class="sm:hidden space-y-4 p-4">
+            @forelse($goodsReceipts as $receipt)
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <!-- Receipt Header -->
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="min-w-0 flex-1">
+                            <h4 class="text-sm font-medium text-gray-900 truncate">
+                                {{ $receipt->grn_number ?? ('#'.$receipt->id) }}
+                            </h4>
+                            <p class="text-xs text-gray-500 mt-1">
+                                {{ $receipt->created_at->format('M d, Y') }}
+                            </p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg font-semibold text-gray-900">
+                                ${{ number_format($receipt->items->sum(function($item) { return $item->quantity * ($item->unit_cost ?? 0); }), 2) }}
+                            </span>
+                            <a href="{{ route('goods-receipts.show', $receipt) }}" class="text-blue-600 hover:text-blue-900">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Receipt Details -->
+                    <div class="space-y-2">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-truck w-4 h-4 mr-2 text-gray-400"></i>
+                            <span class="truncate">{{ $receipt->supplier->name }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-boxes w-4 h-4 mr-2 text-gray-400"></i>
+                                <span>{{ $receipt->items->count() }} items</span>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                @if($receipt->status == 'pending') bg-yellow-100 text-yellow-800
+                                @elseif($receipt->status == 'approved') bg-green-100 text-green-800
+                                @elseif($receipt->status == 'rejected') bg-red-100 text-red-800
+                                @endif">
+                                {{ ucfirst($receipt->status) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="text-center py-8">
+                    <i class="fas fa-truck-loading text-gray-400 text-4xl mb-2"></i>
+                    <p class="text-sm text-gray-500">No goods receipts found matching the criteria.</p>
+                </div>
+            @endforelse
+        </div>
+        
         @if($goodsReceipts->hasPages())
-        <div class="px-6 py-4 border-t border-gray-200">
+        <div class="px-4 sm:px-6 py-4 border-t border-gray-200">
             {{ $goodsReceipts->appends(request()->query())->links() }}
         </div>
         @endif
@@ -223,18 +290,18 @@
 
     <!-- Status Distribution -->
     <div class="bg-white shadow rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Status Distribution</h3>
         </div>
-        <div class="px-6 py-4">
-            <div class="grid grid-cols-3 gap-4">
+        <div class="px-4 sm:px-6 py-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 @php
                     $statusCounts = $goodsReceipts->groupBy('status')->map->count();
                 @endphp
                 @foreach($statuses as $status)
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-gray-900">{{ $statusCounts->get($status, 0) }}</div>
-                    <div class="text-sm text-gray-500">{{ ucfirst($status) }}</div>
+                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                    <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ $statusCounts->get($status, 0) }}</div>
+                    <div class="text-xs sm:text-sm text-gray-500">{{ ucfirst($status) }}</div>
                 </div>
                 @endforeach
             </div>

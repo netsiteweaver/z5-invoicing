@@ -166,10 +166,12 @@
 
     <!-- Orders Table -->
     <div class="bg-white shadow rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Orders</h3>
         </div>
-        <div class="overflow-x-auto">
+        
+        <!-- Desktop Table -->
+        <div class="hidden sm:block overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -229,8 +231,64 @@
             </table>
         </div>
         
+        <!-- Mobile Cards -->
+        <div class="sm:hidden space-y-4 p-4">
+            @forelse($orders as $order)
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <!-- Order Header -->
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="min-w-0 flex-1">
+                            <h4 class="text-sm font-medium text-gray-900 truncate">
+                                {{ $order->order_number ?? ('#'.$order->id) }}
+                            </h4>
+                            <p class="text-xs text-gray-500 mt-1">
+                                {{ $order->created_at->format('M d, Y') }}
+                            </p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg font-semibold text-gray-900">
+                                ${{ number_format($order->total_amount, 2) }}
+                            </span>
+                            <a href="{{ route('orders.show', $order) }}" class="text-blue-600 hover:text-blue-900">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Details -->
+                    <div class="space-y-2">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-user w-4 h-4 mr-2 text-gray-400"></i>
+                            <span class="truncate">{{ $order->customer->display_name ?? $order->customer->company_name ?? $order->customer->full_name ?? '—' }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-boxes w-4 h-4 mr-2 text-gray-400"></i>
+                                <span>{{ $order->items->count() }} items</span>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                @if($order->order_status == 'draft') bg-gray-100 text-gray-800
+                                @elseif($order->order_status == 'confirmed') bg-blue-100 text-blue-800
+                                @elseif($order->order_status == 'processing') bg-yellow-100 text-yellow-800
+                                @elseif($order->order_status == 'shipped') bg-purple-100 text-purple-800
+                                @elseif($order->order_status == 'delivered') bg-green-100 text-green-800
+                                @elseif($order->order_status == 'cancelled') bg-red-100 text-red-800
+                                @endif">
+                                {{ ucfirst($order->order_status) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="text-center py-8">
+                    <i class="fas fa-shopping-cart text-gray-400 text-4xl mb-2"></i>
+                    <p class="text-sm text-gray-500">No orders found matching the criteria.</p>
+                </div>
+            @endforelse
+        </div>
+        
         @if($orders->hasPages())
-        <div class="px-6 py-4 border-t border-gray-200">
+        <div class="px-4 sm:px-6 py-4 border-t border-gray-200">
             {{ $orders->appends(request()->query())->links() }}
         </div>
         @endif
@@ -238,18 +296,18 @@
 
     <!-- State Distribution Chart -->
     <div class="bg-white shadow rounded-lg print:hidden no-print">
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Order State Distribution</h3>
         </div>
-        <div class="px-6 py-4">
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="px-4 sm:px-6 py-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                 @php
                     $stateCounts = $orders->groupBy('order_status')->map->count();
                 @endphp
                 @foreach($states as $state)
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-gray-900">{{ $stateCounts->get($state, 0) }}</div>
-                    <div class="text-sm text-gray-500">{{ ucfirst($state) }}</div>
+                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                    <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ $stateCounts->get($state, 0) }}</div>
+                    <div class="text-xs sm:text-sm text-gray-500">{{ ucfirst($state) }}</div>
                 </div>
                 @endforeach
             </div>
