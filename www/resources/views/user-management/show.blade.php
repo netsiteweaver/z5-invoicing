@@ -17,7 +17,7 @@
 @section('content')
 <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
     <!-- User Details -->
-    <div class="lg:col-span-2">
+    <div class="lg:col-span-2 space-y-6">
         <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
@@ -25,7 +25,7 @@
                     User Information
                 </h3>
                 
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <label class="block text-sm font-medium text-gray-500">Full Name</label>
                         <div class="mt-1 text-sm text-gray-900">{{ $user_management->name }}</div>
@@ -38,7 +38,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-500">Email</label>
-                        <div class="mt-1 text-sm text-gray-900">{{ $user_management->email }}</div>
+                        <div class="mt-1 text-sm text-gray-900 break-all">{{ $user_management->email }}</div>
                     </div>
 
                     <div>
@@ -91,15 +91,15 @@
         </div>
 
         <!-- User Roles -->
-        <div class="mt-6 bg-white shadow rounded-lg">
+        <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 space-y-3 sm:space-y-0">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">
                         <i class="fas fa-user-tag mr-2"></i>
                         Assigned Roles
                     </h3>
-                    <button onclick="openRoleModal()" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <i class="fas fa-plus mr-1"></i>
+                    <button onclick="openRoleModal()" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-plus mr-2"></i>
                         Assign Role
                     </button>
                 </div>
@@ -109,9 +109,11 @@
                         @foreach($user_management->roles as $role)
                             <div class="bg-gray-50 rounded-lg p-4">
                                 <div class="flex justify-between items-start">
-                                    <div>
-                                        <h4 class="text-sm font-medium text-gray-900">{{ $role->display_name }}</h4>
-                                        <p class="text-sm text-gray-500">{{ $role->description }}</p>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-sm font-medium text-gray-900 truncate">{{ $role->display_name }}</h4>
+                                        @if($role->description)
+                                            <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ $role->description }}</p>
+                                        @endif
                                         <div class="mt-2">
                                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $role->is_system ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800' }}">
                                                 {{ $role->is_system ? 'System Role' : 'Custom Role' }}
@@ -119,10 +121,10 @@
                                         </div>
                                     </div>
                                     @if(!$role->is_system || auth()->user()->hasRole('admin'))
-                                        <form method="POST" action="{{ route('user-management.remove-role', ['user_management' => $user_management->id]) }}" class="inline" onsubmit="return confirm('Remove this role from user?')">
+                                        <form method="POST" action="{{ route('user-management.remove-role', ['user_management' => $user_management->id]) }}" class="inline ml-2 flex-shrink-0" onsubmit="return confirm('Remove this role from user?')">
                                             @csrf
                                             <input type="hidden" name="role_id" value="{{ $role->id }}">
-                                            <button type="submit" class="text-red-600 hover:text-red-900">
+                                            <button type="submit" class="text-red-600 hover:text-red-900 p-1">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </form>
@@ -178,9 +180,9 @@
     </div>
 
     <!-- Sidebar -->
-    <div class="lg:col-span-1">
+    <div class="lg:col-span-1 space-y-6">
         <!-- Quick Actions -->
-        <div class="bg-white shadow rounded-lg mb-6">
+        <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
                     <i class="fas fa-bolt mr-2"></i>
@@ -188,12 +190,12 @@
                 </h3>
                 
                 <div class="space-y-3">
-                    <a href="{{ route('user-management.edit', ['user_management' => $user_management->id]) }}" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <a href="{{ route('user-management.edit', ['user_management' => $user_management->id]) }}" class="w-full inline-flex justify-center items-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         <i class="fas fa-edit mr-2"></i>
                         Edit User
                     </a>
                     
-                    <button onclick="openRoleModal()" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                    <button onclick="openRoleModal()" class="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         <i class="fas fa-user-tag mr-2"></i>
                         Assign Role
                     </button>
@@ -202,7 +204,7 @@
                         <form method="POST" action="{{ route('user-management.destroy', ['user_management' => $user_management->id]) }}" onsubmit="return confirm('Are you sure you want to delete this user?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50">
+                            <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-3 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                 <i class="fas fa-trash mr-2"></i>
                                 Delete User
                             </button>
@@ -244,12 +246,12 @@
 </div>
 
 <!-- Role Assignment Modal -->
-<div id="roleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" onclick="if(event.target === this) closeRoleModal()">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+<div id="roleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50" onclick="if(event.target === this) closeRoleModal()">
+    <div class="relative top-4 sm:top-20 mx-auto p-4 sm:p-5 border w-full max-w-sm sm:w-96 shadow-lg rounded-md bg-white m-4">
         <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-medium text-gray-900">Assign Role</h3>
-                <button onclick="closeRoleModal()" class="text-gray-400 hover:text-gray-600">
+                <button onclick="closeRoleModal()" class="text-gray-400 hover:text-gray-600 p-1">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -279,11 +281,11 @@
                     @endif
                 </div>
                 
-                <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="closeRoleModal()" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
+                    <button type="button" onclick="closeRoleModal()" class="w-full sm:w-auto px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Cancel
                     </button>
-                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700" {{ isset($unassignedRoles) && $unassignedRoles->isEmpty() ? 'disabled' : '' }}>
+                    <button type="submit" class="w-full sm:w-auto px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" {{ isset($unassignedRoles) && $unassignedRoles->isEmpty() ? 'disabled' : '' }}>
                         Assign Role
                     </button>
                 </div>

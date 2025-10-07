@@ -53,7 +53,8 @@
       </div>
     </div>
 
-    <div class="overflow-x-auto">
+    <!-- Desktop Table -->
+    <div class="hidden sm:block overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
@@ -70,6 +71,22 @@
           @endforeach
         </tbody>
       </table>
+    </div>
+    
+    <!-- Mobile Cards -->
+    <div class="sm:hidden space-y-3">
+      @foreach($transfer->items as $item)
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div class="min-w-0 flex-1">
+              <h3 class="text-sm font-medium text-gray-900 truncate">{{ $item->product->name ?? ('#'.$item->product_id) }}</h3>
+            </div>
+            <div class="ml-2 flex-shrink-0">
+              <span class="text-lg font-semibold text-gray-900">{{ $item->quantity }}</span>
+            </div>
+          </div>
+        </div>
+      @endforeach
     </div>
   </div>
 </div>

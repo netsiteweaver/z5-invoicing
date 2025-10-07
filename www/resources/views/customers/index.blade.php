@@ -19,46 +19,62 @@
     </div>
 
     <!-- Filters -->
-    <div class="bg-white shadow rounded-lg p-6">
-        <form method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-4">
-            <div>
-                <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
-                <input type="text" name="search" id="search" value="{{ request('search') }}" 
-                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
-                       placeholder="Name, email, phone, company...">
-            </div>
-            
-            <div>
-                <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
-                <select name="type" id="type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                    <option value="">All Types</option>
-                    <option value="individual" {{ request('type') === 'individual' ? 'selected' : '' }}>Individual</option>
-                    <option value="business" {{ request('type') === 'business' ? 'selected' : '' }}>Business</option>
-                </select>
-            </div>
-            
-            <div>
-                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                    <option value="">All Status</option>
-                    <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
-                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
-                </select>
-            </div>
-            
-            <div class="flex items-end">
-                <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <i class="-ml-1 mr-2 fa-solid fa-magnifying-glass"></i>
-                    Filter
+    <div class="bg-white shadow rounded-lg" x-data="{ mobileOpen: false }">
+        <div class="p-4 sm:p-6">
+            <!-- Mobile toggle -->
+            <div class="flex items-center justify-between sm:hidden">
+                <span class="text-sm font-medium text-gray-700">Filters</span>
+                <button type="button" @click="mobileOpen = !mobileOpen" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-filter mr-2"></i>
+                    <span x-show="!mobileOpen">Show</span>
+                    <span x-show="mobileOpen">Hide</span>
                 </button>
             </div>
-        </form>
+            
+            <!-- Filter form -->
+            <div class="mt-4 sm:mt-0" x-cloak x-show="mobileOpen || window.matchMedia('(min-width: 640px)').matches">
+                <form method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+                    <div>
+                        <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+                        <input type="text" name="search" id="search" value="{{ request('search') }}" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                               placeholder="Name, email, phone, company...">
+                    </div>
+                    
+                    <div>
+                        <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
+                        <select name="type" id="type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="">All Types</option>
+                            <option value="individual" {{ request('type') === 'individual' ? 'selected' : '' }}>Individual</option>
+                            <option value="business" {{ request('type') === 'business' ? 'selected' : '' }}>Business</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                        <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="">All Status</option>
+                            <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
+                            <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="-ml-1 mr-2 fa-solid fa-magnifying-glass"></i>
+                            Filter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
-    <!-- Customers Table -->
+    <!-- Customers List -->
     <div class="bg-white shadow overflow-hidden sm:rounded-md">
         @if($customers->count() > 0)
-            <ul class="divide-y divide-gray-200">
+            <!-- Desktop List -->
+            <ul class="hidden sm:block divide-y divide-gray-200">
                 @foreach($customers as $customer)
                     <li>
                         <div class="px-4 py-4 sm:px-6 hover:bg-gray-50">
@@ -135,6 +151,83 @@
                     </li>
                 @endforeach
             </ul>
+            
+            <!-- Mobile Cards -->
+            <div class="sm:hidden space-y-4 p-4">
+                @foreach($customers as $customer)
+                    <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                        <!-- Customer Header -->
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center min-w-0 flex-1">
+                                <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mr-3 flex-shrink-0">
+                                    <span class="text-sm font-medium text-white">
+                                        {{ strtoupper(substr($customer->display_name, 0, 1)) }}
+                                    </span>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <h3 class="text-sm font-medium text-gray-900 truncate">{{ $customer->display_name }}</h3>
+                                    <div class="flex items-center mt-1">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                            @if($customer->customer_type === 'business') bg-green-100 text-green-800
+                                            @else bg-blue-100 text-blue-800
+                                            @endif">
+                                            {{ ucfirst($customer->customer_type) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        <div class="space-y-2 mb-3">
+                            @if($customer->email)
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-envelope w-4 h-4 mr-2 text-gray-400"></i>
+                                    <span class="truncate">{{ $customer->email }}</span>
+                                </div>
+                            @endif
+                            @if($customer->phone_number1)
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-phone w-4 h-4 mr-2 text-gray-400"></i>
+                                    <span>{{ $customer->phone_number1 }}</span>
+                                </div>
+                            @endif
+                            @if($customer->city)
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-map-marker-alt w-4 h-4 mr-2 text-gray-400"></i>
+                                    <span>{{ $customer->city }}</span>
+                                </div>
+                            @endif
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="flex space-x-2 pt-3 border-t border-gray-100">
+                            <a href="{{ route('customers.show', $customer) }}" 
+                               class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-eye mr-1"></i>
+                                View
+                            </a>
+                            @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.edit'))
+                            <a href="{{ route('customers.edit', $customer) }}" 
+                               class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-edit mr-1"></i>
+                                Edit
+                            </a>
+                            @endif
+                            @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.delete'))
+                            <form method="POST" action="{{ route('customers.destroy', $customer) }}" onsubmit="return confirm('Are you sure you want to delete this customer?');" class="flex-1">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="w-full inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                    <i class="fas fa-trash mr-1"></i>
+                                    Delete
+                                </button>
+                            </form>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
             
             <!-- Pagination -->
             <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">

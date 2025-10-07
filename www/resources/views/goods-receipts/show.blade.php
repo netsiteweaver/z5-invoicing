@@ -81,7 +81,8 @@
       </div>
     </div>
 
-    <div class="overflow-x-auto">
+    <!-- Desktop Table -->
+    <div class="hidden sm:block overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
@@ -134,6 +135,88 @@
           </tr>
         </tfoot>
       </table>
+    </div>
+    
+    <!-- Mobile Cards -->
+    <div class="sm:hidden space-y-4">
+      @php
+        $totalQty = 0;
+        $totalNet = 0;
+        $totalVat = 0;
+        $totalGross = 0;
+      @endphp
+      @foreach($receipt->items as $item)
+        @php
+          $unitCost = $item->unit_cost ?? 0;
+          $quantity = $item->quantity;
+          $grossAmount = $quantity * $unitCost;
+          $vatRate = ($item->product->tax_type ?? 'standard') === 'standard' ? 0.15 : 0;
+          $vatAmount = $grossAmount * $vatRate;
+          $lineTotal = $grossAmount + $vatAmount;
+          
+          $totalQty += $quantity;
+          $totalNet += $grossAmount;
+          $totalVat += $vatAmount;
+          $totalGross += $lineTotal;
+        @endphp
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div class="flex items-start justify-between mb-3">
+            <div class="min-w-0 flex-1">
+              <h3 class="text-sm font-medium text-gray-900 truncate">{{ $item->product->name ?? ('#'.$item->product_id) }}</h3>
+            </div>
+            <div class="ml-2 flex-shrink-0">
+              <span class="text-lg font-semibold text-gray-900">Rs {{ number_format($lineTotal, 2) }}</span>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <p class="text-xs text-gray-500">Quantity</p>
+              <p class="text-sm font-medium text-gray-900">{{ $quantity }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Unit Cost</p>
+              <p class="text-sm font-medium text-gray-900">Rs {{ number_format($unitCost, 2) }}</p>
+            </div>
+          </div>
+          
+          @if($vatAmount > 0)
+            <div class="mt-2 pt-2 border-t border-gray-300">
+              <div class="flex justify-between text-xs text-gray-500">
+                <span>Gross Amount:</span>
+                <span>Rs {{ number_format($grossAmount, 2) }}</span>
+              </div>
+              <div class="flex justify-between text-xs text-gray-500">
+                <span>VAT ({{ ($vatRate * 100) }}%):</span>
+                <span>Rs {{ number_format($vatAmount, 2) }}</span>
+              </div>
+            </div>
+          @endif
+        </div>
+      @endforeach
+      
+      <!-- Mobile Totals -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 class="text-sm font-medium text-blue-900 mb-3">Summary</h3>
+        <div class="space-y-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Total Quantity:</span>
+            <span class="font-medium text-gray-900">{{ $totalQty }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Products (excl. VAT):</span>
+            <span class="font-medium text-gray-900">Rs {{ number_format($totalNet, 2) }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">VAT (15%):</span>
+            <span class="font-medium text-gray-900">Rs {{ number_format($totalVat, 2) }}</span>
+          </div>
+          <div class="flex justify-between text-sm font-semibold border-t border-blue-300 pt-2">
+            <span class="text-blue-900">Grand Total:</span>
+            <span class="text-blue-900">Rs {{ number_format($totalGross, 2) }}</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

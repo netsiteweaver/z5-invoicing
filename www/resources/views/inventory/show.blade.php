@@ -129,7 +129,8 @@
                 </h3>
                 
                 @if($stockMovements->count() > 0)
-                    <div class="overflow-x-auto">
+                    <!-- Desktop Table -->
+                    <div class="hidden sm:block overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -186,6 +187,64 @@
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+                    
+                    <!-- Mobile Cards -->
+                    <div class="sm:hidden space-y-3">
+                        @foreach($stockMovements as $movement)
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-start justify-between mb-2">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900">
+                                            {{ $movement->created_at->format('M d, Y H:i') }}
+                                        </p>
+                                        <p class="text-xs text-gray-500">
+                                            {{ $movement->reference_type }} #{{ $movement->reference_id }}
+                                        </p>
+                                    </div>
+                                    <div class="ml-2 flex-shrink-0">
+                                        @if($movement->movement_type === 'in')
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Stock In
+                                            </span>
+                                        @elseif($movement->movement_type === 'out')
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                Stock Out
+                                            </span>
+                                        @elseif($movement->movement_type === 'transfer')
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                Transfer
+                                            </span>
+                                        @elseif($movement->movement_type === 'initial')
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                Initial
+                                            </span>
+                                        @elseif($movement->movement_type === 'adjustment_in')
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                Adjustment In
+                                            </span>
+                                        @elseif($movement->movement_type === 'adjustment_out')
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                                Adjustment Out
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs text-gray-500">Quantity</p>
+                                        <p class="text-lg font-semibold text-gray-900">{{ $movement->quantity }}</p>
+                                    </div>
+                                    @if($movement->notes)
+                                        <div class="flex-1 ml-4">
+                                            <p class="text-xs text-gray-500">Notes</p>
+                                            <p class="text-sm text-gray-700 line-clamp-2">{{ $movement->notes }}</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 @else
                     <div class="text-center py-8">

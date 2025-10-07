@@ -19,7 +19,92 @@
 @if($roles->count() > 0)
     <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
-            <div class="overflow-x-auto">
+            <!-- Mobile cards (visible on small screens) -->
+            <div class="sm:hidden space-y-4">
+                @foreach($roles as $role)
+                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <!-- Role Header -->
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-base font-medium text-gray-900 truncate">{{ $role->display_name }}</div>
+                                <div class="text-sm text-gray-500 truncate">{{ $role->name }}</div>
+                            </div>
+                            <div class="flex items-center space-x-2 ml-3">
+                                @if($role->is_system)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">System</span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Custom</span>
+                                @endif
+                                @if($role->is_active)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactive</span>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Description</span>
+                            <div class="mt-1 text-sm text-gray-900">{{ $role->description ?? 'No description' }}</div>
+                        </div>
+                        
+                        <!-- Stats -->
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Permissions</span>
+                                <div class="mt-1 text-sm text-gray-900">{{ $role->permissions->count() }} permissions</div>
+                                @if($role->permissions->count() > 0)
+                                    <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                                        {{ $role->permissions->take(2)->pluck('display_name')->join(', ') }}
+                                        @if($role->permissions->count() > 2)
+                                            +{{ $role->permissions->count() - 2 }} more
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                            <div>
+                                <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Users</span>
+                                <div class="mt-1 text-sm text-gray-900">{{ $role->users->count() }} users</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="flex flex-wrap gap-2">
+                            @if(!$role->is_system)
+                                <a href="{{ route('user-management.roles.edit', $role) }}" class="btn btn-edit">
+                                    <i class="btn-icon fas fa-edit"></i>
+                                    Edit
+                                </a>
+                                <form method="POST" action="{{ route('user-management.roles.toggle', $role) }}" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="btn-icon fas fa-{{ $role->is_active ? 'pause' : 'play' }}"></i>
+                                        {{ $role->is_active ? 'Deactivate' : 'Activate' }}
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ route('user-management.roles.destroy', $role) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this role?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-delete">
+                                        <i class="btn-icon fas fa-trash"></i>
+                                        Delete
+                                    </button>
+                                </form>
+                            @else
+                                <a href="{{ route('user-management.roles.show', $role) }}" class="btn btn-view">
+                                    <i class="btn-icon fas fa-eye"></i>
+                                    View
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            
+            <!-- Desktop table (hidden on small screens) -->
+            <div class="hidden sm:block overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>

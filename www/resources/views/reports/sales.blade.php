@@ -36,43 +36,55 @@
     </div>
 
     <!-- Filters -->
-    <div class="bg-white shadow rounded-lg print:hidden no-print">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Filters</h3>
+    <div class="bg-white shadow rounded-lg print:hidden no-print" x-data="{ mobileOpen: false }">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
+            <!-- Mobile toggle -->
+            <div class="flex items-center justify-between sm:hidden">
+                <h3 class="text-lg font-medium text-gray-900">Filters</h3>
+                <button type="button" @click="mobileOpen = !mobileOpen" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-filter mr-2"></i>
+                    <span x-show="!mobileOpen">Show</span>
+                    <span x-show="mobileOpen">Hide</span>
+                </button>
+            </div>
+            <!-- Desktop title -->
+            <h3 class="hidden sm:block text-lg font-medium text-gray-900">Filters</h3>
         </div>
-        <div class="px-6 py-4">
-            <form method="GET" action="{{ route('reports.sales') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                    <label for="period" class="block text-sm font-medium text-gray-700">Period</label>
-                    <select name="period" id="period" onchange="toggleCustomDates()" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        @foreach($periods as $key => $label)
-                        <option value="{{ $key }}" {{ request('period') == $key ? 'selected' : '' }}>
-                            {{ $label }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div id="custom-dates" style="display: {{ request('period') == 'custom' ? 'block' : 'none' }};">
-                    <label for="date_from" class="block text-sm font-medium text-gray-700">Date From</label>
-                    <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" 
-                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div id="custom-dates-to" style="display: {{ request('period') == 'custom' ? 'block' : 'none' }};">
-                    <label for="date_to" class="block text-sm font-medium text-gray-700">Date To</label>
-                    <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" 
-                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div class="flex items-end space-x-3">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-                        <i class="fas fa-search mr-2"></i>
-                        Apply Filters
-                    </button>
-                    <a href="{{ route('reports.sales') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                        <i class="fas fa-times mr-2"></i>
-                        Clear
-                    </a>
-                </div>
-            </form>
+        <div class="px-4 sm:px-6 py-4">
+            <div class="mt-4 sm:mt-0" x-cloak x-show="mobileOpen || window.matchMedia('(min-width: 640px)').matches">
+                <form method="GET" action="{{ route('reports.sales') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label for="period" class="block text-sm font-medium text-gray-700">Period</label>
+                        <select name="period" id="period" onchange="toggleCustomDates()" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            @foreach($periods as $key => $label)
+                            <option value="{{ $key }}" {{ request('period') == $key ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div id="custom-dates" style="display: {{ request('period') == 'custom' ? 'block' : 'none' }};">
+                        <label for="date_from" class="block text-sm font-medium text-gray-700">Date From</label>
+                        <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div id="custom-dates-to" style="display: {{ request('period') == 'custom' ? 'block' : 'none' }};">
+                        <label for="date_to" class="block text-sm font-medium text-gray-700">Date To</label>
+                        <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div class="flex items-end space-x-3">
+                        <button type="submit" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                            <i class="fas fa-search mr-2"></i>
+                            Apply Filters
+                        </button>
+                        <a href="{{ route('reports.sales') }}" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                            <i class="fas fa-times mr-2"></i>
+                            Clear
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -142,10 +154,12 @@
 
     <!-- Sales Table -->
     <div class="bg-white shadow rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Sales</h3>
         </div>
-        <div class="overflow-x-auto">
+        
+        <!-- Desktop Table -->
+        <div class="hidden sm:block overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -192,8 +206,52 @@
             </table>
         </div>
         
+        <!-- Mobile Cards -->
+        <div class="sm:hidden space-y-4 p-4">
+            @forelse($sales as $sale)
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <!-- Sale Header -->
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="min-w-0 flex-1">
+                            <h4 class="text-sm font-medium text-gray-900 truncate">
+                                {{ $sale->sale_number ?? ('#'.$sale->id) }}
+                            </h4>
+                            <p class="text-xs text-gray-500 mt-1">
+                                {{ $sale->created_at->format('M d, Y') }}
+                            </p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg font-semibold text-gray-900">
+                                ${{ number_format($sale->total_amount, 2) }}
+                            </span>
+                            <a href="{{ route('sales.show', $sale) }}" class="text-blue-600 hover:text-blue-900">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Sale Details -->
+                    <div class="space-y-2">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-user w-4 h-4 mr-2 text-gray-400"></i>
+                            <span class="truncate">{{ $sale->customer->display_name ?? $sale->customer->company_name ?? $sale->customer->full_name ?? '—' }}</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-boxes w-4 h-4 mr-2 text-gray-400"></i>
+                            <span>{{ $sale->saleItems->count() }} items</span>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="text-center py-8">
+                    <i class="fas fa-chart-line text-gray-400 text-4xl mb-2"></i>
+                    <p class="text-sm text-gray-500">No sales found matching the criteria.</p>
+                </div>
+            @endforelse
+        </div>
+        
         @if($sales->hasPages())
-        <div class="px-6 py-4 border-t border-gray-200">
+        <div class="px-4 sm:px-6 py-4 border-t border-gray-200">
             {{ $sales->appends(request()->query())->links() }}
         </div>
         @endif
@@ -201,11 +259,13 @@
 
     <!-- Best Sellers -->
     <div class="bg-white shadow rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Best Sellers</h3>
             <p class="mt-1 text-sm text-gray-600">Top performing products by quantity sold and revenue.</p>
         </div>
-        <div class="overflow-x-auto">
+        
+        <!-- Desktop Table -->
+        <div class="hidden sm:block overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -250,23 +310,61 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- Mobile Cards -->
+        <div class="sm:hidden space-y-4 p-4">
+            @forelse($bestSellers as $index => $product)
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <!-- Product Header -->
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center mb-1">
+                                @if($index < 3)
+                                    <i class="fas fa-trophy text-yellow-500 mr-2"></i>
+                                @endif
+                                <span class="text-sm font-medium text-gray-900">#{{ $index + 1 }}</span>
+                            </div>
+                            <h4 class="text-sm font-medium text-gray-900 truncate">
+                                {{ $product->name }}
+                            </h4>
+                            <p class="text-xs text-gray-500 mt-1">
+                                SKU: {{ $product->sku }}
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-semibold text-gray-900">
+                                ${{ number_format($product->total_revenue, 2) }}
+                            </div>
+                            <div class="text-xs text-gray-500">
+                                {{ number_format($product->total_quantity) }} sold
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="text-center py-8">
+                    <i class="fas fa-trophy text-gray-400 text-4xl mb-2"></i>
+                    <p class="text-sm text-gray-500">No sales data available for the selected period.</p>
+                </div>
+            @endforelse
+        </div>
     </div>
 
     <!-- Sales by Brand and Category -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <!-- Sales by Brand -->
         <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
+            <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
                 <h3 class="text-lg font-medium text-gray-900">Sales by Brand</h3>
                 <p class="mt-1 text-sm text-gray-600">Revenue breakdown by product brand.</p>
             </div>
-            <div class="px-6 py-4">
+            <div class="px-4 sm:px-6 py-4">
                 @if($salesByBrand->count() > 0)
-                    <div class="h-80">
+                    <div class="h-64 sm:h-80">
                         <canvas id="salesByBrandChart"></canvas>
                     </div>
                 @else
-                    <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                    <div class="h-48 sm:h-64 flex items-center justify-center bg-gray-50 rounded-lg">
                         <div class="text-center">
                             <i class="fas fa-tags text-gray-400 text-4xl mb-2"></i>
                             <p class="text-gray-500">No brand sales data available</p>
@@ -278,17 +376,17 @@
 
         <!-- Sales by Category -->
         <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
+            <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
                 <h3 class="text-lg font-medium text-gray-900">Sales by Category</h3>
                 <p class="mt-1 text-sm text-gray-600">Revenue breakdown by product category.</p>
             </div>
-            <div class="px-6 py-4">
+            <div class="px-4 sm:px-6 py-4">
                 @if($salesByCategory->count() > 0)
-                    <div class="h-80">
+                    <div class="h-64 sm:h-80">
                         <canvas id="salesByCategoryChart"></canvas>
                     </div>
                 @else
-                    <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                    <div class="h-48 sm:h-64 flex items-center justify-center bg-gray-50 rounded-lg">
                         <div class="text-center">
                             <i class="fas fa-list text-gray-400 text-4xl mb-2"></i>
                             <p class="text-gray-500">No category sales data available</p>
@@ -301,17 +399,17 @@
 
     <!-- Sales Trend Chart -->
     <div class="bg-white shadow rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Sales Trend</h3>
             <p class="mt-1 text-sm text-gray-600">Daily sales performance for the selected period.</p>
         </div>
-        <div class="px-6 py-4">
+        <div class="px-4 sm:px-6 py-4">
             @if($salesTrend->count() > 0)
-                <div class="h-80">
+                <div class="h-64 sm:h-80">
                     <canvas id="salesTrendChart"></canvas>
                 </div>
             @else
-                <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                <div class="h-48 sm:h-64 flex items-center justify-center bg-gray-50 rounded-lg">
                     <div class="text-center">
                         <i class="fas fa-chart-area text-gray-400 text-4xl mb-2"></i>
                         <p class="text-gray-500">No sales found for the selected period</p>
