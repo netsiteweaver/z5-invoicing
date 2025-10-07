@@ -39,7 +39,8 @@
                 </span>
             </div>
             
-            <div class="overflow-x-auto">
+            <!-- Desktop Table -->
+            <div class="hidden sm:block overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -119,6 +120,85 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- Mobile Cards -->
+            <div class="sm:hidden space-y-4">
+                @foreach($lowStockItems as $item)
+                    @php
+                        $deficit = $item->min_stock_level - $item->current_stock;
+                    @endphp
+                    <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                        <!-- Product Header -->
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center min-w-0 flex-1">
+                                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                                    <span class="text-gray-600 font-medium text-sm">{{ substr($item->product->name, 0, 1) }}</span>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <h3 class="text-sm font-medium text-gray-900 truncate">{{ $item->product->name }}</h3>
+                                    <p class="text-xs text-gray-500 truncate">{{ $item->product->sku }}</p>
+                                </div>
+                            </div>
+                            <div class="ml-2 flex-shrink-0">
+                                @if($item->current_stock == 0)
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        Critical
+                                    </span>
+                                @elseif($item->current_stock <= ($item->min_stock_level * 0.5))
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                        High
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Medium
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <!-- Stock Information -->
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <p class="text-xs text-gray-500">Current Stock</p>
+                                <p class="text-sm font-medium text-gray-900">{{ $item->current_stock }}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Min Level</p>
+                                <p class="text-sm font-medium text-gray-900">{{ $item->min_stock_level }}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Deficit and Location -->
+                        <div class="grid grid-cols-1 gap-2 mb-3">
+                            <div>
+                                <p class="text-xs text-gray-500">Deficit</p>
+                                <p class="text-sm font-medium {{ $deficit > 0 ? 'text-red-600' : 'text-gray-900' }}">
+                                    {{ $deficit > 0 ? '-' . $deficit : '0' }}
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Location</p>
+                                <p class="text-sm text-gray-900">{{ $item->department->name }}</p>
+                                <p class="text-xs text-gray-500">{{ $item->department->location }}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="flex space-x-2 pt-3 border-t border-gray-100">
+                            <a href="{{ route('inventory.show', $item) }}" 
+                               class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-eye mr-1"></i>
+                                View
+                            </a>
+                            <a href="{{ route('inventory.edit', $item) }}" 
+                               class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-edit mr-1"></i>
+                                Edit
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>

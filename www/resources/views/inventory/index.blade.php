@@ -41,50 +41,62 @@
   </div>
 @endif
 <!-- Filters -->
-<div class="bg-white shadow rounded-lg mb-6">
+<div class="bg-white shadow rounded-lg mb-6" x-data="{ showFilters: false }">
     <div class="px-4 py-5 sm:p-6">
-        <form method="GET" class="grid grid-cols-1 gap-4 sm:grid-cols-5">
-            <div>
-                <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
-                <input type="text" name="search" id="search" value="{{ request('search') }}" 
-                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
-                       placeholder="Product name, SKU...">
-            </div>
-            
-            <div>
-                <label for="department_id" class="block text-sm font-medium text-gray-700">Location</label>
-                <select name="department_id" id="department_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                    <option value="">All Locations</option>
-                    @foreach($departments as $department)
-                        <option value="{{ $department->id }}" {{ request('department_id') == $department->id ? 'selected' : '' }}>
-                            {{ $department->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            
-            <div>
-                <label for="stock_level" class="block text-sm font-medium text-gray-700">Stock Level</label>
-                <select name="stock_level" id="stock_level" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                    <option value="">All Levels</option>
-                    <option value="low" {{ request('stock_level') === 'low' ? 'selected' : '' }}>Low Stock</option>
-                    <option value="out" {{ request('stock_level') === 'out' ? 'selected' : '' }}>Out of Stock</option>
-                    <option value="available" {{ request('stock_level') === 'available' ? 'selected' : '' }}>Available</option>
-                </select>
-            </div>
-            
-            <div class="flex items-end">
-                <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <i class="fas fa-search mr-2"></i>
-                    Filter
-                </button>
-            </div>
-            
-            <div class="flex items-end">
-                <a href="{{ route('inventory.stock-report') }}" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <i class="fas fa-chart-bar mr-2"></i>
-                    Stock Report
-                </a>
+        <!-- Mobile Filter Toggle -->
+        <div class="sm:hidden mb-4">
+            <button @click="showFilters = !showFilters" 
+                    class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-filter mr-2"></i>
+                <span x-text="showFilters ? 'Hide Filters' : 'Show Filters'"></span>
+            </button>
+        </div>
+        
+        <!-- Filter Form -->
+        <form method="GET" class="space-y-4" :class="{ 'hidden': !showFilters }" class="sm:block">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-5">
+                <div>
+                    <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+                    <input type="text" name="search" id="search" value="{{ request('search') }}" 
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                           placeholder="Product name, SKU...">
+                </div>
+                
+                <div>
+                    <label for="department_id" class="block text-sm font-medium text-gray-700">Location</label>
+                    <select name="department_id" id="department_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">All Locations</option>
+                        @foreach($departments as $department)
+                            <option value="{{ $department->id }}" {{ request('department_id') == $department->id ? 'selected' : '' }}>
+                                {{ $department->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="stock_level" class="block text-sm font-medium text-gray-700">Stock Level</label>
+                    <select name="stock_level" id="stock_level" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">All Levels</option>
+                        <option value="low" {{ request('stock_level') === 'low' ? 'selected' : '' }}>Low Stock</option>
+                        <option value="out" {{ request('stock_level') === 'out' ? 'selected' : '' }}>Out of Stock</option>
+                        <option value="available" {{ request('stock_level') === 'available' ? 'selected' : '' }}>Available</option>
+                    </select>
+                </div>
+                
+                <div class="flex items-end">
+                    <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-search mr-2"></i>
+                        Filter
+                    </button>
+                </div>
+                
+                <div class="flex items-end">
+                    <a href="{{ route('inventory.stock-report') }}" class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-chart-bar mr-2"></i>
+                        Stock Report
+                    </a>
+                </div>
             </div>
         </form>
     </div>
@@ -94,7 +106,8 @@
 @if($inventory->count() > 0)
     <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
-            <div class="overflow-x-auto">
+            <!-- Desktop Table -->
+            <div class="hidden sm:block overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -176,6 +189,88 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- Mobile Cards -->
+            <div class="sm:hidden space-y-4">
+                @foreach($inventory as $item)
+                    <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                        <!-- Product Header -->
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center min-w-0 flex-1">
+                                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                                    <span class="text-gray-600 font-medium text-sm">{{ substr($item->product->name, 0, 1) }}</span>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <h3 class="text-sm font-medium text-gray-900 truncate">{{ $item->product->name }}</h3>
+                                    <p class="text-xs text-gray-500 truncate">{{ $item->product->sku }}</p>
+                                </div>
+                            </div>
+                            <div class="ml-2 flex-shrink-0">
+                                @if($item->current_stock == 0)
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        Out of Stock
+                                    </span>
+                                @elseif($item->current_stock <= $item->min_stock_level)
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Low Stock
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        In Stock
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <!-- Stock Information -->
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <p class="text-xs text-gray-500">Current Stock</p>
+                                <p class="text-sm font-medium text-gray-900">{{ $item->current_stock }}</p>
+                                @if($item->max_stock_level)
+                                    <p class="text-xs text-gray-500">Max: {{ $item->max_stock_level }}</p>
+                                @endif
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Min Level</p>
+                                <p class="text-sm font-medium text-gray-900">{{ $item->min_stock_level }}</p>
+                                @if($item->reorder_point)
+                                    <p class="text-xs text-gray-500">Reorder: {{ $item->reorder_point }}</p>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <!-- Location and Cost -->
+                        <div class="grid grid-cols-1 gap-2 mb-3">
+                            <div>
+                                <p class="text-xs text-gray-500">Location</p>
+                                <p class="text-sm text-gray-900">{{ $item->department->name }}</p>
+                                <p class="text-xs text-gray-500">{{ $item->department->location }}</p>
+                            </div>
+                            @if($item->cost_price)
+                                <div>
+                                    <p class="text-xs text-gray-500">Cost Price</p>
+                                    <p class="text-sm font-medium text-gray-900">Rs {{ number_format($item->cost_price, 2) }}</p>
+                                </div>
+                            @endif
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="flex space-x-2 pt-3 border-t border-gray-100">
+                            <a href="{{ route('inventory.show', $item) }}" 
+                               class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-eye mr-1"></i>
+                                View
+                            </a>
+                            <a href="{{ route('inventory.edit', $item) }}" 
+                               class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-edit mr-1"></i>
+                                Edit
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
         

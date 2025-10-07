@@ -45,19 +45,19 @@
 </div>
 
 <!-- Report Summary -->
-<div class="grid grid-cols-1 gap-5 sm:grid-cols-4 mb-6">
+<div class="grid grid-cols-2 gap-4 sm:gap-5 sm:grid-cols-4 mb-6">
     <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
+        <div class="p-4 sm:p-5">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                        <i class="fas fa-box text-white"></i>
+                    <div class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                        <i class="fas fa-box text-white text-xs sm:text-sm"></i>
                     </div>
                 </div>
-                <div class="ml-5 w-0 flex-1">
+                <div class="ml-3 sm:ml-5 w-0 flex-1 min-w-0">
                     <dl>
-                        <dt class="text-sm font-medium text-gray-500 truncate">Total Products</dt>
-                        <dd class="text-lg font-medium text-gray-900">{{ $inventory->count() }}</dd>
+                        <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Products</dt>
+                        <dd class="text-lg sm:text-xl font-medium text-gray-900">{{ $inventory->count() }}</dd>
                     </dl>
                 </div>
             </div>
@@ -65,17 +65,17 @@
     </div>
 
     <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
+        <div class="p-4 sm:p-5">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
-                        <i class="fas fa-check-circle text-white"></i>
+                    <div class="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-md flex items-center justify-center">
+                        <i class="fas fa-check-circle text-white text-xs sm:text-sm"></i>
                     </div>
                 </div>
-                <div class="ml-5 w-0 flex-1">
+                <div class="ml-3 sm:ml-5 w-0 flex-1 min-w-0">
                     <dl>
-                        <dt class="text-sm font-medium text-gray-500 truncate">In Stock</dt>
-                        <dd class="text-lg font-medium text-gray-900">{{ $inventory->where('current_stock', '>', 0)->count() }}</dd>
+                        <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">In Stock</dt>
+                        <dd class="text-lg sm:text-xl font-medium text-gray-900">{{ $inventory->where('current_stock', '>', 0)->count() }}</dd>
                     </dl>
                 </div>
             </div>
@@ -83,17 +83,17 @@
     </div>
 
     <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
+        <div class="p-4 sm:p-5">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
-                        <i class="fas fa-exclamation-triangle text-white"></i>
+                    <div class="w-6 h-6 sm:w-8 sm:h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-white text-xs sm:text-sm"></i>
                     </div>
                 </div>
-                <div class="ml-5 w-0 flex-1">
+                <div class="ml-3 sm:ml-5 w-0 flex-1 min-w-0">
                     <dl>
-                        <dt class="text-sm font-medium text-gray-500 truncate">Low Stock</dt>
-                        <dd class="text-lg font-medium text-gray-900">{{ $inventory->where('current_stock', '>', 0)->filter(function($item) { return $item->current_stock <= $item->min_stock_level; })->count() }}</dd>
+                        <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Low Stock</dt>
+                        <dd class="text-lg sm:text-xl font-medium text-gray-900">{{ $inventory->where('current_stock', '>', 0)->filter(function($item) { return $item->current_stock <= $item->min_stock_level; })->count() }}</dd>
                     </dl>
                 </div>
             </div>
@@ -101,17 +101,17 @@
     </div>
 
     <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
+        <div class="p-4 sm:p-5">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center">
-                        <i class="fas fa-times-circle text-white"></i>
+                    <div class="w-6 h-6 sm:w-8 sm:h-8 bg-red-500 rounded-md flex items-center justify-center">
+                        <i class="fas fa-times-circle text-white text-xs sm:text-sm"></i>
                     </div>
                 </div>
-                <div class="ml-5 w-0 flex-1">
+                <div class="ml-3 sm:ml-5 w-0 flex-1 min-w-0">
                     <dl>
-                        <dt class="text-sm font-medium text-gray-500 truncate">Out of Stock</dt>
-                        <dd class="text-lg font-medium text-gray-900">{{ $inventory->where('current_stock', 0)->count() }}</dd>
+                        <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Out of Stock</dt>
+                        <dd class="text-lg sm:text-xl font-medium text-gray-900">{{ $inventory->where('current_stock', 0)->count() }}</dd>
                     </dl>
                 </div>
             </div>
@@ -132,7 +132,8 @@
             </div>
         </div>
         
-        <div class="overflow-x-auto">
+        <!-- Desktop Table -->
+        <div class="hidden sm:block overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -210,6 +211,90 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+        
+        <!-- Mobile Cards -->
+        <div class="sm:hidden space-y-4">
+            @foreach($inventory as $item)
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <!-- Product Header -->
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center min-w-0 flex-1">
+                            <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                                <span class="text-gray-600 font-medium text-sm">{{ substr($item->product->name, 0, 1) }}</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="text-sm font-medium text-gray-900 truncate">{{ $item->product->name }}</h3>
+                                <p class="text-xs text-gray-500 truncate">{{ $item->product->sku }}</p>
+                            </div>
+                        </div>
+                        <div class="ml-2 flex-shrink-0">
+                            @if($item->current_stock == 0)
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    Out of Stock
+                                </span>
+                            @elseif($item->current_stock <= $item->min_stock_level)
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    Low Stock
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    In Stock
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <!-- Stock Information -->
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <p class="text-xs text-gray-500">Current Stock</p>
+                            <p class="text-sm font-medium text-gray-900">{{ $item->current_stock }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">Min Level</p>
+                            <p class="text-sm font-medium text-gray-900">{{ $item->min_stock_level }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Info -->
+                    <div class="grid grid-cols-1 gap-2 mb-3">
+                        <div>
+                            <p class="text-xs text-gray-500">Location</p>
+                            <p class="text-sm text-gray-900">{{ $item->department->name }}</p>
+                            <p class="text-xs text-gray-500">{{ $item->department->location }}</p>
+                        </div>
+                        @if($item->max_stock_level)
+                            <div>
+                                <p class="text-xs text-gray-500">Max Level</p>
+                                <p class="text-sm text-gray-900">{{ $item->max_stock_level }}</p>
+                            </div>
+                        @endif
+                        @if($item->reorder_point)
+                            <div>
+                                <p class="text-xs text-gray-500">Reorder Point</p>
+                                <p class="text-sm text-gray-900">{{ $item->reorder_point }}</p>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <!-- Pricing -->
+                    @if($item->cost_price)
+                        <div class="pt-3 border-t border-gray-100">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <p class="text-xs text-gray-500">Cost Price</p>
+                                    <p class="text-sm font-medium text-gray-900">Rs {{ number_format($item->cost_price, 2) }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">Total Value</p>
+                                    <p class="text-sm font-medium text-gray-900">Rs {{ number_format($item->current_stock * $item->cost_price, 2) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            @endforeach
         </div>
     </div>
 </div>
