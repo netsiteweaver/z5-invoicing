@@ -3,10 +3,9 @@
 @section('title', 'Stock Transfers')
 
 @section('actions')
-<a href="{{ route('stock-transfers.create') }}" class="btn btn-create">
-    <i class="btn-icon fa-solid fa-plus"></i>
+<x-action-button type="create" :href="route('stock-transfers.create')">
     New Transfer
-</a>
+</x-action-button>
 @endsection
 
 @section('content')
@@ -35,25 +34,18 @@
             <td class="px-6 py-4 whitespace-nowrap">{{ ucfirst(str_replace('_', ' ', $transfer->status)) }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
               <div class="flex space-x-2">
-                <a href="{{ route('stock-transfers.show', $transfer) }}" class="btn btn-view">
-                  <i class="btn-icon fa-regular fa-eye"></i>
-                  View
-                </a>
+                <x-action-button type="view" :href="route('stock-transfers.show', $transfer)" />
+                
                 @if($transfer->status !== 'received')
-                <a href="{{ route('stock-transfers.edit', $transfer) }}" class="btn btn-edit">
-                  <i class="btn-icon fa-solid fa-pen"></i>
-                  Edit
-                </a>
+                <x-action-button type="edit" :href="route('stock-transfers.edit', $transfer)" />
                 @endif
+                
                 @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('stock_transfers.delete'))
-                <form method="POST" action="{{ route('stock-transfers.destroy', $transfer) }}" onsubmit="return confirm('Delete this transfer? This will reverse inventory if already received.');">
-                  @csrf
-                  @method('DELETE')
-                  <button type="submit" class="btn btn-delete">
-                    <i class="btn-icon fa-solid fa-trash"></i>
-                    Delete
-                  </button>
-                </form>
+                <x-action-button 
+                  type="delete" 
+                  :form-action="route('stock-transfers.destroy', $transfer)"
+                  confirm-message="Delete this transfer? This will reverse inventory if already received."
+                />
                 @endif
               </div>
             </td>
@@ -63,10 +55,9 @@
             <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
               <div class="flex flex-col items-center space-y-4">
                 <p>No transfers found.</p>
-                <a href="{{ route('stock-transfers.create') }}" class="btn btn-create">
-                  <i class="btn-icon fa-solid fa-plus"></i>
+                <x-action-button type="create" :href="route('stock-transfers.create')">
                   Create Transfer
-                </a>
+                </x-action-button>
               </div>
             </td>
           </tr>

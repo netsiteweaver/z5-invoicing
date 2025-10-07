@@ -7,10 +7,7 @@
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-900">{{ $payment_term->name }}</h1>
         <div class="flex space-x-3">
-            <a href="{{ route('payment-terms.edit', $payment_term) }}" class="btn btn-edit">
-                <i class="btn-icon fa-solid fa-pen"></i>
-                Edit
-            </a>
+            <x-action-button type="edit" :href="route('payment-terms.edit', $payment_term)" />
         </div>
     </div>
 
@@ -83,14 +80,11 @@
                     | Updated: {{ $payment_term->updated_at->format('M d, Y') }}
                 @endif
             </div>
-            <form method="POST" action="{{ route('payment-terms.destroy', $payment_term) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this payment term?')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-delete">
-                    <i class="btn-icon fa-solid fa-trash"></i>
-                    Delete
-                </button>
-            </form>
+            <x-action-button 
+                type="delete" 
+                :form-action="route('payment-terms.destroy', $payment_term)"
+                confirm-message="Are you sure you want to delete this payment term?"
+            />
         </div>
     </div>
 </div>

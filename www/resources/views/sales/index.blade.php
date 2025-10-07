@@ -4,10 +4,9 @@
 @section('description', 'Manage sales and track revenue')
 
 @section('actions')
-<a href="{{ route('sales.create') }}" class="btn btn-create">
-    <i class="btn-icon fa-solid fa-plus"></i>
+<x-action-button type="create" :href="route('sales.create')">
     Create Sale
-</a>
+</x-action-button>
 @endsection
 
 @section('content')
@@ -238,21 +237,16 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
-                                        <a href="{{ route('sales.show', $sale) }}" class="btn btn-view">
-                                            <i class="btn-icon fa-regular fa-eye"></i>
-                                            View
-                                        </a>
+                                        <x-action-button type="view" :href="route('sales.show', $sale)" />
+                                        
                                         @if($sale->canBeEdited())
-                                            <a href="{{ route('sales.edit', $sale) }}" class="btn btn-edit">
-                                                <i class="btn-icon fa-solid fa-pen"></i>
-                                                Edit
-                                            </a>
+                                            <x-action-button type="edit" :href="route('sales.edit', $sale)" />
                                         @endif
+                                        
                                         @if($sale->payment_status !== 'paid')
-                                            <a href="{{ route('sales.payments.create', $sale) }}" class="btn btn-primary" title="Record Payment">
-                                                <i class="btn-icon fa-solid fa-money-bill-wave"></i>
+                                            <x-action-button type="send" :href="route('sales.payments.create', $sale)" icon="fa-solid fa-money-bill-wave" title="Record Payment">
                                                 Payment
-                                            </a>
+                                            </x-action-button>
                                         @endif
                                     </div>
                                 </td>
@@ -276,10 +270,9 @@
                 <h3 class="mt-2 text-sm font-medium text-gray-900">No sales found</h3>
                 <p class="mt-1 text-sm text-gray-500">Get started by creating a new sale or converting an order.</p>
                 <div class="mt-6">
-                    <a href="{{ route('sales.create') }}" class="btn btn-create">
-                        <i class="btn-icon fa-solid fa-plus"></i>
+                    <x-action-button type="create" :href="route('sales.create')">
                         Create Sale
-                    </a>
+                    </x-action-button>
                 </div>
             </div>
         </div>

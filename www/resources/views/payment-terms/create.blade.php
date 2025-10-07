@@ -33,14 +33,8 @@
             </div>
         </div>
         <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-            <a href="{{ route('payment-terms.index') }}" class="btn btn-secondary">
-                <i class="btn-icon fa-solid fa-times"></i>
-                Cancel
-            </a>
-            <button type="submit" class="btn btn-primary">
-                <i class="btn-icon fa-solid fa-check"></i>
-                Save
-            </button>
+            <x-action-button type="cancel" :href="route('payment-terms.index')" />
+            <x-action-button type="save" />
         </div>
     </form>
 </div>
