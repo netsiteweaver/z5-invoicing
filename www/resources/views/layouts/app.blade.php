@@ -62,7 +62,7 @@
             </a>
 
             <!-- Navigation -->
-            <nav class="mt-2 px-2 flex-1 overflow-y-auto overscroll-contain" @click="if (window.innerWidth < 1024 && $event.target.closest('a')) sidebarOpen = false">
+            <nav class="px-2" @click="if (window.innerWidth < 1024 && $event.target.closest('a')) sidebarOpen = false">
                 <!-- Dashboard -->
                 <a href="{{ route('dashboard') }}" 
                    class="group flex items-center px-3 py-3 text-sm font-medium rounded-md {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
