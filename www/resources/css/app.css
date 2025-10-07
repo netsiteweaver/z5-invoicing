@@ -58,7 +58,20 @@
         
         /* Force active section buttons to show expanded state */
         .sidebar [x-data*="Open: true"] button i.fa-chevron-down {
-            transform: rotate(180deg);
+            transform: rotate(180deg) !important;
+        }
+        
+        /* Additional mobile-specific active section styling */
+        .sidebar [x-data*="Open: true"] [x-show] {
+            opacity: 1 !important;
+            visibility: visible !important;
+            height: auto !important;
+            max-height: none !important;
+        }
+        
+        /* Force show active dropdowns even if Alpine.js hasn't initialized */
+        .sidebar [x-data*="Open: true"] .ml-6 {
+            display: block !important;
         }
     }
 

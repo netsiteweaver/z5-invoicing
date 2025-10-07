@@ -849,10 +849,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 const chevron = section.querySelector('i.fa-chevron-down');
                 
                 if (dropdown && button && chevron) {
-                    // Force the dropdown to be visible
-                    dropdown.style.display = 'block';
-                    // Rotate the chevron to show expanded state
-                    chevron.style.transform = 'rotate(180deg)';
+                    // Get the Alpine.js component data
+                    const alpineData = section.getAttribute('x-data');
+                    const match = alpineData.match(/(\w+)Open:\s*true/);
+                    
+                    if (match) {
+                        const varName = match[1];
+                        
+                        // Try to access the Alpine component and set it to open
+                        try {
+                            const component = Alpine.$data(section);
+                            if (component && component[varName + 'Open'] !== undefined) {
+                                component[varName + 'Open'] = true;
+                            }
+                        } catch (e) {
+                            // Fallback: directly manipulate the DOM
+                            dropdown.style.display = 'block';
+                            chevron.style.transform = 'rotate(180deg)';
+                        }
+                    } else {
+                        // Fallback: directly manipulate the DOM
+                        dropdown.style.display = 'block';
+                        chevron.style.transform = 'rotate(180deg)';
+                    }
                 }
             });
         }
@@ -863,13 +882,49 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Run when sidebar opens on mobile
     document.addEventListener('alpine:init', () => {
+        // Watch for sidebar state changes
         Alpine.effect(() => {
             const sidebarOpen = Alpine.store('sidebarOpen') || false;
             if (sidebarOpen && window.innerWidth < 1024) {
                 setTimeout(enhanceMobileNavigation, 100);
             }
         });
+        
+        // Also watch for Alpine component initialization
+        Alpine.effect(() => {
+            if (window.innerWidth < 1024) {
+                setTimeout(enhanceMobileNavigation, 200);
+            }
+        });
     });
+    
+    // Additional mobile enhancement when sidebar opens
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.closest('[\\@click="sidebarOpen = !sidebarOpen"]') && window.innerWidth < 1024) {
+            setTimeout(enhanceMobileNavigation, 150);
+        }
+    });
+    
+    // Mutation observer to watch for sidebar changes
+    if (window.innerWidth < 1024) {
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    const target = mutation.target;
+                    if (target.classList.contains('translate-x-0')) {
+                        // Sidebar is now open, enhance navigation
+                        setTimeout(enhanceMobileNavigation, 100);
+                    }
+                }
+            });
+        });
+        
+        // Start observing the sidebar
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar) {
+            observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+        }
+    }
 });
 </script>
 
