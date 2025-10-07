@@ -52,7 +52,7 @@
         </div>
         <div class="bg-gray-50 px-4 py-3 sm:px-5">
             <div class="text-xs sm:text-sm">
-                <a href="#" class="font-medium text-green-600 hover:text-green-500">
+                <a href="{{ route('sales.index') }}" class="font-medium text-green-600 hover:text-green-500">
                     View sales report
                 </a>
             </div>
