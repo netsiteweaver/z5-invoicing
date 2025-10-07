@@ -38,7 +38,7 @@
              x-transition:enter-end="translate-x-0"
              x-transition:leave="transition ease-in duration-300"
              x-transition:leave-start="translate-x-0"
-             x-transition:leave-end="-translate-x-full">
+             x-transition:leave-end="-translate-x-full"
             
             <!-- Brand Logo -->
             <div class="flex items-center justify-center h-16 px-4 bg-gradient-to-r from-blue-600 to-purple-600">
@@ -834,6 +834,39 @@ document.addEventListener('DOMContentLoaded', function() {
                         button.value = originalText;
                     }
                 }, 10000);
+            }
+        });
+    });
+    
+    // Mobile navigation enhancements
+    function enhanceMobileNavigation() {
+        if (window.innerWidth < 1024) {
+            // Find all active sections and ensure they're expanded
+            const activeSections = document.querySelectorAll('[x-data*="Open: true"]');
+            activeSections.forEach(section => {
+                const dropdown = section.querySelector('[x-show]');
+                const button = section.querySelector('button');
+                const chevron = section.querySelector('i.fa-chevron-down');
+                
+                if (dropdown && button && chevron) {
+                    // Force the dropdown to be visible
+                    dropdown.style.display = 'block';
+                    // Rotate the chevron to show expanded state
+                    chevron.style.transform = 'rotate(180deg)';
+                }
+            });
+        }
+    }
+    
+    // Run on page load
+    enhanceMobileNavigation();
+    
+    // Run when sidebar opens on mobile
+    document.addEventListener('alpine:init', () => {
+        Alpine.effect(() => {
+            const sidebarOpen = Alpine.store('sidebarOpen') || false;
+            if (sidebarOpen && window.innerWidth < 1024) {
+                setTimeout(enhanceMobileNavigation, 100);
             }
         });
     });

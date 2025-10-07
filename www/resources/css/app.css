@@ -48,6 +48,19 @@
         min-height: 0; /* Important for flex child scrolling */
         padding-top: 0.5rem; /* Add some top spacing */
     }
+    
+    /* Mobile navigation enhancements */
+    @media (max-width: 1023px) {
+        /* Ensure active sections are visible on mobile */
+        .sidebar [x-data*="Open: true"] [x-show] {
+            display: block !important;
+        }
+        
+        /* Force active section buttons to show expanded state */
+        .sidebar [x-data*="Open: true"] button i.fa-chevron-down {
+            transform: rotate(180deg);
+        }
+    }
 
     /* Print helpers */
     @media print {
