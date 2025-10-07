@@ -27,62 +27,74 @@
     </div>
 
     <!-- Filters -->
-    <div class="bg-white shadow rounded-lg print:hidden no-print">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Filters</h3>
+    <div class="bg-white shadow rounded-lg print:hidden no-print" x-data="{ mobileOpen: false }">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
+            <!-- Mobile toggle -->
+            <div class="flex items-center justify-between sm:hidden">
+                <h3 class="text-lg font-medium text-gray-900">Filters</h3>
+                <button type="button" @click="mobileOpen = !mobileOpen" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-filter mr-2"></i>
+                    <span x-show="!mobileOpen">Show</span>
+                    <span x-show="mobileOpen">Hide</span>
+                </button>
+            </div>
+            <!-- Desktop title -->
+            <h3 class="hidden sm:block text-lg font-medium text-gray-900">Filters</h3>
         </div>
-        <div class="px-6 py-4">
-            <form method="GET" action="{{ route('reports.inventory') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                    <label for="product_id" class="block text-sm font-medium text-gray-700">Product</label>
-                    <select name="product_id" id="product_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        <option value="">All Products</option>
-                        @foreach(\App\Models\Product::orderBy('name')->get() as $product)
-                        <option value="{{ $product->id }}" {{ request('product_id') == $product->id ? 'selected' : '' }}>
-                            {{ $product->name }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label for="category_id" class="block text-sm font-medium text-gray-700">Category</label>
-                    <select name="category_id" id="category_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        <option value="">All Categories</option>
-                        @foreach(\App\Models\ProductCategory::orderBy('name')->get() as $category)
-                        <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                            {{ $category->name }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label for="date_from" class="block text-sm font-medium text-gray-700">Date From</label>
-                    <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" 
-                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div>
-                    <label for="date_to" class="block text-sm font-medium text-gray-700">Date To</label>
-                    <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" 
-                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div class="flex items-center">
-                    <input type="checkbox" name="low_stock" id="low_stock" value="1" {{ request('low_stock') ? 'checked' : '' }}
-                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                    <label for="low_stock" class="ml-2 block text-sm text-gray-900">
-                        Show only low stock items
-                    </label>
-                </div>
-                <div class="flex items-end space-x-3">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-                        <i class="fas fa-search mr-2"></i>
-                        Apply Filters
-                    </button>
-                    <a href="{{ route('reports.inventory') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                        <i class="fas fa-times mr-2"></i>
-                        Clear
-                    </a>
-                </div>
-            </form>
+        <div class="px-4 sm:px-6 py-4">
+            <div class="mt-4 sm:mt-0" x-cloak x-show="mobileOpen || window.matchMedia('(min-width: 640px)').matches">
+                <form method="GET" action="{{ route('reports.inventory') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label for="product_id" class="block text-sm font-medium text-gray-700">Product</label>
+                        <select name="product_id" id="product_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="">All Products</option>
+                            @foreach(\App\Models\Product::orderBy('name')->get() as $product)
+                            <option value="{{ $product->id }}" {{ request('product_id') == $product->id ? 'selected' : '' }}>
+                                {{ $product->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="category_id" class="block text-sm font-medium text-gray-700">Category</label>
+                        <select name="category_id" id="category_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="">All Categories</option>
+                            @foreach(\App\Models\ProductCategory::orderBy('name')->get() as $category)
+                            <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="date_from" class="block text-sm font-medium text-gray-700">Date From</label>
+                        <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="date_to" class="block text-sm font-medium text-gray-700">Date To</label>
+                        <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="low_stock" id="low_stock" value="1" {{ request('low_stock') ? 'checked' : '' }}
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="low_stock" class="ml-2 block text-sm text-gray-900">
+                            Show only low stock items
+                        </label>
+                    </div>
+                    <div class="flex items-end space-x-3">
+                        <button type="submit" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                            <i class="fas fa-search mr-2"></i>
+                            Apply Filters
+                        </button>
+                        <a href="{{ route('reports.inventory') }}" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                            <i class="fas fa-times mr-2"></i>
+                            Clear
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -152,10 +164,12 @@
 
     <!-- Inventory Table -->
     <div class="bg-white shadow rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Inventory</h3>
         </div>
-        <div class="overflow-x-auto">
+        
+        <!-- Desktop Table -->
+        <div class="hidden sm:block overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -218,8 +232,68 @@
             </table>
         </div>
         
+        <!-- Mobile Cards -->
+        <div class="sm:hidden space-y-4 p-4">
+            @forelse($inventory as $item)
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <!-- Product Header -->
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="min-w-0 flex-1">
+                            <h4 class="text-sm font-medium text-gray-900 truncate">
+                                {{ $item->product->name }}
+                            </h4>
+                            <p class="text-xs text-gray-500 mt-1">
+                                SKU: {{ $item->product->stockref }}
+                            </p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg font-semibold text-gray-900">
+                                ${{ number_format($item->current_stock * ($item->product->selling_price ?? 0), 2) }}
+                            </span>
+                            <a href="{{ route('inventory.show', $item) }}" class="text-blue-600 hover:text-blue-900">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Stock Details -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-600">Current Stock:</span>
+                            <span class="text-gray-900 font-medium">{{ number_format($item->current_stock) }}</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-600">Min Level:</span>
+                            <span class="text-gray-900">{{ number_format($item->min_stock_level) }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Status:</span>
+                            @if($item->current_stock <= $item->min_stock_level)
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    Low Stock
+                                </span>
+                            @elseif($item->current_stock <= $item->min_stock_level * 1.5)
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    Warning
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    Good
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="text-center py-8">
+                    <i class="fas fa-boxes text-gray-400 text-4xl mb-2"></i>
+                    <p class="text-sm text-gray-500">No inventory items found matching the criteria.</p>
+                </div>
+            @endforelse
+        </div>
+        
         @if($inventory->hasPages())
-        <div class="px-6 py-4 border-t border-gray-200">
+        <div class="px-4 sm:px-6 py-4 border-t border-gray-200">
             {{ $inventory->appends(request()->query())->links() }}
         </div>
         @endif
@@ -227,11 +301,13 @@
 
     <!-- Stock Movements -->
     <div class="bg-white shadow rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Stock Movements</h3>
             <p class="mt-1 text-sm text-gray-600">Recent stock movements for the selected period.</p>
         </div>
-        <div class="overflow-x-auto">
+        
+        <!-- Desktop Table -->
+        <div class="hidden sm:block overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -272,6 +348,57 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+        
+        <!-- Mobile Cards -->
+        <div class="sm:hidden space-y-4 p-4">
+            @forelse($stockMovements as $movement)
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <!-- Movement Header -->
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="min-w-0 flex-1">
+                            <h4 class="text-sm font-medium text-gray-900 truncate">
+                                {{ $movement->name }}
+                            </h4>
+                            <p class="text-xs text-gray-500 mt-1">
+                                SKU: {{ $movement->sku }}
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            @php
+                                $netMovement = $movement->total_in - $movement->total_out;
+                            @endphp
+                            <span class="text-lg font-semibold {{ $netMovement >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                {{ $netMovement >= 0 ? '+' : '' }}{{ number_format($netMovement) }}
+                            </span>
+                            <p class="text-xs text-gray-500">Net Movement</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Movement Details -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center text-green-600">
+                                <i class="fas fa-arrow-up w-4 h-4 mr-2"></i>
+                                <span>Stock In:</span>
+                            </div>
+                            <span class="text-green-600 font-medium">{{ number_format($movement->total_in) }}</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center text-red-600">
+                                <i class="fas fa-arrow-down w-4 h-4 mr-2"></i>
+                                <span>Stock Out:</span>
+                            </div>
+                            <span class="text-red-600 font-medium">{{ number_format($movement->total_out) }}</span>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="text-center py-8">
+                    <i class="fas fa-chart-line text-gray-400 text-4xl mb-2"></i>
+                    <p class="text-sm text-gray-500">No stock movements found for the selected period.</p>
+                </div>
+            @endforelse
         </div>
     </div>
 </div>

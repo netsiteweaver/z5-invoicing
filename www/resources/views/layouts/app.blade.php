@@ -31,14 +31,14 @@
 <body class="font-sans antialiased bg-gray-50" x-data="{ sidebarOpen: false }" x-init="sidebarOpen = window.matchMedia('(min-width: 1024px)').matches">
     <div class="min-h-screen flex transition-all duration-300 app-container" :style="{ paddingLeft: sidebarOpen ? '16rem' : '0' }">
         <!-- Sidebar -->
-        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col print:hidden no-print sidebar"
+        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col print:hidden no-print sidebar h-screen"
              :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="-translate-x-full"
              x-transition:enter-end="translate-x-0"
              x-transition:leave="transition ease-in duration-300"
              x-transition:leave-start="translate-x-0"
-             x-transition:leave-end="-translate-x-full">
+             x-transition:leave-end="-translate-x-full"
             
             <!-- Brand Logo -->
             <div class="flex items-center justify-center h-16 px-4 bg-gradient-to-r from-blue-600 to-purple-600">
@@ -46,54 +46,54 @@
                     <div class="w-8 h-8 bg-white rounded flex items-center justify-center mr-3 overflow-hidden">
                         <img src="{{ asset('favicon-32x32.png') }}" alt="Logo" class="h-8 w-8 object-contain">
                     </div>
-                    <h1 class="text-xl font-bold text-white">{{ $companySettings ? $companySettings->company_name : ($displayAppName ?? config('app.name', 'Welcome')) }}</h1>
+                    <h1 class="text-lg sm:text-xl font-bold text-white truncate">{{ $companySettings ? $companySettings->company_name : ($displayAppName ?? config('app.name', 'Welcome')) }}</h1>
                 </div>
             </div>
 
             <!-- User Panel (clickable to profile) -->
             <a href="{{ route('profile.edit') }}" class="flex items-center px-4 py-3 border-b border-gray-700 hover:bg-gray-800">
-                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
                     <span class="text-white font-medium text-sm">{{ substr(Auth::user()->name, 0, 1) }}</span>
                 </div>
-                <div class="flex-1">
-                    <p class="text-white text-sm font-medium">{{ Auth::user()->name }}</p>
-                    <p class="text-gray-400 text-xs">{{ Auth::user()->user_level ?? 'User' }}</p>
+                <div class="flex-1 min-w-0">
+                    <p class="text-white text-sm font-medium truncate">{{ Auth::user()->name }}</p>
+                    <p class="text-gray-400 text-xs truncate">{{ Auth::user()->user_level ?? 'User' }}</p>
                 </div>
             </a>
 
             <!-- Navigation -->
-            <nav class="mt-2 px-2 flex-1 overflow-y-auto" @click="if (window.innerWidth < 1024 && $event.target.closest('a')) sidebarOpen = false">
+            <nav class="px-2" @click="if (window.innerWidth < 1024 && $event.target.closest('a')) sidebarOpen = false">
                 <!-- Dashboard -->
                 <a href="{{ route('dashboard') }}" 
-                   class="group flex items-center px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                    <i class="fas fa-tachometer-alt mr-3 h-5 w-5"></i>
-                    Dashboard
+                   class="group flex items-center px-3 py-3 text-sm font-medium rounded-md {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                    <i class="fas fa-tachometer-alt mr-3 h-5 w-5 flex-shrink-0"></i>
+                    <span class="truncate">Dashboard</span>
                 </a>
 
                 <!-- Customers -->
                 @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.view'))
                 <div x-data="{ customersOpen: {{ request()->routeIs('customers.*') ? 'true' : 'false' }} }">
                     <button @click="customersOpen = !customersOpen" 
-                            class="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('customers.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                        <div class="flex items-center">
-                            <i class="fas fa-users mr-3 h-5 w-5"></i>
-                            Customers
+                            class="group flex items-center justify-between w-full px-3 py-3 text-sm font-medium rounded-md {{ request()->routeIs('customers.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                        <div class="flex items-center flex-1 min-w-0">
+                            <i class="fas fa-users mr-3 h-5 w-5 flex-shrink-0"></i>
+                            <span class="truncate">Customers</span>
                         </div>
-                        <i class="fas fa-chevron-down transition-transform duration-200" :class="customersOpen ? 'rotate-180' : ''"></i>
+                        <i class="fas fa-chevron-down transition-transform duration-200 flex-shrink-0" :class="customersOpen ? 'rotate-180' : ''"></i>
                     </button>
                     <div x-show="customersOpen" x-transition class="ml-6 mt-1 space-y-1">
                         @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.view'))
                         <a href="{{ route('customers.index') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('customers.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            All Customers
+                           class="flex items-center px-3 py-3 text-sm rounded-md {{ request()->routeIs('customers.index') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-3 text-xs flex-shrink-0"></i>
+                            <span class="truncate">All Customers</span>
                         </a>
                         @endif
                         @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('customers.create'))
                         <a href="{{ route('customers.create') }}" 
-                           class="block px-3 py-2 text-sm rounded-md {{ request()->routeIs('customers.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
-                            <i class="far fa-circle mr-2 text-xs"></i>
-                            Create Customer
+                           class="flex items-center px-3 py-3 text-sm rounded-md {{ request()->routeIs('customers.create') ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white' }}">
+                            <i class="far fa-circle mr-3 text-xs flex-shrink-0"></i>
+                            <span class="truncate">Create Customer</span>
                         </a>
                         @endif
                     </div>
@@ -586,7 +586,7 @@
             <div class="bg-white shadow-sm border-b border-gray-200 print:hidden no-print">
                 <div class="flex justify-between items-center h-16 px-4">
                     <!-- Mobile menu button -->
-                    <button @click="sidebarOpen = !sidebarOpen" title="Toggle sidebar" aria-label="Toggle sidebar" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500">
+                    <button @click="sidebarOpen = !sidebarOpen" title="Toggle sidebar" aria-label="Toggle sidebar" class="inline-flex items-center justify-center p-3 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 touch-manipulation">
                         <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                             <path :class="{'hidden': sidebarOpen, 'inline-flex': ! sidebarOpen }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                             <path :class="{'hidden': ! sidebarOpen, 'inline-flex': sidebarOpen }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -594,12 +594,12 @@
                     </button>
 
                     <!-- Breadcrumbs -->
-                    <div class="flex-1">
+                    <div class="flex-1 min-w-0">
                         <nav class="flex" aria-label="Breadcrumb">
-                            <ol class="flex items-center space-x-4">
-                                <li>
+                            <ol class="flex items-center space-x-2 sm:space-x-4 overflow-hidden">
+                                <li class="flex-shrink-0">
                                     <div>
-                                        <a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-gray-500">
+                                        <a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-gray-500 p-1 rounded touch-manipulation">
                                             <i class="fas fa-home"></i>
                                             <span class="sr-only">Home</span>
                                         </a>
@@ -608,10 +608,10 @@
                                 @hasSection('breadcrumbs')
                                 @yield('breadcrumbs')
                                 @endif
-                                <li>
+                                <li class="flex-shrink-0">
                                     <div class="flex items-center">
-                                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                                        <span class="text-sm font-medium text-gray-500">@yield('title', 'Dashboard')</span>
+                                        <i class="fas fa-chevron-right text-gray-400 mx-1 sm:mx-2 text-xs"></i>
+                                        <span class="text-sm font-medium text-gray-500 truncate">@yield('title', 'Dashboard')</span>
                                     </div>
                                 </li>
                             </ol>
@@ -619,12 +619,12 @@
                     </div>
 
                     <!-- Right side -->
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 sm:space-x-4">
                         <!-- Low Stock Notification -->
                         @if($lowStockCount > 0)
                         <div class="relative" x-data="{ open: false }">
                             <a href="{{ route('inventory.low-stock') }}" 
-                               class="p-2 text-gray-400 hover:text-gray-500 relative group"
+                               class="p-2 text-gray-400 hover:text-gray-500 relative group touch-manipulation"
                                title="{{ $lowStockCount }} {{ Str::plural('item', $lowStockCount) }} running low on stock">
                                 <i class="fas fa-exclamation-triangle text-lg text-yellow-500"></i>
                                 <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">{{ $lowStockCount }}</span>
@@ -634,29 +634,33 @@
 
                         <!-- User menu -->
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <button @click="open = !open" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 p-1 touch-manipulation">
                                 <div class="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center">
                                     <span class="text-sm font-medium text-white">{{ substr(Auth::user()->name, 0, 1) }}</span>
                                 </div>
-                                <span class="ml-2 text-gray-700 hidden md:block">{{ Auth::user()->name }}</span>
-                                <i class="fas fa-chevron-down ml-1 text-gray-400"></i>
+                                <span class="ml-2 text-gray-700 hidden sm:block truncate max-w-24">{{ Auth::user()->name }}</span>
+                                <i class="fas fa-chevron-down ml-1 text-gray-400 hidden sm:block"></i>
                             </button>
 
                             <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border">
-                                <a href="{{ route('manual') }}" target="_blank" rel="noopener" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-book mr-2"></i> User Manual
+                                <a href="{{ route('manual') }}" target="_blank" rel="noopener" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 touch-manipulation">
+                                    <i class="fas fa-book mr-3 flex-shrink-0"></i> 
+                                    <span>User Manual</span>
                                 </a>
-                                <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-user mr-2"></i> Profile
+                                <a href="{{ route('profile.edit') }}" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 touch-manipulation">
+                                    <i class="fas fa-user mr-3 flex-shrink-0"></i> 
+                                    <span>Profile</span>
                                 </a>
-                                <a href="{{ route('settings.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-cog mr-2"></i> Settings
+                                <a href="{{ route('settings.index') }}" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 touch-manipulation">
+                                    <i class="fas fa-cog mr-3 flex-shrink-0"></i> 
+                                    <span>Settings</span>
                                 </a>
                                 <div class="border-t border-gray-100"></div>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                    <button type="submit" class="flex items-center w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 touch-manipulation">
+                                        <i class="fas fa-sign-out-alt mr-3 flex-shrink-0"></i> 
+                                        <span>Logout</span>
                                     </button>
                                 </form>
                             </div>
@@ -668,14 +672,18 @@
             <!-- Page Header -->
             <div class="bg-white border-b border-gray-200 print:hidden no-print">
                 <div class="px-4 py-4">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h1 class="text-2xl font-bold text-gray-900">@yield('title', 'Dashboard')</h1>
-                            <!-- <p class="mt-1 text-sm text-gray-500">@yield('description', 'Welcome to your dashboard')</p> -->
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
+                        <div class="min-w-0 flex-1">
+                            <h1 class="text-xl sm:text-2xl font-bold text-gray-900 truncate">@yield('title', 'Dashboard')</h1>
+                            @hasSection('description')
+                            <p class="mt-1 text-sm text-gray-500">@yield('description')</p>
+                            @endif
                         </div>
-                            <div class="flex space-x-3 no-print print:hidden">
+                        @hasSection('actions')
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 no-print print:hidden">
                             @yield('actions')
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -832,6 +840,126 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Mobile navigation enhancements
+    function enhanceMobileNavigation() {
+        if (window.innerWidth < 1024) {
+            // Find all active sections and ensure they're expanded
+            const activeSections = document.querySelectorAll('[x-data*="Open: true"]');
+            
+            activeSections.forEach(section => {
+                const dropdown = section.querySelector('[x-show]');
+                const button = section.querySelector('button');
+                const chevron = section.querySelector('i.fa-chevron-down');
+                
+                if (dropdown && button && chevron) {
+                    // Get the Alpine.js component data
+                    const alpineData = section.getAttribute('x-data');
+                    const match = alpineData.match(/(\w+)Open:\s*true/);
+                    
+                    if (match) {
+                        const varName = match[1];
+                        
+                        // Try to access the Alpine component and set it to open
+                        try {
+                            const component = Alpine.$data(section);
+                            
+                            if (component && component[varName + 'Open'] !== undefined) {
+                                component[varName + 'Open'] = true;
+                                
+                                // Force UI update after Alpine state change
+                                setTimeout(() => {
+                                    dropdown.style.display = 'block';
+                                    chevron.style.transform = 'rotate(180deg)';
+                                }, 50);
+                                
+                                // Also try clicking the button to trigger Alpine.js properly
+                                setTimeout(() => {
+                                    if (component[varName + 'Open'] === false) {
+                                        button.click();
+                                    }
+                                }, 100);
+                            }
+                        } catch (e) {
+                            // Fallback: directly manipulate the DOM
+                            dropdown.style.display = 'block';
+                            chevron.style.transform = 'rotate(180deg)';
+                        }
+                    } else {
+                        // Fallback: directly manipulate the DOM
+                        dropdown.style.display = 'block';
+                        chevron.style.transform = 'rotate(180deg)';
+                    }
+                }
+            });
+            
+            // Also try to find sections with active sub-items (highlighted in blue)
+            const activeSubItems = document.querySelectorAll('.sidebar a[class*="bg-blue-500"]');
+            
+            activeSubItems.forEach(subItem => {
+                const parentSection = subItem.closest('[x-data]');
+                if (parentSection) {
+                    const dropdown = parentSection.querySelector('[x-show]');
+                    const button = parentSection.querySelector('button');
+                    const chevron = parentSection.querySelector('i.fa-chevron-down');
+                    
+                    if (dropdown && button && chevron) {
+                        dropdown.style.display = 'block';
+                        chevron.style.transform = 'rotate(180deg)';
+                    }
+                }
+            });
+        }
+    }
+    
+    // Run on page load
+    enhanceMobileNavigation();
+    
+    // Run when sidebar opens on mobile
+    document.addEventListener('alpine:init', () => {
+        // Watch for sidebar state changes
+        Alpine.effect(() => {
+            const sidebarOpen = Alpine.store('sidebarOpen') || false;
+            if (sidebarOpen && window.innerWidth < 1024) {
+                setTimeout(enhanceMobileNavigation, 100);
+            }
+        });
+        
+        // Also watch for Alpine component initialization
+        Alpine.effect(() => {
+            if (window.innerWidth < 1024) {
+                setTimeout(enhanceMobileNavigation, 200);
+            }
+        });
+    });
+    
+    // Additional mobile enhancement when sidebar opens
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.closest('[\\@click="sidebarOpen = !sidebarOpen"]') && window.innerWidth < 1024) {
+            setTimeout(enhanceMobileNavigation, 150);
+        }
+    });
+    
+    // Mutation observer to watch for sidebar changes
+    if (window.innerWidth < 1024) {
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    const target = mutation.target;
+                    if (target.classList.contains('translate-x-0')) {
+                        // Sidebar is now open, enhance navigation
+                        setTimeout(enhanceMobileNavigation, 100);
+                    }
+                }
+            });
+        });
+        
+        // Start observing the sidebar
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar) {
+            observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+        }
+    }
 });
 </script>
 

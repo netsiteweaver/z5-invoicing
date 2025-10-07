@@ -7,92 +7,172 @@
 <form method="POST" action="{{ route('goods-receipts.store') }}" class="bg-white shadow rounded-lg">
   @csrf
   <div class="px-4 py-5 sm:p-6 space-y-6">
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Location</label>
-        <input type="hidden" name="department_id" value="{{ $defaultDepartment->id }}">
-        <input type="text" value="{{ $defaultDepartment->name }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-50" readonly>
-        <p class="mt-1 text-sm text-gray-500">Location is set to the main department and cannot be changed</p>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Receipt Date</label>
-        <input type="date" name="receipt_date" value="{{ date('Y-m-d') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Supplier</label>
-        <select name="supplier_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-          <option value="">Select supplier</option>
-          @foreach($suppliers as $s)
-            <option value="{{ $s->id }}">{{ $s->name }}</option>
-          @endforeach
-        </select>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Supplier Ref</label>
-        <input type="text" name="supplier_ref" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-      </div>
-    </div>
-
+    <!-- Basic Information Section -->
     <div>
-      <label class="block text-sm font-medium text-gray-700">Notes</label>
-      <textarea name="notes" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        <i class="fas fa-info-circle mr-2"></i>
+        Basic Information
+      </h3>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Location</label>
+          <input type="hidden" name="department_id" value="{{ $defaultDepartment->id }}">
+          <input type="text" value="{{ $defaultDepartment->name }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-50" readonly>
+          <p class="mt-1 text-sm text-gray-500">Location is set to the main department and cannot be changed</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Receipt Date</label>
+          <input type="date" name="receipt_date" value="{{ date('Y-m-d') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Supplier</label>
+          <select name="supplier_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+            <option value="">Select supplier</option>
+            @foreach($suppliers as $s)
+              <option value="{{ $s->id }}">{{ $s->name }}</option>
+            @endforeach
+          </select>
+        </div>
+      </div>
     </div>
 
+    <!-- Additional Details Section -->
     <div>
-      <h3 class="text-md font-medium text-gray-900 mb-2">Items</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        <i class="fas fa-clipboard-list mr-2"></i>
+        Additional Details
+      </h3>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Supplier Ref</label>
+          <input type="text" name="supplier_ref" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-medium text-gray-700">Notes</label>
+          <textarea name="notes" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items Section -->
+    <div>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">
+        <i class="fas fa-boxes mr-2"></i>
+        Items
+      </h3>
       <div id="items" class="space-y-3"></div>
-      <button type="button" onclick="addItem()" class="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50">
+      <button type="button" onclick="addItem()" class="mt-2 w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
         <i class="fas fa-plus mr-2"></i> Add Item
       </button>
     </div>
   </div>
-  <div class="bg-gray-50 px-4 py-3 sm:px-6 text-right">
-    <a href="{{ route('goods-receipts.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50">Cancel</a>
-    <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">Save Receipt</button>
+  
+  <!-- Form Actions -->
+  <div class="bg-gray-50 px-4 py-3 sm:px-6">
+    <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
+      <a href="{{ route('goods-receipts.index') }}" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        Cancel
+      </a>
+      <button type="submit" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        <i class="fas fa-save mr-2"></i>
+        Save Receipt
+      </button>
+    </div>
   </div>
 </form>
 
 <template id="item-template">
-  <div class="grid grid-cols-1 sm:grid-cols-6 gap-3 items-end bg-gray-50 p-3 rounded">
-    <div class="sm:col-span-2">
-      <label class="block text-sm font-medium text-gray-700">Product</label>
-      <select name="items[IDX][product_id]" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm gr-product-select" required>
-        <option value="">Select product</option>
-        @foreach($products as $p)
-          <option value="{{ $p->id }}" data-cost="{{ number_format((float) $p->cost_price, 2, '.', '') }}" data-tax="{{ $p->tax_type }}">{{ $p->name }}</option>
-        @endforeach
-      </select>
+  <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+    <!-- Mobile Layout -->
+    <div class="sm:hidden space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Product</label>
+        <select name="items[IDX][product_id]" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm gr-product-select" required>
+          <option value="">Select product</option>
+          @foreach($products as $p)
+            <option value="{{ $p->id }}" data-cost="{{ number_format((float) $p->cost_price, 2, '.', '') }}" data-tax="{{ $p->tax_type }}">{{ $p->name }}</option>
+          @endforeach
+        </select>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Qty</label>
+          <input type="number" name="items[IDX][quantity]" min="1" value="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm gr-qty" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Unit Cost</label>
+          <input type="number" step="0.01" name="items[IDX][unit_cost]" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm gr-unit-cost">
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">UOM</label>
+          <select name="items[IDX][uom_id]" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+            <option value="">Select</option>
+            @foreach(\App\Models\Uom::orderBy('name')->get() as $u)
+              <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->units_per_uom }})</option>
+            @endforeach
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">UOM Qty</label>
+          <input type="number" name="items[IDX][uom_quantity]" value="1" min="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        </div>
+      </div>
+      
+      <div class="flex items-center justify-between pt-2 border-t border-gray-300">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Line Total</label>
+          <div class="text-lg font-semibold text-gray-900 gr-line-total">0.00</div>
+        </div>
+        <button type="button" class="px-3 py-2 border border-red-300 rounded-md text-sm bg-white hover:bg-red-50 text-red-700" onclick="removeItem(this)">
+          <i class="fas fa-trash mr-1"></i>
+          Remove
+        </button>
+      </div>
     </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Qty</label>
-      <input type="number" name="items[IDX][quantity]" min="1" value="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm gr-qty" required>
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Unit Cost</label>
-      <input type="number" step="0.01" name="items[IDX][unit_cost]" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm gr-unit-cost">
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700">UOM</label>
-      <select name="items[IDX][uom_id]" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-        <option value="">Select</option>
-        @foreach(\App\Models\Uom::orderBy('name')->get() as $u)
-          <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->units_per_uom }})</option>
-        @endforeach
-      </select>
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700">UOM Qty</label>
-      <input type="number" name="items[IDX][uom_quantity]" value="1" min="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Line Total</label>
-      <div class="mt-1 text-gray-900 gr-line-total">0.00</div>
-    </div>
-    <div class="flex space-x-2">
-      <button type="button" class="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50" onclick="removeItem(this)">Remove</button>
+    
+    <!-- Desktop Layout -->
+    <div class="hidden sm:grid grid-cols-6 gap-3 items-end">
+      <div class="col-span-2">
+        <label class="block text-sm font-medium text-gray-700">Product</label>
+        <select name="items[IDX][product_id]" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm gr-product-select" required>
+          <option value="">Select product</option>
+          @foreach($products as $p)
+            <option value="{{ $p->id }}" data-cost="{{ number_format((float) $p->cost_price, 2, '.', '') }}" data-tax="{{ $p->tax_type }}">{{ $p->name }}</option>
+          @endforeach
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Qty</label>
+        <input type="number" name="items[IDX][quantity]" min="1" value="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm gr-qty" required>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Unit Cost</label>
+        <input type="number" step="0.01" name="items[IDX][unit_cost]" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm gr-unit-cost">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">UOM</label>
+        <select name="items[IDX][uom_id]" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+          <option value="">Select</option>
+          @foreach(\App\Models\Uom::orderBy('name')->get() as $u)
+            <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->units_per_uom }})</option>
+          @endforeach
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">UOM Qty</label>
+        <input type="number" name="items[IDX][uom_quantity]" value="1" min="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Line Total</label>
+        <div class="mt-1 text-gray-900 gr-line-total">0.00</div>
+      </div>
+      <div class="flex space-x-2">
+        <button type="button" class="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50" onclick="removeItem(this)">Remove</button>
+      </div>
     </div>
   </div>
 </template>

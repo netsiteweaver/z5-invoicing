@@ -77,11 +77,11 @@
 		</div>
 
 		<!-- Sale Items -->
-		<div class="bg-white shadow rounded-lg p-6">
-			<div class="flex justify-between items-center mb-4">
+		<div class="bg-white shadow rounded-lg p-4 sm:p-6">
+			<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 space-y-3 sm:space-y-0">
 				<h3 class="text-lg font-medium text-gray-900">Sale Items</h3>
 				<button type="button" @click="addItem()" 
-						class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+						class="inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
 					<svg class="-ml-0.5 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
 					</svg>
@@ -89,7 +89,82 @@
 				</button>
 			</div>
 
-			<div class="overflow-x-auto" x-show="form.items.length > 0">
+			<!-- Mobile cards (visible on small screens) -->
+			<div class="sm:hidden space-y-4" x-show="form.items.length > 0">
+				<template x-for="(item, index) in form.items" :key="index">
+					<div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+						<div class="flex items-start justify-between mb-3">
+							<div class="flex-1">
+								<label class="block text-xs font-medium text-gray-700 mb-1">Product</label>
+								<select :name="`items[${index}][product_id]`" 
+										x-model="item.product_id"
+										@change="updateItem(index)"
+										class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+									<option value="">Select Product</option>
+									@foreach($products as $product)
+										<option value="{{ $product->id }}" 
+												data-price="{{ $product->selling_price }}"
+												data-tax-type="{{ $product->tax_type }}">
+										{{ $product->name }} - Rs {{ number_format($product->selling_price, 2) }}
+										</option>
+									@endforeach
+								</select>
+							</div>
+							<button type="button" @click="removeItem(index)" class="ml-2 text-red-600 hover:text-red-900 p-1">
+								<i class="fas fa-trash text-sm"></i>
+							</button>
+						</div>
+						
+						<div class="grid grid-cols-2 gap-3 mb-3">
+							<div>
+								<label class="block text-xs font-medium text-gray-700 mb-1">Quantity</label>
+								<input type="number" :name="`items[${index}][quantity]`" x-model="item.quantity" @input="updateItem(index)" min="1" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+							</div>
+							<div>
+								<label class="block text-xs font-medium text-gray-700 mb-1">Unit Price</label>
+								<input type="number" :name="`items[${index}][unit_price]`" x-model="item.unit_price" @input="updateItem(index)" step="0.01" min="0" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+							</div>
+						</div>
+						
+						<div class="grid grid-cols-2 gap-3 mb-3">
+							<div>
+								<label class="block text-xs font-medium text-gray-700 mb-1">UOM</label>
+								<select :name="`items[${index}][uom_id]`" x-model="item.uom_id" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+									<option value="">Unit</option>
+									@foreach(\App\Models\Uom::orderBy('name')->get() as $u)
+										<option value="{{ $u->id }}">{{ $u->name }} ({{ $u->units_per_uom }})</option>
+									@endforeach
+								</select>
+							</div>
+							<div>
+								<label class="block text-xs font-medium text-gray-700 mb-1">UOM Qty</label>
+								<input type="number" :name="`items[${index}][uom_quantity]`" x-model="item.uom_quantity" min="1" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+							</div>
+						</div>
+						
+						<div class="grid grid-cols-2 gap-3 mb-3">
+							<div>
+								<label class="block text-xs font-medium text-gray-700 mb-1">Discount %</label>
+								<input type="number" :name="`items[${index}][discount_percentage]`" x-model="item.discount_percentage" @input="updateItem(index)" step="0.01" min="0" max="100" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+							</div>
+							<div>
+								<label class="block text-xs font-medium text-gray-700 mb-1">VAT</label>
+								<input type="text" :value="(item.tax_type === 'standard' ? '15%' : (item.tax_type === 'zero' ? '0%' : 'EX'))" class="block w-full border-gray-200 rounded-md shadow-sm bg-gray-50 text-gray-700 text-sm" disabled>
+							</div>
+						</div>
+						
+						<div class="border-t pt-3">
+							<div class="flex justify-between items-center">
+								<span class="text-sm font-medium text-gray-700">Line Total:</span>
+								<span class="text-lg font-bold text-gray-900" x-text="formatCurrency(item.line_total)"></span>
+							</div>
+						</div>
+					</div>
+				</template>
+			</div>
+
+			<!-- Desktop table (hidden on small screens) -->
+			<div class="hidden sm:block overflow-x-auto" x-show="form.items.length > 0">
 				<table class="min-w-full divide-y divide-gray-200">
 					<thead class="bg-gray-50">
 						<tr>
@@ -167,34 +242,34 @@
 		</div>
 
 		<!-- Sale Summary -->
-		<div class="bg-white shadow rounded-lg p-6" x-show="form.items.length > 0">
+		<div class="bg-white shadow rounded-lg p-4 sm:p-6" x-show="form.items.length > 0">
 			<h3 class="text-lg font-medium text-gray-900 mb-4">Sale Summary</h3>
-			<div class="space-y-2">
-				<div class="flex justify-between">
+			<div class="space-y-3">
+				<div class="flex justify-between items-center">
 					<span class="text-sm text-gray-600">Subtotal:</span>
 					<span class="text-sm font-medium text-gray-900" x-text="formatCurrency(form.subtotal)"></span>
 				</div>
-				<div class="flex justify-between">
+				<div class="flex justify-between items-center">
 					<span class="text-sm text-gray-600">Total Discount:</span>
 					<span class="text-sm font-medium text-green-600" x-text="formatCurrency(form.total_discount)"></span>
 				</div>
-				<div class="flex justify-between">
+				<div class="flex justify-between items-center">
 					<span class="text-sm text-gray-600">VAT Total:</span>
 					<span class="text-sm font-medium text-gray-900" x-text="formatCurrency(form.total_tax)"></span>
 				</div>
-				<div class="border-t pt-2">
-					<div class="flex justify-between">
+				<div class="border-t pt-3">
+					<div class="flex justify-between items-center">
 						<span class="text-base font-medium text-gray-900">Total Amount (incl. VAT):</span>
-						<span class="text-base font-bold text-gray-900" x-text="formatCurrency(form.total_amount)"></span>
+						<span class="text-lg font-bold text-gray-900" x-text="formatCurrency(form.total_amount)"></span>
 					</div>
 				</div>
 			</div>
 		</div>
 
 		<!-- Actions -->
-		<div class="flex justify-end space-x-3">
-			<a href="{{ route('sales.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Cancel</a>
-			<button type="submit" :disabled="form.items.length === 0" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+		<div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
+			<a href="{{ route('sales.index') }}" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Cancel</a>
+			<button type="submit" :disabled="form.items.length === 0" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
 				Create Sale
 			</button>
 		</div>
