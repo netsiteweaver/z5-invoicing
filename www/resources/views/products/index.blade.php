@@ -224,14 +224,14 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end space-x-2">
-                                        <a href="{{ route('products.show', $product) }}" class="btn btn-view"><i class="btn-icon fa-regular fa-eye"></i>View</a>
-                                        <a href="{{ route('products.edit', $product) }}" class="btn btn-edit"><i class="btn-icon fa-solid fa-pen"></i>Edit</a>
+                                        <x-action-button type="view" :href="route('products.show', $product)" />
+                                        <x-action-button type="edit" :href="route('products.edit', $product)" />
                                         @can('products.delete')
-                                        <form method="POST" action="{{ route('products.destroy', $product) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this product?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-delete"><i class="btn-icon fa-solid fa-trash"></i>Delete</button>
-                                        </form>
+                                        <x-action-button 
+                                            type="delete" 
+                                            :form-action="route('products.destroy', $product)"
+                                            confirm-message="Are you sure you want to delete this product?"
+                                        />
                                         @endcan
                                     </div>
                                 </td>

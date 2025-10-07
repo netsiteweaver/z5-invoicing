@@ -242,25 +242,16 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
-                                        <a href="{{ route('orders.show', $order) }}" class="btn btn-view">
-                                            <i class="btn-icon fa-regular fa-eye"></i>
-                                            View
-                                        </a>
+                                        <x-action-button type="view" :href="route('orders.show', $order)" />
                                         @if($order->canBeEdited() && (auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.edit')))
-                                            <a href="{{ route('orders.edit', $order) }}" class="btn btn-edit">
-                                                <i class="btn-icon fa-solid fa-pen"></i>
-                                                Edit
-                                            </a>
-                                            <form method="POST" action="{{ route('orders.destroy', $order) }}" onsubmit="return confirm('Delete this order? This is a soft delete and can\'t be undone.');" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.delete'))
-                                                <button type="submit" class="btn btn-delete">
-                                                    <i class="btn-icon fa-solid fa-trash"></i>
-                                                    Delete
-                                                </button>
-                                                @endif
-                                            </form>
+                                            <x-action-button type="edit" :href="route('orders.edit', $order)" />
+                                            @if(auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.delete'))
+                                            <x-action-button 
+                                                type="delete" 
+                                                :form-action="route('orders.destroy', $order)"
+                                                confirm-message="Delete this order? This is a soft delete and can't be undone."
+                                            />
+                                            @endif
                                         @endif
                                         @if($order->order_status === 'confirmed' && ($order->sales_count ?? 0) === 0 && (auth()->user()->is_admin || auth()->user()->is_root || auth()->user()->hasPermission('orders.convert_to_sale')))
                                             <a href="{{ route('orders.convert-to-sale', $order) }}" class="btn btn-primary" title="Convert to Sale">
