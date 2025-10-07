@@ -746,11 +746,14 @@
                 </div>
             </main>
 
-            <!-- Footer: version info -->
+            <!-- Footer: version info and developer credit -->
             <div class="bg-white border-t border-gray-200">
                 <div class="px-4 py-2 text-xs text-gray-500 flex items-center justify-between">
                     <span>{{ $displayAppName ?? config('app.name') }}</span>
                     <span x-data="{v:''}" x-init="(async()=>{try{const r=await fetch('{{ route('changelog.feed') }}',{cache:'no-cache'});if(r.ok){const d=await r.json();v=(d.releases?.[0]?.version)||''}}catch(e){}})()">Version <span x-text="v || '–'"></span></span>
+                </div>
+                <div class="px-4 py-2 text-center text-xs text-gray-400">
+                    Developed by <a href="https://netsiteweaver.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline">Netsiteweaver</a>
                 </div>
             </div>
 
