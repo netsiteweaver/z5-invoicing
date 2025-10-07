@@ -4,18 +4,15 @@
 @section('description', 'Manage users, roles, and permissions')
 
 @section('actions')
-<a href="{{ route('user-management.create') }}" class="btn btn-create">
-    <i class="btn-icon fa-solid fa-user-plus"></i>
+<x-action-button type="create" :href="route('user-management.create')" icon="fa-solid fa-user-plus">
     Add User
-</a>
-<a href="{{ route('user-management.roles') }}" class="btn btn-secondary">
-    <i class="btn-icon fa-solid fa-user-tag"></i>
+</x-action-button>
+<x-action-button type="settings" :href="route('user-management.roles')" icon="fa-solid fa-user-tag">
     Manage Roles
-</a>
-<a href="{{ route('user-management.permissions') }}" class="btn btn-secondary">
-    <i class="btn-icon fa-solid fa-key"></i>
+</x-action-button>
+<x-action-button type="settings" :href="route('user-management.permissions')" icon="fa-solid fa-key">
     Manage Permissions
-</a>
+</x-action-button>
 @endsection
 
 @section('content')
