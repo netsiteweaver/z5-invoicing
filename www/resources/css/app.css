@@ -41,7 +41,7 @@
     
     .sidebar nav {
         max-height: calc(100vh - 8rem); /* Account for header and user panel */
-        overflow-y: auto;
+        overflow-y: scroll;
         -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
 
