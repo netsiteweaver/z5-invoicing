@@ -7,63 +7,57 @@
     <form method="POST" action="{{ route('uoms.update', $uom) }}" class="space-y-6 p-6">
         @csrf
         @method('PUT')
+        
+        <!-- Hidden fields with default values -->
+        <input type="hidden" name="dimension_code" value="{{ old('dimension_code', $uom->dimension_code ?? 'count') }}">
+        <input type="hidden" name="factor_to_base" id="factor_to_base" value="{{ old('factor_to_base', $uom->factor_to_base ?? $uom->units_per_uom) }}">
+        <input type="hidden" name="offset_to_base" value="{{ old('offset_to_base', $uom->offset_to_base ?? 0) }}">
+        <input type="hidden" name="min_increment" value="{{ old('min_increment', $uom->min_increment ?? 1) }}">
+        
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
                 <label class="block text-sm font-medium text-gray-700">Name <span class="text-red-500">*</span></label>
-                <input type="text" name="name" value="{{ old('name', $uom->name) }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                <input type="text" name="name" value="{{ old('name', $uom->name) }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="e.g., Box of 10" required>
+                <p class="mt-1 text-xs text-gray-500">Display name for this unit (e.g., "Box of 12", "Carton")</p>
                 @error('name')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
+            
             <div>
                 <label class="block text-sm font-medium text-gray-700">Code <span class="text-red-500">*</span></label>
-                <input type="text" name="code" value="{{ old('code', $uom->code) }}" id="code" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required oninput="formatCode(this)">
+                <input type="text" name="code" value="{{ old('code', $uom->code) }}" id="code" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="e.g., BOX10" required oninput="formatCode(this)">
+                <p class="mt-1 text-xs text-gray-500">Short code (e.g., "BOX10", "CTN20X12")</p>
                 @error('code')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Dimension <span class="text-red-500">*</span></label>
-                <select name="dimension_code" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
-                    <option value="count" {{ old('dimension_code', $uom->dimension_code) == 'count' ? 'selected' : '' }}>Count</option>
-                    <option value="weight" {{ old('dimension_code', $uom->dimension_code) == 'weight' ? 'selected' : '' }}>Weight</option>
-                    <option value="volume" {{ old('dimension_code', $uom->dimension_code) == 'volume' ? 'selected' : '' }}>Volume</option>
-                    <option value="length" {{ old('dimension_code', $uom->dimension_code) == 'length' ? 'selected' : '' }}>Length</option>
-                </select>
-                @error('dimension_code')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
-            </div>
+            
             <div>
                 <label class="block text-sm font-medium text-gray-700">Units per UOM <span class="text-red-500">*</span></label>
-                <input type="number" name="units_per_uom" value="{{ old('units_per_uom', $uom->units_per_uom) }}" min="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                <input type="number" name="units_per_uom" id="units_per_uom" value="{{ old('units_per_uom', $uom->units_per_uom) }}" min="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="e.g., 10" required>
+                <p class="mt-1 text-xs text-gray-500">How many pieces are in this UOM? (e.g., 10 for a box of 10)</p>
                 @error('units_per_uom')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Factor to Base <span class="text-red-500">*</span></label>
-                <input type="number" name="factor_to_base" value="{{ old('factor_to_base', $uom->factor_to_base) }}" step="0.000001" min="0.000001" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
-                <p class="mt-1 text-xs text-gray-500">Conversion factor to base unit (e.g., 1000 for kg to g)</p>
-                @error('factor_to_base')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Offset to Base</label>
-                <input type="number" name="offset_to_base" value="{{ old('offset_to_base', $uom->offset_to_base) }}" step="0.000001" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                <p class="mt-1 text-xs text-gray-500">Offset value (usually 0 for most units)</p>
-                @error('offset_to_base')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Minimum Increment</label>
-                <input type="number" name="min_increment" value="{{ old('min_increment', $uom->min_increment) }}" step="0.000001" min="0.000001" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                <p class="mt-1 text-xs text-gray-500">Minimum increment for this unit (e.g., 0.01 for currency)</p>
-                @error('min_increment')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
-            </div>
+            
             <div>
                 <label class="block text-sm font-medium text-gray-700">Status</label>
                 <select name="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                     <option value="1" {{ old('status', $uom->status) == 1 ? 'selected' : '' }}>Active</option>
                     <option value="0" {{ old('status', $uom->status) == 0 ? 'selected' : '' }}>Inactive</option>
                 </select>
+                @error('status')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
+            
             <div class="sm:col-span-2">
                 <label class="block text-sm font-medium text-gray-700">Description</label>
-                <textarea name="description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">{{ old('description', $uom->description) }}</textarea>
+                <textarea name="description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="e.g., Box containing 10 cans">{{ old('description', $uom->description) }}</textarea>
+                <p class="mt-1 text-xs text-gray-500">Additional details about this UOM (optional)</p>
+                @error('description')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
         </div>
+        
         <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+            <a href="{{ route('uoms.index') }}" class="btn btn-secondary">
+                <i class="btn-icon fa-solid fa-times"></i>
+                Cancel
+            </a>
             <button type="submit" class="btn btn-primary">
                 <i class="btn-icon fa-solid fa-check"></i>
                 Save Changes
@@ -100,6 +94,11 @@ function formatCode(input) {
     value = value.replace(/\s+/g, '_').toUpperCase();
     input.value = value;
 }
+
+// Auto-sync units_per_uom with factor_to_base
+document.getElementById('units_per_uom').addEventListener('input', function() {
+    document.getElementById('factor_to_base').value = this.value;
+});
 </script>
 @endsection
 
