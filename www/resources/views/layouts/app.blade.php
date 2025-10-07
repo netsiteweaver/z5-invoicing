@@ -876,6 +876,21 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (component && component[varName + 'Open'] !== undefined) {
                                 console.log(`Setting ${varName}Open to true`);
                                 component[varName + 'Open'] = true;
+                                
+                                // Force UI update after Alpine state change
+                                setTimeout(() => {
+                                    console.log('Forcing UI update after Alpine state change');
+                                    dropdown.style.display = 'block';
+                                    chevron.style.transform = 'rotate(180deg)';
+                                }, 50);
+                                
+                                // Also try clicking the button to trigger Alpine.js properly
+                                setTimeout(() => {
+                                    console.log('Clicking button to trigger Alpine.js');
+                                    if (component[varName + 'Open'] === false) {
+                                        button.click();
+                                    }
+                                }, 100);
                             }
                         } catch (e) {
                             console.log('Alpine access failed, using DOM fallback:', e);
